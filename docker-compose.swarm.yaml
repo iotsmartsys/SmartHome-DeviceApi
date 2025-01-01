@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  asi-api:
+    image: "centraliot.azurecr.io/smarthome-api:"
+    environment:
+      - TZ=America/Bahia
+      - ConnectionStrings__Devices=Server=192.168.2.116;Database=SmartHome;User Id=sa;Password=SenhaForte@123;TrustServerCertificate=True;MultipleActiveResultSets=True;
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft=Warning
+      - Logging__LogLevel__Microsoft.Hosting.Lifetime=Information
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5      
+      resources:
+        limits:
+          cpus: '1'
+          memory: 200M
+        reservations:
+          cpus: '0'
+          memory: 20M
+    ports:
+      - target: 8080
+        published: 8081
+        protocol: tcp
+        mode: ingress
+        
+networks:
+  default:
+    external: true
+    name: overlay-swarm
