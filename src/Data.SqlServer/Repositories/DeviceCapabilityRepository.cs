@@ -48,9 +48,9 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                     capability.Owner
                 }, transaction);
 
-                transaction.Commit();
                 logger.LogInformation("Capability {capabilityName} adicionada para o device {deviceId}", capability.Name, device_id);
             }
+            transaction.Commit();
         }
         catch (Exception ex)
         {
@@ -113,7 +113,11 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
             {
                 logger.LogInformation("Removendo capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
                 const string sql = @"
-            DELETE FROM DeviceCapabilities WHERE DeviceId = @DeviceId AND CapabilityId = (SELECT TOP 1 Id FROM Capabilities WHERE Name = @Type)
+            DELETE FROM DeviceCapabilities 
+            WHERE 
+                DeviceId = @DeviceId AND 
+                CapabilityId = (SELECT TOP 1 Id FROM Capabilities WHERE Name = @Type) AND
+                Name = @Name
             ";
                 await connection.ExecuteAsync(sql, new
                 {
@@ -122,9 +126,9 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                     capability.Type
                 }, transaction);
 
-                transaction.Commit();
                 logger.LogInformation("Capability {capabilityName} removida para o device {deviceId}", capability.Name, device_id);
             }
+            transaction.Commit();
         }
         catch (Exception ex)
         {
