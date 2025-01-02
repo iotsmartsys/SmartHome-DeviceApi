@@ -32,6 +32,14 @@ CREATE table DeviceCapabilities(
     [Value] nvarchar(50) NOT NULL
 );
 
+CREATE table DeviceProperties(
+    Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    [DeviceId] int NOT NULL FOREIGN KEY REFERENCES Devices(Id),
+    [Name] nvarchar(50) NOT NULL,
+    [Description] nvarchar(100) NULL,
+    [Value] nvarchar(50) NOT NULL
+);
+
 /*Data Seed*/
 /*Device Types*/
 INSERT INTO Capabilities([Name], [ActuatorMode]) VALUES('Temperature Sensor', 'Read');
@@ -80,10 +88,13 @@ INSERT INTO CommunicationTypes([Name]) VALUES('5G');
 INSERT INTO CommunicationTypes([Name]) VALUES('WiFi');
 
 /*Devices*/
-INSERT INTO Devices([Name], [DeviceId], [Description], [Status], [LastActive], [IpAddress], [MacAddress], [CommunicationTypeId], [Platform]) VALUES('Temperature Sensor 1', 'TEMP-001', 'Temperature Sensor 1', 'Active', GETDATE(), '192.168.0.12', '00:11:22:33:44:55', 1, 'ESP32-WROOM-32');
+INSERT INTO Devices([Name], [DeviceId], [Description], [Status], [LastActive], [IpAddress], [MacAddress], [CommunicationTypeId], [Platform]) VALUES('Central Home Office', 'esp32s3-6AC178', 'Dispositivo responsável por contrlar os dispositivos agregados do Escritório', 'Active', GETDATE(), 'ST:192.168.1.119;AP:192.168.4.1', '84:FC:E6:6A:C1:78', 1, 'ESP32-S3-WROOM-1');
 
 /*Device Capabilities*/
 INSERT INTO DeviceCapabilities([DeviceId], [CapabilityId], [Name], [Value]) VALUES(1, 13, 'LuzIndicadora', 'Luz Indicadora', 'ON');
+
+/*Device Configurations*/
+INSERT INTO DeviceProperties([DeviceId], [Name], [Value]) VALUES(1, 'SubscribedTopics', 'devices.status');
 
 /*SCRIPT TO DEPLOY ON MYSQL*/
 CREATE table Capabilities(
@@ -118,6 +129,7 @@ CREATE table DeviceCapabilities(
     `Description` nvarchar(100) NULL,
     `Value` nvarchar(50) NOT NULL
 );
+
 
 /*Data Seed*/
 /*Device Types*/

@@ -1,11 +1,49 @@
+using Core.Entities;
+
 namespace Api.Models;
 
-public record class Capability(string capability_name, string type, string mode, string value)
+public record class Device(
+    string device_id
+    , string device_name
+    , string description
+    , string last_active
+    , string state
+    , string mac_address
+    , string ip_address
+    , string protocol
+    , string platform
+    , IEnumerable<Capability> capabilities
+    , IEnumerable<Property> properties)
 {
-    public static Capability Create(Core.Capability capability) => new Capability(capability.Name, capability.Type, capability.Mode, capability.Value);
-}
 
-public record class Device(string device_id, string device_name, string last_active, string state, IEnumerable<Capability> capabilities)
-{
-    public static Device Create(Core.Device device) => new Device(device.DeviceId, device.DeviceName, device.LastActive, device.State, [.. device.Capabilities.Select(Capability.Create)]);
+    public static implicit operator Device(Core.Entities.Device device) => new(
+        device.DeviceId,
+        device.Name,
+        device.Description,
+        device.LastActive,
+        device.State,
+        device.MacAddress,
+        device.IpAddress,
+        device.Protocol.ToString(),
+        device.Platform,
+        device.Capabilities.Select(c => (Capability)c),
+        device.Properties.Select(p => (Property)p)
+    );
+
+    public static implicit operator Core.Entities.Device(Device device) => new Core.Entities.Device(
+        device.device_id,
+        device.device_name,
+        device.last_active,
+        device.state
+    )
+    {
+        Description = device.description,
+        MacAddress = device.mac_address,
+        IpAddress = device.ip_address,
+        Protocol = Enum.Parse<CommunicationProtocol>(device.protocol),
+        Platform = device.platform,
+    }
+    .AddCapabilities(device.capabilities.Select(c => (Core.Entities.Capability)c))
+    .AddProperties(device.properties.Select(p => (Core.Entities.Property)p));
+
 }

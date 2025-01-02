@@ -12,7 +12,10 @@ public static class SqlServerDependencyInjection
     public static IServiceCollection AddSqlServerData(this IServiceCollection services, string connectionString)
     {
         services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
-        services.AddScoped<IDeviceRepository, DeviceRepository>();
+        services
+            .AddScoped<IDeviceRepository, DeviceRepository>()
+            .AddScoped<IDeviceCapabilityRepository, DeviceCapabilityRepository>();
+
         return services;
     }
 }

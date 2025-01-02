@@ -1,0 +1,1 @@
+public class NotFoundExceptionDomain(string message) : Exception(message);

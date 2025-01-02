@@ -1,6 +1,7 @@
-@SmartHome_Api_HostAddress = http://localhost:5143
+# @SmartHome_Api_HostAddress = http://iotserver.local:8081/api/v1
+@SmartHome_Api_HostAddress = http://localhost:8081/api/v1
 
-GET {{SmartHome_Api_HostAddress}}/weatherforecast/
+GET {{SmartHome_Api_HostAddress}}/devices/
 Accept: application/json
 
 ###

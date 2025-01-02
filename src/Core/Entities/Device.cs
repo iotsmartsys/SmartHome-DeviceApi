@@ -1,32 +1,20 @@
-namespace Core;
-
-public class Capability
-{
-    public string Name { get; set; } = default!;
-    public string Type { get; set; } = default!;
-    public string Mode { get; set; } = default!;
-    public string Value { get; set; } = default!;
-    public Capability(string name, string type, string mode, string value)
-    {
-        Name = name;
-        Type = type;
-        Mode = mode;
-        Value = value;
-    }
-
-    public Capability() { }
-
-}
+namespace Core.Entities;
 public class Device
 {
+    public int Id { get; set; }
     public string DeviceId { get; set; } = default!;
-    public string DeviceName { get; set; } = default!;
+    public string Name { get; set; } = default!;
+    public string Description { get; set; } = default!;
     public string LastActive { get; set; } = default!;
     public string State { get; set; } = default!;
+    public string MacAddress { get; set; } = default!;
+    public string IpAddress { get; set; } = default!;
+    public CommunicationProtocol Protocol { get; set; } = CommunicationProtocol.HTTP;
+    public string Platform { get; set; } = default!;
     public Device(string device_id, string device_name, string last_active, string state)
     {
         DeviceId = device_id;
-        DeviceName = device_name;
+        Name = device_name;
         LastActive = last_active;
         State = state;
     }
@@ -34,7 +22,42 @@ public class Device
     public IEnumerable<Capability> Capabilities { get; private set; } = [];
     public Device AddCapability(Capability capability)
     {
+        if (capability == null || Capabilities.Any(c => c.Id == capability.Id))
+            return this;
+
         Capabilities = Capabilities.Append(capability);
         return this;
     }
+
+    public Device AddCapabilities(IEnumerable<Capability> capabilities)
+    {
+        var capabilitiesNotPresentIn = capabilities.Where(c => !Capabilities.Any(c2 => c2.Id == c.Id)).ToArray();
+        if (capabilitiesNotPresentIn.Length == 0)
+            return this;
+
+        Capabilities = Capabilities.Concat(capabilitiesNotPresentIn);
+        return this;
+    }
+
+    public IEnumerable<Property> Properties { get; private set; } = [];
+
+    public Device AddProperty(Property property)
+    {
+
+        if (property == null || Properties.Any(p => p.Id == property.Id))
+            return this;
+        Properties = Properties.Append(property);
+        return this;
+    }
+
+    public Device AddProperties(IEnumerable<Property> properties)
+    {
+        var propertiesNotPresentIn = properties.Where(p => !Properties.Any(p2 => p2.Id == p.Id)).ToArray();
+        if (propertiesNotPresentIn.Length == 0)
+            return this;
+            
+        Properties = Properties.Concat(propertiesNotPresentIn);
+        return this;
+    }
 }
+

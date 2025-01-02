@@ -4,8 +4,6 @@ api:
 
 build:
 	./build.sh
-# docker buildx build --platform=linux/arm64/v8 -f src/Api/Dockerfile -t centraliot.azurecr.io/smarthome-api:v1.0.3 ./src
-# docker push centraliot.azurecr.io/smarthome-api:v1.0.3
 
 deploy:
 	docker network create --driver overlay --attachable overlay-swarm
