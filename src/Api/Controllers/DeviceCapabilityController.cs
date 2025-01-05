@@ -19,14 +19,24 @@ public class DeviceCapabilityController : ControllerBase
         return NotFound();
     }
 
-    [HttpPut]
+    [HttpPost]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateCapabilities([FromRoute] string device_id, [FromBody] IEnumerable<Capability> capabilities, [FromServices] IDeviceCapabilityRepository repository)
+    public async Task<IActionResult> AddCapabilities([FromRoute] string device_id, [FromBody] IEnumerable<Capability> capabilities, [FromServices] IDeviceCapabilityRepository repository)
     {
         await repository.AddForDeviceAsync(device_id, capabilities.Select(c => (Core.Entities.Capability)c));
+        return NoContent();
+    }
+
+    [HttpPatch()]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateCapabilities([FromRoute] string device_id, [FromBody] CapabilityUpdate capability, [FromServices] IDeviceCapabilityRepository repository)
+    {
+        await repository.UpdateForDeviceAsync(device_id, (Core.Entities.Capability)capability);
         return NoContent();
     }
 

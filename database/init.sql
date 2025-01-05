@@ -40,6 +40,18 @@ CREATE table DeviceProperties(
     [Value] nvarchar(50) NOT NULL
 );
 
+CREATE TABLE Platforms(
+    Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    [Name] nvarchar(50) NOT NULL,
+    [Description] nvarchar(100) NULL
+);
+
+CREATE TABLE DeviceCapabilities_RelationShip_Platforms(
+    Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    [DeviceCapabilityId] int NOT NULL FOREIGN KEY REFERENCES DeviceCapabilities(Id),
+    [PlatformId] int NOT NULL FOREIGN KEY REFERENCES Platforms(Id),
+);
+
 /*Data Seed*/
 /*Device Types*/
 INSERT INTO Capabilities([Name], [ActuatorMode]) VALUES('Temperature Sensor', 'Read');
@@ -96,82 +108,13 @@ INSERT INTO DeviceCapabilities([DeviceId], [CapabilityId], [Name], [Value]) VALU
 /*Device Configurations*/
 INSERT INTO DeviceProperties([DeviceId], [Name], [Value]) VALUES(1, 'SubscribedTopics', 'devices.status');
 
-/*SCRIPT TO DEPLOY ON MYSQL*/
-CREATE table Capabilities(
-    Id int PRIMARY KEY AUTO_INCREMENT,
-    `Name` nvarchar(50) NOT NULL,
-    `ActuatorMode` nvarchar(50) NULL
-);
+/*Platforms*/
+INSERT INTO Platforms([Name], [Description]) VALUES('Arduino IoT Cloud', 'Plataforma de IoT da Arduino');
+INSERT INTO Platforms([Name], [Description]) VALUES('Sinric Pro', 'Plataforma de IoT da Sinric Pro');
+INSERT INTO Platforms([Name], [Description]) VALUES('ESP IoT Cloud', 'Plataforma de IoT da Espressif');
+INSERT INTO Platforms([Name], [Description]) VALUES('Google Cloud IoT', 'Plataforma de IoT da Google');
+INSERT INTO Platforms([Name], [Description]) VALUES('AWS IoT', 'Plataforma de IoT da Amazon');
 
-CREATE TABLE CommunicationTypes(
-    Id int PRIMARY KEY AUTO_INCREMENT,
-    `Name` nvarchar(50) NOT NULL
-);
-
-CREATE table Devices(
-    Id int PRIMARY KEY AUTO_INCREMENT,
-    `Name` nvarchar(50) NOT NULL,
-    `DeviceId` nvarchar(50) NOT NULL,
-    `Description` nvarchar(100) NOT NULL,
-    `Status` nvarchar(50) NOT NULL,
-    `LastActive` datetime NOT NULL,
-    `IpAddress` nvarchar(50) NOT NULL,
-    `MacAddress` nvarchar(50) NOT NULL,
-    `CommunicationTypeId` int NOT NULL,
-    `Platform` nvarchar(50) NOT NULL
-);
-
-CREATE table DeviceCapabilities(
-    Id int PRIMARY KEY AUTO_INCREMENT,
-    `DeviceId` int NOT NULL,
-    `CapabilityId` int NOT NULL,
-    `Name` nvarchar(50) NOT NULL,
-    `Description` nvarchar(100) NULL,
-    `Value` nvarchar(50) NOT NULL
-);
-
-
-/*Data Seed*/
-/*Device Types*/
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Temperature Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Humidity Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Pressure Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Light Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Motion Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Smoke Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Gas Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Water Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Door Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Window Sensor', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Door Lock', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Window Lock', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Light Actuator', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Fan Actuator', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Heater Actuator', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Cooler Actuator', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Sprinkler Actuator', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Alarm Actuator', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Camera', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Speaker', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Microphone', 'Read');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Display', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Motor', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Pump', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Valve', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Switch', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Relay', 'Write');
-INSERT INTO Capabilities(`Name`, `ActuatorMode`) VALUES('Actuator', 'Write');
-
-/*Communication Types*/
-INSERT INTO CommunicationTypes(`Name`) VALUES('WebServer');
-INSERT INTO CommunicationTypes(`Name`) VALUES('MQTT');
-INSERT INTO CommunicationTypes(`Name`) VALUES('HTTP');
-INSERT INTO CommunicationTypes(`Name`) VALUES('TCP');
-INSERT INTO CommunicationTypes(`Name`) VALUES('UDP');
-INSERT INTO CommunicationTypes(`Name`) VALUES('Bluetooth');
-
-/*Devices*/
-INSERT INTO Devices(`Name`, `DeviceId`, `Description`, `Status`, `LastActive`, `IpAddress`, `MacAddress`, `CommunicationTypeId`, `Platform`) VALUES('Temperature Sensor 1', 'TEMP-001', 'Temperature Sensor 1', 'Active', NOW(), '192.168.0.12', '00:11:22:33:44:55', 1, 'ESP32-WROOM-32');
-
-/*Device Capabilities*/
-INSERT INTO DeviceCapabilities(`DeviceId`, `CapabilityId`, `Name`, `Value`) VALUES(1, 13, 'LuzIndicadora', 'Luz Indicadora', 'ON');
+/*Device Capabilities RelationShip Platforms*/
+INSERT INTO DeviceCapabilities_RelationShip_Platforms([DeviceCapabilityId], [PlatformId]) 
+VALUES((SELECT Id FROM DeviceCapabilities WHERE Name = @name), (SELECT Id FROM Platforms WHERE Name = 'Sinric Pro'));

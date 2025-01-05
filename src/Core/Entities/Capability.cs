@@ -1,3 +1,4 @@
+
 namespace Core.Entities;
 
 public class Capability
@@ -9,6 +10,7 @@ public class Capability
     public string Mode { get; set; } = default!;
     public string Value { get; set; } = default!;
     public string? Owner { get; set; } = default!;
+    public IEnumerable<string> Platforms { get; set; } = [];
     public Capability(string name, string type, string mode, string value, string owner)
     {
         Name = name;
@@ -19,4 +21,13 @@ public class Capability
     }
 
     public Capability() { }
+
+    public Capability AddPlatform(string platform)
+    {
+        if (string.IsNullOrWhiteSpace(platform) || Platforms.Contains(platform))
+            return this;
+
+        Platforms = Platforms.Append(platform);
+        return this;
+    }
 }

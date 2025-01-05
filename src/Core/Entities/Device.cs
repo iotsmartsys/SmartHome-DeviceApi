@@ -20,13 +20,18 @@ public class Device
     }
     public Device() { }
     public IEnumerable<Capability> Capabilities { get; private set; } = [];
-    public Device AddCapability(Capability capability)
+    public Capability AddCapability(Capability capability)
     {
-        if (capability == null || Capabilities.Any(c => c.Id == capability.Id))
-            return this;
+        if (capability == null)
+            return default!;
+
+        Capability? existingCapability = Capabilities.FirstOrDefault(c => c.Name == capability.Name);
+        if (existingCapability != null)
+            return existingCapability!;
 
         Capabilities = Capabilities.Append(capability);
-        return this;
+
+        return capability;
     }
 
     public Device AddCapabilities(IEnumerable<Capability> capabilities)
@@ -55,7 +60,7 @@ public class Device
         var propertiesNotPresentIn = properties.Where(p => !Properties.Any(p2 => p2.Id == p.Id)).ToArray();
         if (propertiesNotPresentIn.Length == 0)
             return this;
-            
+
         Properties = Properties.Concat(propertiesNotPresentIn);
         return this;
     }
