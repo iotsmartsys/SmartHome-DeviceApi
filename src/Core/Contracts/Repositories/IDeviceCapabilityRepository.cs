@@ -8,4 +8,5 @@ public interface IDeviceCapabilityRepository : IRepository
     Task AddForDeviceAsync(string device_id, IEnumerable<Capability> enumerable);
     Task RemoveFromDeviceAsync(string device_id, IEnumerable<Capability> enumerable);
     Task UpdateForDeviceAsync(string device_id, Capability capability);
+    Task<Capability?> GetByDeviceAndNameAsync(string device_id, string capability_name);
 }

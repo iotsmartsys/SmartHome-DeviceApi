@@ -80,6 +80,39 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
         }
     }
 
+    public async Task<Capability?> GetByDeviceAndNameAsync(string device_id, string capability_name)
+    {
+        const string sql = @"
+            SELECT 
+                dc.Id,
+                dc.DeviceId, 
+                dc.Name, 
+                dc.[Description], 
+                c.Name Type, 
+                c.ActuatorMode Mode, 
+                dc.Value, 
+                dc.deviceOwner Owner,
+                c.DataType, 
+                p.Id,
+                p.Name 
+            FROM DeviceCapabilities dc
+                INNER JOIN Capabilities c ON dc.CapabilityId = c.Id
+                INNER JOIN Devices d ON dc.DeviceId = d.Id
+                LEFT JOIN DeviceCapabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
+                LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
+            WHERE d.DeviceId = @device_id AND dc.Name = @capability_name";
+
+        var query = await connection.QueryAsync<Capability, Platform, Capability>(sql, (capability, platform) =>
+        {
+            if (platform != null)
+                capability.AddPlatform(platform.Name);
+
+            return capability;
+        }, new { device_id, capability_name });
+
+        return query.FirstOrDefault();
+    }
+
     public async Task<IEnumerable<Capability>> GetCapabilitiesByDeviceAsync(string device_id)
     {
         try

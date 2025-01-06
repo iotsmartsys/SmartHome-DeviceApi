@@ -19,6 +19,19 @@ public class DeviceCapabilityController : ControllerBase
         return NotFound();
     }
 
+    [HttpGet("{capability_name}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetCapabilityByName([FromRoute] string device_id, [FromRoute] string capability_name, [FromServices] IDeviceCapabilityRepository repository)
+    {
+        var capability = await repository.GetByDeviceAndNameAsync(device_id, capability_name);
+        if (capability is not null)
+            return Ok((Capability)capability);
+
+        return NotFound();
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
