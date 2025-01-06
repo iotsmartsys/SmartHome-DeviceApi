@@ -94,6 +94,7 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                 c.ActuatorMode Mode, 
                 dc.Value, 
                 dc.deviceOwner Owner,
+                c.DataType, 
                 p.Id,
                 p.Name 
             FROM DeviceCapabilities dc

@@ -10,6 +10,7 @@ public class Capability
     public string Mode { get; set; } = default!;
     public string Value { get; set; } = default!;
     public string? Owner { get; set; } = default!;
+    public string? DataType { get; set; } = default!;
     public IEnumerable<string> Platforms { get; set; } = [];
     public Capability(string name, string type, string mode, string value, string owner)
     {

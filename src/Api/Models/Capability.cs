@@ -1,8 +1,8 @@
 namespace Api.Models;
 
-public record class Capability(string capability_name, string? description, string? owner, string type, string? mode, string? value, IEnumerable<string>? platforms)
+public record class Capability(string capability_name, string? description, string? owner, string type, string? mode, string? value, IEnumerable<string>? platforms,string? value_type)
 {
-    public static implicit operator Capability(Core.Entities.Capability capability) => new(capability.Name, capability.Description, capability.Owner, capability.Type, capability.Mode, capability.Value, capability.Platforms);
+    public static implicit operator Capability(Core.Entities.Capability capability) => new(capability.Name, capability.Description, capability.Owner, capability.Type, capability.Mode, capability.Value, capability.Platforms, capability.DataType);
 
     public static implicit operator Core.Entities.Capability(Capability capability) => new()
     {
@@ -12,7 +12,8 @@ public record class Capability(string capability_name, string? description, stri
         Mode = capability.mode ?? default!,
         Value = capability.value!,
         Description = capability.description,
-        Platforms = capability.platforms ?? new string[] { }
+        Platforms = capability.platforms ?? [],
+        DataType = capability.value_type
     };
 }
 public record class CapabilityUpdate(string capability_name, string value)
