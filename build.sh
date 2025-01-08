@@ -13,7 +13,7 @@ set -e
 # Ajuste estas variáveis:
 # -------------------------
 REGISTRY="centraliot.azurecr.io"  # ou "docker.io/seu-usuario"
-IMAGE_NAME="smarthome-api"                         # nome da sua imagem
+IMAGE_NAME="devices-api"                         # nome da sua imagem
 VERSION="v1.0"                           # sua versão base
 
 # Gera a string de data/tempo no formato YYYYMMDDHHMM (Ex: 202412312043)

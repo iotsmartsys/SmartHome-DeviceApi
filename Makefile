@@ -7,4 +7,4 @@ build:
 
 deploy:
 	docker network create --driver overlay --attachable overlay-swarm
-	docker run -d -p 8081:8080 centraliot.azurecr.io/smarthome-api:v1.0.3 --name smarthome-api
+	docker run -d -p 8081:8080 centraliot.azurecr.io/devices-api:v1.0.3 --name devices-api
