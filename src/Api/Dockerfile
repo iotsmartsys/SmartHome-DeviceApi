@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 80
 EXPOSE 443
 
-# ENV DOTNET_NUGET_SIGNATURE_VERIFICATION=false
-# ENV NUGET_CERT_REVOCATION_MODE=offline
+# Configura para usar a porta 80
+ENV ASPNETCORE_URLS=http://+:80
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src

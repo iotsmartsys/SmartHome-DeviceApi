@@ -25,7 +25,7 @@ services:
           cpus: '0'
           memory: 20M
     ports:
-      - target: 8080
+      - target: 80
         published: 8081
         protocol: tcp
         mode: ingress

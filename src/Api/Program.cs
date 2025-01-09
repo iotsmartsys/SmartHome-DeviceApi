@@ -1,17 +1,22 @@
 using Api.Models;
 using Data.SqlServer.DI;
+using Core.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
-builder.Services.AddSqlServerData(connectionString!);
+builder.Services
+    .AddCore()
+    .AddSqlServerData(connectionString!)
+    .AddRabbitMq();
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
 app.MapControllers();
 app.UseMiddleware<ExceptionHandler>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -80,7 +80,7 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
         }
     }
 
-    public async Task<Capability?> GetByDeviceAndNameAsync(string device_id, string capability_name)
+    public async Task<IEnumerable<Capability>> GetByDeviceAndNameAsync(string device_id, params string[] capability_name)
     {
         const string sql = @"
             SELECT 
@@ -100,17 +100,19 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                 INNER JOIN Devices d ON dc.DeviceId = d.Id
                 LEFT JOIN DeviceCapabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
-            WHERE d.DeviceId = @device_id AND dc.Name = @capability_name";
+            WHERE d.DeviceId = @device_id AND dc.Name IN @capability_name";
 
-        var query = await connection.QueryAsync<Capability, Platform, Capability>(sql, (capability, platform) =>
-        {
-            if (platform != null)
-                capability.AddPlatform(platform.Name);
+        return await connection.QueryAsync<Capability, Platform, Capability>(sql, (capability, platform) =>
+          {
+              if (platform != null)
+                  capability.AddPlatform(platform.Name);
 
-            return capability;
-        }, new { device_id, capability_name });
-
-        return query.FirstOrDefault();
+              return capability;
+          }, new
+          {
+              device_id,
+              capability_name = capability_name
+          });
     }
 
     public async Task<IEnumerable<Capability>> GetCapabilitiesByDeviceAsync(string device_id)
@@ -183,9 +185,10 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
             {
                 logger.LogInformation("Removendo o relacionamento de plataforma para a capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
                 const string sqlPlatform = @"
-            DELETE FROM DeviceCapabilities_RelationShip_Platforms
-            WHERE
-                DeviceCapabilityId = (SELECT TOP 1 Id FROM DeviceCapabilities WHERE DeviceId = @DeviceId AND Name = @Name)
+            DELETE DCRP
+                FROM DeviceCapabilities_RelationShip_Platforms DCRP
+                INNER JOIN DeviceCapabilities DC ON DCRP.DeviceCapabilityId = DC.Id
+                WHERE DC.DeviceId = @DeviceId AND DC.Name = @Name
             ";
                 await connection.ExecuteAsync(sqlPlatform, new
                 {
