@@ -5,6 +5,10 @@ services:
     environment:
       - TZ=America/Bahia
       - ConnectionStrings__Devices=Server=sql-edge;Database=SmartHome;User Id=sa;Password=SenhaForte@123;TrustServerCertificate=True;MultipleActiveResultSets=True;
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Port=5672
+      - RabbitMq__User=smarthomeiot
+      - RabbitMq__Password=Smarthomeiot@123      
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft=Warning
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Information

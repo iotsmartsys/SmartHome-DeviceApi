@@ -9,7 +9,7 @@ builder.Services.AddOpenApi();
 builder.Services
     .AddCore()
     .AddSqlServerData(connectionString!)
-    .AddRabbitMq();
+    .AddRabbitMq(builder.Configuration);
 builder.Services.AddControllers();
 
 var app = builder.Build();

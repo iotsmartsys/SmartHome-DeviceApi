@@ -1,22 +1,20 @@
 
 using Core.Contracts.Events;
-using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using SmartHome_Api.RabbitMq;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddRabbitMq(this IServiceCollection services)
+    public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IConnectionFactory>(sp =>
         {
             var factory = new ConnectionFactory
             {
-                // HostName = "rabbitmq",
-                HostName = "iotserver.local",
-                Port = 5672,
-                UserName = "smarthomeiot",
-                Password = "Smarthomeiot@123"
+                HostName = configuration["RabbitMq:Host"]!,
+                Port = int.Parse(configuration["RabbitMq:Port"]!),
+                UserName = configuration["RabbitMq:User"]!,
+                Password = configuration["RabbitMq:Password"]!
             };
 
             return factory;
