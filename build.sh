@@ -52,3 +52,7 @@ echo " Build e push finalizados com sucesso!"
 echo "-------------------------------------------------------"
 echo "Imagem gerada com tag única: $FULL_TAG"
 echo "Imagem gerada com tag latest: $LATEST_TAG"
+
+# Substitui "latest" por UNIQUE_TAG no arquivo docker-compose.swarm.yaml VERSÃO MAC_OS
+sed -i '' "s/latest/${UNIQUE_TAG}/g" docker-compose.swarm.yaml
+echo "Substituição em docker-compose.swarm.yaml concluída: 'latest' -> '${UNIQUE_TAG}'"

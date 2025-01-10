@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   api:
-    image: "centraliot.azurecr.io/devices-api:latest"
+    image: "centraliot.azurecr.io/devices-api:v1.0.202501101957"
     environment:
       - TZ=America/Bahia
       - ConnectionStrings__Devices=Server=sql-edge;Database=SmartHome;User Id=sa;Password=SenhaForte@123;TrustServerCertificate=True;MultipleActiveResultSets=True;
