@@ -43,6 +43,6 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
             WHERE Name = @name
         ";
 
-        return await connection.QueryFirstOrDefaultAsync<CapabilityType>(sql, new { name });
+        return await connection.QueryFirstOrDefaultAsync<CapabilityType>(new CommandDefinition( sql, new { name }, cancellationToken: default));
     }
 }
