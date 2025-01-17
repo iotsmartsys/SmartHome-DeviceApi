@@ -3,7 +3,7 @@ using Core.Contracts.Repositories;
 using Core.Entities;
 using Dapper;
 
-namespace Data.SqlServer.Repositories;
+namespace Data.Repositories;
 
 internal class PlatformRepository(IDbConnection connection) : IPlatformRepository
 {

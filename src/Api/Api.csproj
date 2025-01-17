@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Core/Core.csproj" />
-    <ProjectReference Include="../Data.SqlServer/Data.SqlServer.csproj" />
+    <ProjectReference Include="../Data.Repositories/Data.Repositories.csproj" />
   </ItemGroup>
 
 </Project>

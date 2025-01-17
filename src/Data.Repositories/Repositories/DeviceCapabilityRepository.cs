@@ -4,7 +4,7 @@ using Core.Contracts.Repositories;
 using Dapper;
 using Microsoft.Extensions.Logging;
 
-namespace Data.SqlServer.Repositories;
+namespace Data.Repositories;
 
 internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IRepository
 {
@@ -35,8 +35,15 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
             {
                 logger.LogInformation("Adicionando capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
                 const string sql = @"
-            INSERT INTO DeviceCapabilities (DeviceId, CapabilityId, Name, [Description], Value, deviceOwner)
-    VALUES(@DeviceId, (SELECT TOP 1 Id FROM Capabilities WHERE Name = @Type), @Name, @Description, @Value, @Owner)
+                INSERT INTO DeviceCapabilities (DeviceId, CapabilityId, Name, Description, Value, deviceOwner)
+                VALUES (
+                    @DeviceId,
+                    (SELECT Id FROM Capabilities WHERE Name = @Type LIMIT 1),
+                    @Name,
+                    @Description,
+                    @Value,
+                    @Owner
+                );
             ";
                 await connection.ExecuteAsync(sql, new
                 {
@@ -54,8 +61,11 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                 {
                     logger.LogInformation("Adicionando capability {capabilityName} para o device {deviceId} na plataforma {platformName}", capability.Name, device_id, platform);
                     const string sqlPlatform = @"
-                    INSERT INTO DeviceCapabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
-                    VALUES((SELECT TOP 1 Id FROM DeviceCapabilities WHERE DeviceId = @DeviceId AND Name = @Name), (SELECT TOP 1 Id FROM Platforms WHERE Name = @Platform))
+                        INSERT INTO DeviceCapabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
+                        VALUES (
+                            (SELECT Id FROM DeviceCapabilities WHERE DeviceId = @DeviceId AND Name = @Name LIMIT 1),
+                            (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1)
+                        );
                     ";
                     await connection.ExecuteAsync(sqlPlatform, new
                     {
@@ -87,7 +97,7 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                 dc.Id,
                 dc.DeviceId, 
                 dc.Name, 
-                dc.[Description], 
+                dc.Description, 
                 c.Name Type, 
                 c.ActuatorMode Mode, 
                 dc.Value, 
@@ -124,7 +134,7 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
                 dc.Id,
                 dc.DeviceId, 
                 dc.Name, 
-                dc.[Description], 
+                dc.Description, 
                 c.Name Type, 
                 c.ActuatorMode Mode, 
                 dc.Value, 
@@ -185,10 +195,10 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
             {
                 logger.LogInformation("Removendo o relacionamento de plataforma para a capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
                 const string sqlPlatform = @"
-            DELETE DCRP
+                DELETE DCRP
                 FROM DeviceCapabilities_RelationShip_Platforms DCRP
-                INNER JOIN DeviceCapabilities DC ON DCRP.DeviceCapabilityId = DC.Id
-                WHERE DC.DeviceId = @DeviceId AND DC.Name = @Name
+                    INNER JOIN DeviceCapabilities DC ON DCRP.DeviceCapabilityId = DC.Id
+                WHERE DC.DeviceId = @DeviceId AND DC.Name = @Name;
             ";
                 await connection.ExecuteAsync(sqlPlatform, new
                 {
@@ -199,11 +209,16 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
 
                 logger.LogInformation("Removendo capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
                 const string sql = @"
-            DELETE FROM DeviceCapabilities 
-            WHERE 
-                DeviceId = @DeviceId AND 
-                CapabilityId = (SELECT TOP 1 Id FROM Capabilities WHERE Name = @Type) AND
-                Name = @Name
+                    DELETE FROM DeviceCapabilities 
+                    WHERE 
+                        DeviceId = @DeviceId 
+                        AND CapabilityId = (
+                            SELECT Id 
+                            FROM Capabilities 
+                            WHERE Name = @Type 
+                            LIMIT 1
+                        )
+                        AND Name = @Name;
             ";
                 await connection.ExecuteAsync(sql, new
                 {
@@ -248,8 +263,9 @@ internal class DeviceCapabilityRepository : IDeviceCapabilityRepository, IReposi
             SET
                 Value = @Value
             WHERE
-                DeviceId = @DeviceId AND
-                Name = @Name
+                DeviceId = @DeviceId
+                AND Name = @Name;
+
             ";
             await connection.ExecuteAsync(sql, new
             {

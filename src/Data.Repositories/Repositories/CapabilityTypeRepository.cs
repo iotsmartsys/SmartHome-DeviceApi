@@ -4,7 +4,7 @@ using Core.Contracts.Repositories;
 using Dapper;
 using Microsoft.Extensions.Logging;
 
-namespace Data.SqlServer.Repositories;
+namespace Data.Repositories;
 
 internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
 {

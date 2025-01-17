@@ -1,5 +1,5 @@
 using Api.Models;
-using Data.SqlServer.DI;
+using Data.Repositories.MySql.DI;
 using Core.DI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +8,8 @@ string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
 builder.Services
     .AddCore()
-    .AddSqlServerData(connectionString!)
+    // .AddSqlServerData(connectionString!)
+    .AddMySqlData(connectionString!)
     .AddRabbitMq(builder.Configuration);
 builder.Services.AddControllers();
 

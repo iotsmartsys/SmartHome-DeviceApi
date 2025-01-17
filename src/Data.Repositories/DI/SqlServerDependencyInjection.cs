@@ -1,11 +1,10 @@
-using System;
+
 using System.Data;
 using Core.Contracts.Repositories;
-using Data.SqlServer.Repositories;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Data.SqlServer.DI;
+namespace Data.Repositories.SqlServer.DI;
 
 public static class SqlServerDependencyInjection
 {

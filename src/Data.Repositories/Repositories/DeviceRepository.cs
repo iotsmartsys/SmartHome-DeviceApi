@@ -5,7 +5,7 @@ using Core.Contracts.Repositories;
 using Dapper;
 using Microsoft.Extensions.Logging;
 
-namespace Data.SqlServer.Repositories;
+namespace Data.Repositories;
 
 internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection connection) : IDeviceRepository
 {
@@ -37,7 +37,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
                 dp.Value,
                 p.Id,
                 p.Name Name
-            FROM devices d
+            FROM Devices d
                 INNER JOIN DeviceCapabilities dc ON d.Id = dc.DeviceId
                 INNER JOIN Capabilities c ON dc.CapabilityId = c.Id 
                 LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
@@ -102,7 +102,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
         dp.Value,
         p.Id,
         p.Name
-    FROM devices d
+    FROM Devices d
         INNER JOIN DeviceCapabilities dc ON d.Id = dc.DeviceId
         INNER JOIN Capabilities c ON dc.CapabilityId = c.Id 
         LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
@@ -149,7 +149,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
         {
             logger.LogInformation("Ciando device {deviceId}", entity.DeviceId);
             const string sql = @"
-        INSERT INTO devices (DeviceId, Name,[Description], LastActive, Status, MacAddress, IpAddress, CommunicationTypeId, Platform)
+        INSERT INTO Devices (DeviceId, Name, Description, LastActive, Status, MacAddress, IpAddress, CommunicationTypeId, Platform)
         VALUES (@DeviceId, @Name,@Description, @LastActive, @State, @MacAddress, @IpAddress, @Protocol, @Platform)
         SELECT SCOPE_IDENTITY()
         ";
