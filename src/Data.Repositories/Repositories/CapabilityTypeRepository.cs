@@ -17,14 +17,29 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         this.connection = connection;
     }
 
+    public async Task CreateAsync(CapabilityType capabilityType)
+    {
+        const string sql = @"
+        INSERT INTO CapabilityTypes (Name, ActuatorMode,DataType, DynamicComputedValue)
+        VALUES (@Name, @ActuatorMode, @DataType, @ComputedValue);
+
+        SELECT LAST_INSERT_ID() AS NewId;
+        ";
+
+        var newId = await connection.ExecuteScalarAsync<int>(sql, capabilityType);
+        capabilityType.Id = newId;
+    }
+
     public async Task<IEnumerable<CapabilityType>> GetAllAsync(string? name)
     {
         const string sql = @"
             SELECT 
                 Id, 
                 Name, 
-                ActuatorMode
-            FROM Capabilities
+                ActuatorMode,
+                DataType,
+                DynamicComputedValue
+            FROM CapabilityTypes
             WHERE Name LIKE @name
             ORDER BY Name
         ";
@@ -38,8 +53,10 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
             SELECT 
                 Id, 
                 Name, 
-                ActuatorMode
-            FROM Capabilities
+                ActuatorMode,
+                DataType,
+                DynamicComputedValue
+            FROM CapabilityTypes
             WHERE Name = @name
         ";
 

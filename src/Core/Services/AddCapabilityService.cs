@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace Core.Services;
 
 internal class AddCapabilityService(ILogger<AddCapabilityService> logger
-    , IDeviceCapabilityRepository repository
+    , ICapabilityRepository repository
     , IEventPublisher publisher) : IAddCapabilityService
 {
     public async Task AddAsync(CapabilityRequest request, CancellationToken cancellationToken)

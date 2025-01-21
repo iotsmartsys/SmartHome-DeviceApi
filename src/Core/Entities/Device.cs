@@ -5,17 +5,16 @@ public class Device
     public string DeviceId { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
-    public string LastActive { get; set; } = default!;
+    public DateTime LastActive { get; set; } = default!;
     public string State { get; set; } = default!;
     public string MacAddress { get; set; } = default!;
     public string IpAddress { get; set; } = default!;
     public CommunicationProtocol Protocol { get; set; } = CommunicationProtocol.HTTP;
     public string Platform { get; set; } = default!;
-    public Device(string device_id, string device_name, string last_active, string state)
+    public Device(string device_id, string device_name,  string state)
     {
         DeviceId = device_id;
         Name = device_name;
-        LastActive = last_active;
         State = state;
     }
     public Device() { }

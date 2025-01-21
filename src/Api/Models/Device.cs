@@ -6,7 +6,6 @@ public record class Device(
     string device_id
     , string device_name
     , string description
-    , string last_active
     , string state
     , string mac_address
     , string ip_address
@@ -20,7 +19,6 @@ public record class Device(
         device.DeviceId,
         device.Name,
         device.Description,
-        device.LastActive,
         device.State,
         device.MacAddress,
         device.IpAddress,
@@ -33,7 +31,6 @@ public record class Device(
     public static implicit operator Core.Entities.Device(Device device) => new Core.Entities.Device(
         device.device_id,
         device.device_name,
-        device.last_active,
         device.state
     )
     {

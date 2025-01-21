@@ -38,10 +38,10 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
                 p.Id,
                 p.Name Name
             FROM Devices d
-                INNER JOIN DeviceCapabilities dc ON d.Id = dc.DeviceId
-                INNER JOIN Capabilities c ON dc.CapabilityId = c.Id 
+                INNER JOIN Capabilities dc ON d.Id = dc.DeviceId
+                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id 
                 LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
-                LEFT JOIN DeviceCapabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
+                LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
             ";
         List<Device> devicesSelecteds = [];
@@ -78,37 +78,37 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
     {
         logger.LogInformation($"Getting devices from database. Connection string: {connection.ConnectionString}");
         const string sql = @"
-   SELECT
-        d.Id ,
-        d.DeviceId DeviceId,
-        d.Name Name,
-        d.description,
-        d.LastActive LastActive,
-        d.Status state,
-        d.MacAddress,
-        d.IpAddress,
-        d.CommunicationTypeId Protocol,
-        d.Platform,
-        dc.Id,
-        dc.Name Name,
-        dc.Description,
-        dc.DeviceOwner Owner, 
-        c.Name type,
-        c.ActuatorMode mode,
-        dc.value,
-        c.DataType, 
-        dp.Id ,
-        dp.Name,
-        dp.Value,
-        p.Id,
-        p.Name
-    FROM Devices d
-        INNER JOIN DeviceCapabilities dc ON d.Id = dc.DeviceId
-        INNER JOIN Capabilities c ON dc.CapabilityId = c.Id 
-        LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
-        LEFT JOIN DeviceCapabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
-        LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
-    WHERE d.DeviceId = @device_id
+        SELECT
+                d.Id ,
+                d.DeviceId DeviceId,
+                d.Name Name,
+                d.description,
+                d.LastActive LastActive,
+                d.Status state,
+                d.MacAddress,
+                d.IpAddress,
+                d.CommunicationTypeId Protocol,
+                d.Platform,
+                dc.Id,
+                dc.Name Name,
+                dc.Description,
+                dc.DeviceOwner Owner, 
+                c.Name type,
+                c.ActuatorMode mode,
+                dc.value,
+                c.DataType, 
+                dp.Id ,
+                dp.Name,
+                dp.Value,
+                p.Id,
+                p.Name
+            FROM Devices d
+                INNER JOIN Capabilities dc ON d.Id = dc.DeviceId
+                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id 
+                LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
+                LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
+                LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
+            WHERE d.DeviceId = @device_id
             ";
         Device? result = null;
         var devices = await connection.QueryAsync<Device, Capability, Property?, Platform?, Device>(
@@ -150,16 +150,16 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             logger.LogInformation("Ciando device {deviceId}", entity.DeviceId);
             const string sql = @"
         INSERT INTO Devices (DeviceId, Name, Description, LastActive, Status, MacAddress, IpAddress, CommunicationTypeId, Platform)
-        VALUES (@DeviceId, @Name,@Description, @LastActive, @State, @MacAddress, @IpAddress, @Protocol, @Platform)
-        SELECT SCOPE_IDENTITY()
+        VALUES (@DeviceId, @Name, @Description, NOW(), @State, @MacAddress, @IpAddress, @Protocol, @Platform);
+        SELECT LAST_INSERT_ID() AS NewId;
         ";
 
             entity.Id = await connection.ExecuteScalarAsync<int>(sql, entity, transaction);
             logger.LogInformation("Device {deviceId} criado com sucesso", entity.DeviceId);
 
             const string capabilitySql = @"
-        INSERT INTO DeviceCapabilities (DeviceId, Name, DeviceOwner, CapabilityId, Value, [Description])
-        VALUES (@DeviceId, @Name, @Owner, (SELECT TOP 1 Id FROM Capabilities WHERE [Name] = @Type ), @Value, @Description)
+        INSERT INTO Capabilities (DeviceId, Name, DeviceOwner, CapabilityId, Value, Description)
+        VALUES (@DeviceId, @Name, @Owner, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Description)
         ";
 
             foreach (var capability in entity.Capabilities)
@@ -195,9 +195,9 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             }
 
             const string platformSql = @"
-            INSERT INTO DeviceCapabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
+            INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
             VALUES(
-                (SELECT TOP 1 Id FROM DeviceCapabilities WHERE Name = @capabilityName AND DeviceId = @idDevice), (SELECT TOP 1 Id FROM Platforms WHERE Name = @platformName));";
+                (SELECT Id FROM Capabilities WHERE Name = @capabilityName AND DeviceId = @idDevice LIMIT 1), (SELECT Id FROM Platforms WHERE Name = @platformName LIMIT 1));";
 
             var capabilitiesWithPlatforms = entity.Capabilities.Where(c => c.Platforms.Any()).ToArray();
             foreach (var capability in capabilitiesWithPlatforms)

@@ -16,7 +16,7 @@ public static class MySqlDependencyInjection
         services.AddScoped<IDbConnection>(_ => new MySqlConnection(connectionString));
         services
             .AddScoped<IDeviceRepository, DeviceRepository>()
-            .AddScoped<IDeviceCapabilityRepository, DeviceCapabilityRepository>()
+            .AddScoped<ICapabilityRepository, CapabilityRepository>()
             .AddScoped<ICapabilityTypeRepository, CapabilityTypeRepository>()
             .AddScoped<IPlatformRepository, PlatformRepository>();
 

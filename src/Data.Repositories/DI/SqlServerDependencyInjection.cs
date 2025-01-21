@@ -13,7 +13,7 @@ public static class SqlServerDependencyInjection
         services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
         services
             .AddScoped<IDeviceRepository, DeviceRepository>()
-            .AddScoped<IDeviceCapabilityRepository, DeviceCapabilityRepository>()
+            .AddScoped<ICapabilityRepository, CapabilityRepository>()
             .AddScoped<ICapabilityTypeRepository, CapabilityTypeRepository>()
             .AddScoped<IPlatformRepository, PlatformRepository>();
 

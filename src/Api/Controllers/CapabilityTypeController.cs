@@ -16,10 +16,10 @@ public class CapabilityTypeController : ControllerBase
         if (!capabilities.Any())
             return NoContent();
 
-        return Ok(capabilities);
+        return Ok(capabilities.Select(c => (CapabilityType)c));
     }
 
-    [HttpGet("{name}")]
+    [HttpGet("{name}", Name = "GetCapabilityType")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CapabilityType))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -29,6 +29,19 @@ public class CapabilityTypeController : ControllerBase
         if (capability is null)
             return NotFound();
 
-        return Ok(capability);
+        return Ok((CapabilityType)capability);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CapabilityType))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> CreateCapabilityType([FromBody] CapabilityType capabilityType, [FromServices] ICapabilityTypeRepository repository)
+    {
+        if (capabilityType is null)
+            return BadRequest();
+
+        await repository.CreateAsync((Core.Entities.CapabilityType)capabilityType);
+        return CreatedAtRoute("GetCapabilityType", new { name = capabilityType.name }, capabilityType);
     }
 }

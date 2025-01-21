@@ -2,7 +2,7 @@ using Core.Entities;
 
 namespace Core.Contracts.Repositories;
 
-public interface IDeviceCapabilityRepository : IRepository
+public interface ICapabilityRepository : IRepository
 {
     Task<IEnumerable<Capability>> GetCapabilitiesByDeviceAsync(string device_id);
     Task AddForDeviceAsync(string device_id, IEnumerable<Capability> enumerable);
