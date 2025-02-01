@@ -195,10 +195,16 @@ internal class CapabilityRepository : ICapabilityRepository, IRepository
             {
                 logger.LogInformation("Removendo o relacionamento de plataforma para a capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
                 const string sqlPlatform = @"
-                DELETE DCRP
-                FROM Capabilities_RelationShip_Platforms DCRP
-                    INNER JOIN Capabilities DC ON DCRP.DeviceCapabilityId = DC.Id
-                WHERE DC.DeviceId = @DeviceId AND DC.Name = @Name;
+                DELETE FROM Capabilities_RelationShip_Platforms 
+                WHERE DeviceCapabilityId IN
+                    (
+                        SELECT 
+                            Id 
+                        FROM Capabilities DC 
+                        WHERE 
+                            DC.DeviceId = @DeviceId AND 
+                            DC.Name = @Name
+                    );
             ";
                 await connection.ExecuteAsync(sqlPlatform, new
                 {
@@ -212,12 +218,6 @@ internal class CapabilityRepository : ICapabilityRepository, IRepository
                     DELETE FROM Capabilities 
                     WHERE 
                         DeviceId = @DeviceId 
-                        AND CapabilityId = (
-                            SELECT Id 
-                            FROM Capabilities 
-                            WHERE Name = @Type 
-                            LIMIT 1
-                        )
                         AND Name = @Name;
             ";
                 await connection.ExecuteAsync(sql, new
