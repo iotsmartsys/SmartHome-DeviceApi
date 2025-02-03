@@ -1,5 +1,4 @@
 using Api.Models;
-using Core.Contracts.Events;
 using Core.Contracts.Repositories;
 using Core.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
