@@ -11,15 +11,15 @@ public class CapabilityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCapabilities([FromRoute] string device_id, [FromServices] ICapabilityRepository repository)
+    public async Task<IActionResult> GetCapabilities([FromRoute] string device_id, [FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        var capabilities = await repository.GetCapabilitiesByDeviceAsync(device_id);
+        var capabilities = await repository.GetCapabilitiesByDeviceAsync(device_id, capabilityQuery, cancellationToken);
         if (capabilities.Any())
             return Ok(capabilities.Select(c => (Capability)c));
 
         return NotFound();
     }
-
+    
     [HttpGet("{capability_name}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
