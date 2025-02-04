@@ -12,7 +12,8 @@ internal static class CapabilityQuery
                 c.ActuatorMode Mode, 
                 dc.Value, 
                 dc.deviceOwner Owner,
-                c.DataType, 
+                c.DataType,
+                dc.UpdatedAt,
                 p.Id,
                 p.Name 
             FROM Capabilities dc
@@ -32,7 +33,8 @@ internal static class CapabilityQuery
                 c.ActuatorMode Mode, 
                 dc.Value, 
                 dc.deviceOwner Owner,
-                c.DataType, 
+                c.DataType,
+                dc.UpdatedAt, 
                 p.Id,
                 p.Name 
             FROM Capabilities dc
@@ -65,22 +67,23 @@ internal static class CapabilityQuery
     public const string UpdateForDeviceAsync = @"
         UPDATE Capabilities
         SET
-            Value = @Value
+            Value = @Value,
+            UpdatedAt = CURRENT_TIMESTAMP
         WHERE
             DeviceId = @DeviceId
             AND Name = @Name;
     ";
 
     public const string RemovePlatformFromCapability = @"
-                DELETE FROM Capabilities_RelationShip_Platforms 
-                WHERE DeviceCapabilityId IN
-                    (
-                        SELECT 
-                            Id 
-                        FROM Capabilities DC 
-                        WHERE 
-                            DC.DeviceId = @DeviceId AND 
-                            DC.Name = @Name
-                    );
+        DELETE FROM Capabilities_RelationShip_Platforms 
+        WHERE DeviceCapabilityId IN
+            (
+                SELECT 
+                    Id 
+                FROM Capabilities DC 
+                WHERE 
+                    DC.DeviceId = @DeviceId AND 
+                    DC.Name = @Name
+            );
             ";
 }

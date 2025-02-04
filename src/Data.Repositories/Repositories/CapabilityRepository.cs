@@ -6,17 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Repositories;
 
-internal class CapabilityRepository : ICapabilityRepository, IRepository
+internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbConnection connection) : ICapabilityRepository, IRepository
 {
-    private readonly ILogger<CapabilityRepository> logger;
-    private readonly IDbConnection connection;
-
-    public CapabilityRepository(ILogger<CapabilityRepository> logger, IDbConnection connection)
-    {
-        this.logger = logger;
-        this.connection = connection;
-    }
-
     public async Task AddForDeviceAsync(string device_id, IEnumerable<Capability> capabilities)
     {
         connection.Open();

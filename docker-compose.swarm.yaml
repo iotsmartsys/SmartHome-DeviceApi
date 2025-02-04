@@ -4,7 +4,6 @@ services:
     image: "centraliot.azurecr.io/devices-api:latest"
     environment:
       - TZ=America/Bahia
-      # - ConnectionStrings__Devices=Server=sql-edge;Database=SmartHome;User Id=sa;Password=SenhaForte@123;TrustServerCertificate=True;MultipleActiveResultSets=True;
       - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;
       - RabbitMq__Host=rabbitmq
       - RabbitMq__Port=5672
