@@ -19,7 +19,7 @@ public class CapabilityController : ControllerBase
 
         return NotFound();
     }
-    
+
     [HttpGet("{capability_name}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -51,7 +51,13 @@ public class CapabilityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateCapabilities([FromRoute] string device_id, [FromBody] CapabilityUpdate capability, [FromServices] ICapabilityRepository repository)
     {
-        await repository.UpdateForDeviceAsync(device_id, (Core.Entities.Capability)capability);
+        var capabilities = await repository.GetByDeviceAndNameAsync(device_id, capability.capability_name);
+        if (capabilities.Any() is false)
+            return NotFound();
+        
+        var entity = capabilities.First();
+        entity.UpdateValue(capability.value);
+        await repository.UpdateForDeviceAsync(device_id, entity);
         return NoContent();
     }
 

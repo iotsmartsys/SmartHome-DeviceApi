@@ -5,12 +5,12 @@ public class Capability
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
-    public string? Description { get; set; } 
+    public string? Description { get; set; }
     public string Type { get; set; } = default!;
     public string Mode { get; set; } = default!;
     public string Value { get; set; } = default!;
     public string? Owner { get; set; } = default!;
-    public string? DataType { get; set; } = default!;
+    public CapabilityDataType? DataType { get; set; } = default!;
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<string> Platforms { get; set; } = [];
     public Capability(string name, string type, string mode, string value, string owner)
@@ -31,5 +31,9 @@ public class Capability
 
         Platforms = Platforms.Append(platform);
         return this;
+    }
+    public void UpdateValue(string value)
+    {
+        Value = DataType?.Convert(value.ToLower()) ?? value;
     }
 }
