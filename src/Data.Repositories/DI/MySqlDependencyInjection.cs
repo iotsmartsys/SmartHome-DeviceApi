@@ -18,7 +18,9 @@ public static class MySqlDependencyInjection
             .AddScoped<IDeviceRepository, DeviceRepository>()
             .AddScoped<ICapabilityRepository, CapabilityRepository>()
             .AddScoped<ICapabilityTypeRepository, CapabilityTypeRepository>()
-            .AddScoped<IPlatformRepository, PlatformRepository>();
+            .AddScoped<IPlatformRepository, PlatformRepository>()
+            .AddScoped<IPropertyRepository, PropertyRepository>()
+            ;
 
         return services;
     }

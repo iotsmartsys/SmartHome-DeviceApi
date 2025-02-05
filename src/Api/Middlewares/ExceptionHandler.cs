@@ -27,6 +27,10 @@ class ExceptionHandler(RequestDelegate _next)
 
         switch (exception)
         {
+            case ArgumentDomainException argument:
+                message = argument.Message;
+                statusCode = HttpStatusCode.BadRequest;
+                break;
             case NotFoundExceptionDomain notFound:
                 message = notFound.Message;
                 statusCode = HttpStatusCode.NotFound;

@@ -23,4 +23,3 @@ internal abstract class CapabilityQueryBuilder(string sql) : ICapabilityQueryBui
 
     public abstract CommandDefinition Build();
 }
-

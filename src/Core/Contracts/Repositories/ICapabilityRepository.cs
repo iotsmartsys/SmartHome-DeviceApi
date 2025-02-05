@@ -10,7 +10,6 @@ public interface ICapabilityRepository : IRepository
     Task UpdateForDeviceAsync(string device_id, Capability capability);
     Task<IEnumerable<Capability>> GetByDeviceAndNameAsync(string device_id, params string[] capability_name);
 }
-
 public record class CapabilityFind(string? name, string? type, string? owner, string? value)
 {
     public CapabilityFind() : this(null, null, null, null) { }

@@ -16,6 +16,6 @@ public record class CapabilityEventModel(string capability_name, string? descrip
         Value = capability.value!,
         Description = capability.description,
         Platforms = capability.platforms ?? [],
-        DataType = capability.value_type
+        DataType = capability.value_type!
     };
 }
