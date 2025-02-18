@@ -2,7 +2,7 @@ api:
 	dotnet run --project src/Api/Api.csproj
 
 
-build:
+api-build:
 	./build.sh
 
 deploy:

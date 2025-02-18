@@ -118,3 +118,47 @@ INSERT INTO Platforms([Name], [Description]) VALUES('AWS IoT', 'Plataforma de Io
 /*Device Capabilities RelationShip Platforms*/
 INSERT INTO DeviceCapabilities_RelationShip_Platforms([DeviceCapabilityId], [PlatformId]) 
 VALUES((SELECT Id FROM DeviceCapabilities WHERE Name = @name), (SELECT Id FROM Platforms WHERE Name = 'Sinric Pro'));
+
+/*SqlServer Operators*/
+CREATE TABLE Operators(
+    Id int PRIMARY KEY IDENTITY(1,1) NOT NULL,
+    [Name] nvarchar(50) NOT NULL,
+    [Symbol] nvarchar(100) NULL
+);
+
+INSERT INTO Operators([Name], [Symbol]) VALUES('EQUAL', '=');
+INSERT INTO Operators([Name], [Symbol]) VALUES('GREATER', '>');
+INSERT INTO Operators([Name], [Symbol]) VALUES('LESS', '<');
+INSERT INTO Operators([Name], [Symbol]) VALUES('GREATER_OR_EQUAL', '>=');
+INSERT INTO Operators([Name], [Symbol]) VALUES('LESS_OR_EQUAL', '<=');
+INSERT INTO Operators([Name], [Symbol]) VALUES('DIFFERENT', '!=');
+INSERT INTO Operators([Name], [Symbol]) VALUES('LIKE', 'LIKE');
+INSERT INTO Operators([Name], [Symbol]) VALUES('IN', 'IN');
+INSERT INTO Operators([Name], [Symbol]) VALUES('NOT_IN', 'NOT IN');
+INSERT INTO Operators([Name], [Symbol]) VALUES('BETWEEN', 'BETWEEN');
+INSERT INTO Operators([Name], [Symbol]) VALUES('NOT_BETWEEN', 'NOT BETWEEN');
+INSERT INTO Operators([Name], [Symbol]) VALUES('IS_NULL', 'IS NULL');
+INSERT INTO Operators([Name], [Symbol]) VALUES('IS_NOT_NULL', 'IS NOT NULL');
+INSERT INTO Operators([Name], [Symbol]) VALUES('PERIOD', 'PERIOD');
+
+/*MySql Operators*/
+CREATE TABLE Operators(
+    Id int PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    [Name] nvarchar(50) NOT NULL,
+    [Symbol] nvarchar(100) NULL
+);
+
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('EQUAL', '=');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('GREATER', '>');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('LESS', '<');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('GREATER_OR_EQUAL', '>=');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('LESS_OR_EQUAL', '<=');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('DIFFERENT', '!=');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('LIKE', 'LIKE');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('IN', 'IN');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('NOT_IN', 'NOT IN');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('BETWEEN', 'BETWEEN');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('NOT_BETWEEN', 'NOT BETWEEN');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('IS_NULL', 'IS NULL');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('IS_NOT_NULL', 'IS NOT NULL');
+INSERT INTO Operators(`Name`, `Symbol`) VALUES('PERIOD', 'PERIOD');
