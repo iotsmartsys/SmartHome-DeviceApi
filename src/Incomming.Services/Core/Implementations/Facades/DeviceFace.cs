@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Incomming.Service.Core.Implementations.Facades;
 
-internal class DeviceFace(ILogger<DeviceFace> logger, IHttpClientFactory httpClientFactory, IOptions<ClientDeviceApiSettings> apiSettings) : IDeviceFacade
+internal class DeviceFace(IHttpClientFactory httpClientFactory, IOptions<ClientDeviceApiSettings> apiSettings) : IDeviceFacade
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient(apiSettings.GetName());
 

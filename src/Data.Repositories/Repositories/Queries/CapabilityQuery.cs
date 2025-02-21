@@ -2,7 +2,8 @@ namespace Data.Repositories;
 
 internal static class CapabilityQuery
 {
-    public const string GetByDeviceAndNameAsync = @"
+    public const string AliasOnQuery = "dc";
+    public const string GetByDeviceAndNameAsync = $@"
            SELECT 
                 dc.Id,
                 dc.DeviceId, 
@@ -16,14 +17,14 @@ internal static class CapabilityQuery
                 dc.UpdatedAt,
                 p.Id,
                 p.Name 
-            FROM Capabilities dc
+            FROM Capabilities {AliasOnQuery}
                 INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
                 INNER JOIN Devices d ON dc.DeviceId = d.Id
                 LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
             WHERE d.DeviceId = @device_id AND dc.Name IN @capability_name";
 
-    public const string GetCapabilitiesByDeviceAsync = @"
+    public const string GetCapabilitiesByDeviceAsync = $@"
             SELECT 
                 dc.Id,
                 dc.DeviceId, 
@@ -37,13 +38,13 @@ internal static class CapabilityQuery
                 dc.UpdatedAt, 
                 p.Id,
                 p.Name 
-            FROM Capabilities dc
+            FROM Capabilities {AliasOnQuery}
                 INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
                 INNER JOIN Devices d ON dc.DeviceId = d.Id
                 LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id              
         ";
-    
+
     public const string AddForDeviceAsync = @"
         INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityId, Value, deviceOwner)
         VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner);

@@ -87,8 +87,13 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         try
         {
             connection.Open();
-            ICapabilityQueryBuilder queryBuilder = CapabilityQueryBuilderFactory.Create(capabilityQuery ?? new CapabilityFind())
-                .WithCancellationToken(cancellationToken);
+            IFindCapabilityQueryBuilder queryBuilder = CapabilityQueryBuilderFactory.Create(capabilityQuery ?? new CapabilityFind());
+            
+            queryBuilder.WithCancellationToken(cancellationToken);
+            queryBuilder
+                .WithDeviceId(device_id)
+                .OrderBy("Name");
+
             var command = queryBuilder.Build();
 
             List<Capability> capabilitiesSelecteds = [];
