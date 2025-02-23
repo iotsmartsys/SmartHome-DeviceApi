@@ -47,7 +47,6 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
 
     public IFindCapabilityQueryBuilder OrderByDescending(string order)
     {
-
         AddOrderBy(order, true);
         return this;
     }

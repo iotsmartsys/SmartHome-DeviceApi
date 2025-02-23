@@ -2,10 +2,11 @@ using Api.Models;
 using Core.Contracts.Repositories;
 using Core.Contracts.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 [Route("api/v1/devices/{device_id}/capabilities")]
 [ApiController]
-public class CapabilityController : ControllerBase
+public class CapabilityController(ILogger<CapabilityController> logger) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
@@ -15,7 +16,7 @@ public class CapabilityController : ControllerBase
     {
         var capabilities = await repository.GetCapabilitiesByDeviceAsync(device_id, capabilityQuery, cancellationToken);
         if (capabilities.Any())
-            return Ok(capabilities.Select(c => (Capability)c));
+            return Ok(capabilities.Select(c => (Capability?)c));
 
         return NotFound();
     }
@@ -24,13 +25,21 @@ public class CapabilityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCapabilityByName([FromRoute] string device_id, [FromRoute] string capability_name, [FromServices] ICapabilityRepository repository)
+    public async Task<IActionResult> GetCapabilityByName([FromRoute] string device_id, [FromRoute] string capability_name,[FromServices] IMemoryCache cache, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        var capabilities = await repository.GetByDeviceAndNameAsync(device_id, capability_name);
-        var capability = capabilities.FirstOrDefault();
+        logger.LogInformation("Buscando capability {capability_name} para o device {device_id} no Cache", capability_name, device_id);
+        Capability? capability = await cache.GetOrCreateAsync($"{device_id}-{capability_name}", async entry =>
+        {
+            logger.LogInformation("Buscando capability {capability_name} para o device {device_id} no Banco de Dados", capability_name, device_id);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60);
+            IEnumerable<Core.Entities.Capability> capabilities = await repository.GetByDeviceAndNameAsync(device_id, capability_name);
+           return (Capability?)capabilities.FirstOrDefault();
+        });
+        
         if (capability is not null)
-            return Ok((Capability)capability);
+            return Ok(capability);
 
+        logger.LogWarning("Capability {capability_name} não encontrado para o device {device_id}", capability_name, device_id);
         return NotFound();
     }
 

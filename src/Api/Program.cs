@@ -8,7 +8,7 @@ string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
 builder.Services
     .AddCore()
-    // .AddSqlServerData(connectionString!)
+    .AddMemoryCache()
     .AddMySqlData(connectionString!)
     .AddRabbitMq(builder.Configuration);
 builder.Services.AddControllers();
