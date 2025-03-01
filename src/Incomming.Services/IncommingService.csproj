@@ -4,7 +4,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-AutomationServices-3018abd8-15b7-4b3d-a073-38fa89080fb0</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,12 +11,12 @@
     <PackageReference Include="RabbitMQ.Client" Version="7.1.0-alpha.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
+    <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
+    <PackageReference Include="HiveMQtt" Version="0.24.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Core/Implementations/" />
   </ItemGroup>
 
-  <ItemGroup>
-  </ItemGroup>
 </Project>

@@ -17,13 +17,13 @@ public static class DIAutomationExtensions
             .AddSingleton<IChanelQueueBuilder, ChannelQueueBuilder>()
             .AddSingleton<IPublisher, AmpqRabitmqPublisher>()
             .AddAutomationApi(configuration)
-            .AddRabbitMqAsync(configuration, cancellationToken)
-                    ;
+            .AddRabbitMqAsync(configuration, cancellationToken);
     }
 
     private static async Task<IServiceCollection> AddRabbitMqAsync(this IServiceCollection services, IConfiguration configuration, CancellationToken cancellationToken)
     {
-
+        return services;
+        
         services.AddOptions<RabbitMqConfiguration>()
                     .Configure(options => configuration.GetSection("RabbitMQ").Bind(options));
 
@@ -31,7 +31,6 @@ public static class DIAutomationExtensions
         int port = configuration.GetIntOrThrowIfNullOrEmpty("RabbitMQ:Port");
         string? userName = configuration.GetOrThrowIfNullOrEmpty("RabbitMQ:UserName");
         string? password = configuration.GetOrThrowIfNullOrEmpty("RabbitMQ:Password");
-
 
         var factory = new ConnectionFactory
         {

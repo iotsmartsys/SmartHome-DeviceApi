@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Repositories", "Data.R
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{20543853-AF10-B830-2A3D-9FE9F6ECBF6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Incomming.Service", "Incomming.Services\Incomming.Service.csproj", "{EBC365FA-DBD0-42B5-9FCE-B605FFFFE9F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncommingService", "Incomming.Services\IncommingService.csproj", "{EBC365FA-DBD0-42B5-9FCE-B605FFFFE9F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

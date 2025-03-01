@@ -12,9 +12,19 @@ builder.Services
     .AddMySqlData(connectionString!)
     .AddRabbitMq(builder.Configuration);
 builder.Services.AddControllers();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 var app = builder.Build();
 
+app.UseCors("AllowAll"); 
 app.MapControllers();
 app.UseMiddleware<ExceptionHandler>();
 
