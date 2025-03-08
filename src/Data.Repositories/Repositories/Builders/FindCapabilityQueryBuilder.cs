@@ -9,7 +9,7 @@ internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
     IFindCapabilityQueryBuilder OrderBy(string order);
     IFindCapabilityQueryBuilder OrderByDescending(string order);
 }
-internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : CapabilityQueryBuilder(CapabilityQuery.GetCapabilitiesByDeviceAsync), IFindCapabilityQueryBuilder
+internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : CapabilityQueryBuilder(CapabilityQuery.GetCapabilitiesByDevice), IFindCapabilityQueryBuilder
 {
     private string? _device_id;
     string _order_by = " ORDER BY ";

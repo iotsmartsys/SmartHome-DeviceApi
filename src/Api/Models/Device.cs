@@ -24,7 +24,7 @@ public record class Device(
         device.IpAddress,
         device.Protocol.ToString(),
         device.Platform,
-        device.Capabilities.Select(c => (Capability)c),
+        device.Capabilities.Select(c => (Capability)c!),
         device.Properties.Select(p => (Property)p)
     );
 

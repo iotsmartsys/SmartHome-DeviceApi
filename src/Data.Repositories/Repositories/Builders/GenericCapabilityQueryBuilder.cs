@@ -2,7 +2,7 @@ using Dapper;
 
 namespace Data.Repositories;
 
-internal class GenericCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQuery.GetCapabilitiesByDeviceAsync)
+internal class GenericCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQuery.GetCapabilitiesByDevice)
 {
     public override CommandDefinition Build()
     {

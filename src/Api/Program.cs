@@ -1,6 +1,6 @@
 using Api.Models;
-using Data.Repositories.MySql.DI;
 using Core.DI;
+using Data.Repositories.MySql.DI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +11,11 @@ builder.Services
     .AddMemoryCache()
     .AddMySqlData(connectionString!)
     .AddRabbitMq(builder.Configuration);
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+        {
+            options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+        });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -24,7 +28,7 @@ builder.Services.AddCors(options =>
 });
 var app = builder.Build();
 
-app.UseCors("AllowAll"); 
+app.UseCors("AllowAll");
 app.MapControllers();
 app.UseMiddleware<ExceptionHandler>();
 

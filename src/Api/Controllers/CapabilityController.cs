@@ -1,6 +1,7 @@
 using Api.Models;
 using Core.Contracts.Repositories;
 using Core.Contracts.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -25,17 +26,17 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCapabilityByName([FromRoute] string device_id, [FromRoute] string capability_name,[FromServices] IMemoryCache cache, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetCapabilityByName([FromRoute] string device_id, [FromRoute] string capability_name, [FromServices] IMemoryCache cache, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
         logger.LogInformation("Buscando capability {capability_name} para o device {device_id} no Cache", capability_name, device_id);
         Capability? capability = await cache.GetOrCreateAsync($"{device_id}-{capability_name}", async entry =>
         {
             logger.LogInformation("Buscando capability {capability_name} para o device {device_id} no Banco de Dados", capability_name, device_id);
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60);
-            IEnumerable<Core.Entities.Capability> capabilities = await repository.GetByDeviceAndNameAsync(device_id, capability_name);
-           return (Capability?)capabilities.FirstOrDefault();
+            IEnumerable<Core.Entities.Capability> capabilities = await repository.GetByDeviceAndNameAsync(device_id, cancellationToken, capability_name);
+            return (Capability?)capabilities.FirstOrDefault();
         });
-        
+
         if (capability is not null)
             return Ok(capability);
 
@@ -55,28 +56,48 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     }
 
     [HttpPatch()]
+    [HttpPatch("value")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateCapabilities([FromRoute] string device_id, [FromBody] CapabilityUpdate capability, [FromServices] ICapabilityRepository repository)
+    public async Task<IActionResult> UpdateCapabilities([FromRoute] string device_id, [FromBody] CapabilityUpdate capability, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        var capabilities = await repository.GetByDeviceAndNameAsync(device_id, capability.capability_name);
+        var capabilities = await repository.GetByDeviceAndNameAsync(device_id, cancellationToken, capability.capability_name);
         if (capabilities.Any() is false)
             return NotFound();
-        
+
         var entity = capabilities.First();
         entity.UpdateValue(capability.value);
-        await repository.UpdateForDeviceAsync(device_id, entity);
+        await repository.UpdateAsync(device_id, entity);
         return NoContent();
     }
 
-    [HttpDelete]
+    [HttpPatch("patches/{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteCapabilities([FromRoute] string device_id, [FromBody] IEnumerable<Capability> capabilities, [FromServices] ICapabilityRepository repository)
+    public async Task<IActionResult> PatchAsync([FromRoute] string device_id, [FromRoute] int id, [FromBody] JsonPatchDocument<Capability> request, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        await repository.RemoveFromDeviceAsync(device_id, capabilities.Select(c => (Core.Entities.Capability)c));
+        var entity = await repository.GetByIdAsync(device_id, id, cancellationToken);
+        if (entity is null)
+            return NotFound();
+
+        var model = (Capability)entity!;
+
+        request.ApplyTo(model);
+
+        entity = model;
+        await repository.UpdateAsync(device_id, entity);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteCapabilities([FromRoute] string device_id, [FromRoute] int id, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    {
+        await repository.DeleteAsync(device_id, id);
         return NoContent();
     }
 }

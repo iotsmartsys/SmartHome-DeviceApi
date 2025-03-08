@@ -13,10 +13,10 @@ internal class AddCapabilityService(ILogger<AddCapabilityService> logger
     public async Task AddAsync(CapabilityRequest request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Adicionando novas capacidades ao dispositivo {DeviceId}", request.DeviceId);
-        await repository.AddForDeviceAsync(request.DeviceId, request.Capabilities);
+        await repository.AddAsync(request.DeviceId, request.Capabilities);
         logger.LogInformation("Capacidades adicionadas ao dispositivo {DeviceId}", request.DeviceId);
 
-        var capabilitiesCompleted = await repository.GetByDeviceAndNameAsync(request.DeviceId, [.. request.Capabilities.Select(c => c.Name)]);
+        var capabilitiesCompleted = await repository.GetByDeviceAndNameAsync(request.DeviceId,cancellationToken, [.. request.Capabilities.Select(c => c.Name)]);
 
         await publisher.PublishAsync(new CapabilityRegisterEvent(action : "add",context : "capability",capabilities :[.. capabilitiesCompleted ]), cancellationToken);
     }

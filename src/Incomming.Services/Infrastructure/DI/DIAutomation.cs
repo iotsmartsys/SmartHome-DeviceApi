@@ -7,12 +7,12 @@ using RabbitMQ.Client;
 
 namespace Incomming.Service.Infrastructure.DI;
 
-public static class DIAutomationExtensions
+public static class DIIncommingServiceExtensions
 {
     public static async Task<IServiceCollection> AddAutomationAsync(this IServiceCollection services, IConfiguration configuration, CancellationToken cancellationToken)
     {
         return await services
-            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DIAutomationExtensions).Assembly))
+            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DIIncommingServiceExtensions).Assembly))
             .AddScoped<IDeviceFacade, DeviceFace>()
             .AddSingleton<IChanelQueueBuilder, ChannelQueueBuilder>()
             .AddSingleton<IPublisher, AmpqRabitmqPublisher>()
