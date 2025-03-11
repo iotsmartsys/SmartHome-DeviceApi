@@ -19,3 +19,5 @@ public record class CapabilityEventModel(string capability_name, string? descrip
         DataType = capability.value_type!
     };
 }
+
+public record class CapabilityCommand(string device_id, string capability_name, string value);

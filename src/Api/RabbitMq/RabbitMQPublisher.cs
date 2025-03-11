@@ -21,9 +21,12 @@ public class RabbitMQPublisher(IConnectionFactory factory, ILogger<RabbitMQPubli
 
     public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken)
     {
+        await PublishAsync(queueName, @event, cancellationToken);
+    }
+    public async Task PublishAsync<TEvent>(string queue, TEvent @event, CancellationToken cancellationToken)
+    {
         if (_connection is null)
         {
-
             await ConnectAsync(cancellationToken);
         }
         if (_channel is null)
@@ -31,16 +34,16 @@ public class RabbitMQPublisher(IConnectionFactory factory, ILogger<RabbitMQPubli
             throw new InvalidOperationException("Conexão com o RabbitMQ não foi estabelecida");
         }
 
-        logger.LogInformation($"Publicando mensagem na fila {queueName}");
+        logger.LogInformation($"Publicando mensagem na fila {queue}");
         var message = JsonSerializer.Serialize(@event);
         var body = Encoding.UTF8.GetBytes(message);
         await _channel.BasicPublishAsync(
             exchange: "amq.topic",
-            routingKey: queueName,
+            routingKey: queue,
             body: body,
             cancellationToken);
 
-        logger.LogInformation($"Mensagem publicada na fila {queueName}");
+        logger.LogInformation($"Mensagem publicada na fila {queue}");
     }
 
     public async ValueTask DisposeAsync()
