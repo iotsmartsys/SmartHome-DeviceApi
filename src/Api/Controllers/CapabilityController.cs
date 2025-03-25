@@ -30,19 +30,16 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     public async Task<IActionResult> GetCapabilityByName([FromRoute] string device_id, [FromRoute] string capability_name, [FromServices] IMemoryCache cache, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
         logger.LogInformation("Buscando capability {capability_name} para o device {device_id} no Cache", capability_name, device_id);
-        Capability? capability = await cache.GetOrCreateAsync($"{device_id}-{capability_name}", async entry =>
+        IEnumerable<Core.Entities.Capability> capabilities = await repository.GetByDeviceAndNameAsync(device_id, cancellationToken, capability_name);
+
+        if (capabilities.Any() is false)
         {
-            logger.LogInformation("Buscando capability {capability_name} para o device {device_id} no Banco de Dados", capability_name, device_id);
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60);
-            IEnumerable<Core.Entities.Capability> capabilities = await repository.GetByDeviceAndNameAsync(device_id, cancellationToken, capability_name);
-            return (Capability?)capabilities.FirstOrDefault();
-        });
+            logger.LogWarning("Capability {capability_name} não encontrado para o device {device_id}", capability_name, device_id);
+            return NotFound();
+        }
 
-        if (capability is not null)
-            return Ok(capability);
-
-        logger.LogWarning("Capability {capability_name} não encontrado para o device {device_id}", capability_name, device_id);
-        return NotFound();
+        Capability? capability = (Capability?)capabilities.FirstOrDefault();
+        return Ok(capability);
     }
 
     [HttpPost]
