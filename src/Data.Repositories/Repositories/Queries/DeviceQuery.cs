@@ -31,8 +31,8 @@ internal static class DeviceQuery
                 p.Id,
                 p.Name Name
             FROM Devices d
-                INNER JOIN Capabilities dc ON d.Id = dc.DeviceId
-                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id 
+                LEFT JOIN Capabilities dc ON d.Id = dc.DeviceId
+                LEFT JOIN CapabilityTypes c ON dc.CapabilityId = c.Id 
                 LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
                 LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id

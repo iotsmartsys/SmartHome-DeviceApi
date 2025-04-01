@@ -53,22 +53,26 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             .WithDeviceId(device_id)
                 .Build();
         Device? result = null;
-        var devices = await connection.QueryAsync<Device, Capability, Property?, Platform?, Device>(
+        var devices = await connection.QueryAsync<Device, Capability?, Property?, Platform?, Device>(
           command: command,
           map: (device, capability, property, platform) =>
             {
                 result ??= device;
-                logger.LogInformation("Mapping device {deviceId} capability {capabilityName}", device.DeviceId, capability.Name);
+                logger.LogInformation("Mapping device {deviceId} capability {capabilityName}", device.DeviceId, capability?.Name);
 
-                logger.LogInformation("Adding capability {capabilityName} to device {deviceId}", capability.Name, device.DeviceId);
-                var capInList = result.AddCapability(capability);
-                logger.LogInformation("Capability {capabilityName} added to device {deviceId}", capInList.Name, device.DeviceId);
-                if (capInList != null && platform != null)
+                logger.LogInformation("Adding capability {capabilityName} to device {deviceId}", capability?.Name, device.DeviceId);
+
+                if (capability != null)
                 {
-                    logger.LogInformation("Adding platform {platformName} to capability {capabilityName} of device {deviceId}", platform.Name, capability.Name, device.DeviceId);
-                    capInList.AddPlatform(platform.Name);
+                    var capInList = result.AddCapability(capability);
+                    logger.LogInformation("Capability {capabilityName} added to device {deviceId}", capInList.Name, device.DeviceId);
+                    if (capInList != null && platform != null)
+                    {
+                        logger.LogInformation("Adding platform {platformName} to capability {capabilityName} of device {deviceId}", platform.Name, capability.Name, device.DeviceId);
+                        capInList.AddPlatform(platform.Name);
+                    }
                 }
-
+                
                 result.AddProperty(property!);
 
                 return result;
