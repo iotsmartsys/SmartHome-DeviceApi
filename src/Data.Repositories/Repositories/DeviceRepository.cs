@@ -20,7 +20,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             command,
             (device, capability, property, platform) =>
             {
-                logger.LogInformation("Mapping device {deviceId} capability {capabilityName}", device.DeviceId, capability.Name);
+                logger.LogInformation("Mapping device {deviceId} capability", device.DeviceId);
                 var deviceSelected = devicesSelecteds.FirstOrDefault(d => d.DeviceId == device.DeviceId);
                 if (deviceSelected == null)
                 {
@@ -58,10 +58,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
           map: (device, capability, property, platform) =>
             {
                 result ??= device;
-                logger.LogInformation("Mapping device {deviceId} capability {capabilityName}", device.DeviceId, capability?.Name);
-
-                logger.LogInformation("Adding capability {capabilityName} to device {deviceId}", capability?.Name, device.DeviceId);
-
+                
                 if (capability != null)
                 {
                     var capInList = result.AddCapability(capability);
@@ -72,7 +69,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
                         capInList.AddPlatform(platform.Name);
                     }
                 }
-                
+
                 result.AddProperty(property!);
 
                 return result;
