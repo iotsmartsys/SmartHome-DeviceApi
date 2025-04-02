@@ -18,9 +18,9 @@ services:
         parallelism: 2
         delay: 10s
       restart_policy:
-        condition: always
+        condition: any
         delay: 5s
-        max_attempts: 5000
+        max_attempts: 10000
       resources:
         limits:
           cpus: '1'
