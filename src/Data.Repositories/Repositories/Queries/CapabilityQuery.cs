@@ -15,6 +15,7 @@ internal static class CapabilityQuery
                 dc.deviceOwner Owner,
                 c.DataType,
                 dc.UpdatedAt,
+                dc.Active,
                 p.Id,
                 p.Name 
             FROM Capabilities {AliasOnQuery}
@@ -35,6 +36,7 @@ internal static class CapabilityQuery
                 dc.deviceOwner Owner,
                 c.DataType,
                 dc.UpdatedAt,
+                dc.Active,
                 p.Id,
                 p.Name 
             FROM Capabilities {AliasOnQuery}
@@ -55,7 +57,8 @@ internal static class CapabilityQuery
                 dc.Value, 
                 dc.deviceOwner Owner,
                 c.DataType,
-                dc.UpdatedAt, 
+                dc.UpdatedAt,
+                dc.Active,
                 p.Id,
                 p.Name 
             FROM Capabilities dc
@@ -93,6 +96,7 @@ internal static class CapabilityQuery
             Description = @description,
             UpdatedAt = CURRENT_TIMESTAMP,
             deviceOwner = @owner,
+            Active = @active,
             CapabilityId = (SELECT Id FROM CapabilityTypes WHERE Name = @type LIMIT 1)
         WHERE
             DeviceId = @DeviceId

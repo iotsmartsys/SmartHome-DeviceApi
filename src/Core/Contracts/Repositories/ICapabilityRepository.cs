@@ -11,7 +11,8 @@ public interface ICapabilityRepository : IRepository
     Task<IEnumerable<Capability>> GetByDeviceAndNameAsync(string device_id, CancellationToken cancellationToken, params string[] capability_name);
     Task<Capability?> GetByIdAsync(string device_id, int id, CancellationToken cancellationToken);
 }
-public record class CapabilityFind(string? name, string? type, string? owner, string? value)
+public record class CapabilityFind(string? name, string? type, string? owner, string? value,
+    bool? active)
 {
-    public CapabilityFind() : this(null, null, null, null) { }
+    public CapabilityFind() : this(null, null, null, null, null) { }
 }

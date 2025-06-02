@@ -196,7 +196,8 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 capability.Description,
                 capability.Type,
                 capability.Value,
-                capability.Owner
+                capability.Owner,
+                capability.Active
             }, transaction);
 
             logger.LogInformation("Capability {capabilityName} atualizada para o device {deviceId}", capability.Name, device_id);

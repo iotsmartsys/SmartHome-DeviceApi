@@ -10,16 +10,18 @@ public class Capability
     public string Mode { get; set; } = default!;
     public string Value { get; set; } = default!;
     public string? Owner { get; set; } = default!;
+    public bool Active { get; set; } = true;
     public CapabilityDataType? DataType { get; set; } = default!;
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<string> Platforms { get; set; } = [];
-    public Capability(string name, string type, string mode, string value, string owner)
+    public Capability(string name, string type, string mode, string value, string owner, bool active)
     {
         Name = name;
         Type = type;
         Mode = mode;
         Value = value;
         Owner = owner;
+        Active = active;
     }
 
     public Capability() { }

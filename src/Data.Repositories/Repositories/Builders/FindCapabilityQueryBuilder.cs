@@ -6,12 +6,14 @@ namespace Data.Repositories;
 internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
 {
     IFindCapabilityQueryBuilder WithDeviceId(string device_id);
+    IFindCapabilityQueryBuilder WithActive(bool active);
     IFindCapabilityQueryBuilder OrderBy(string order);
     IFindCapabilityQueryBuilder OrderByDescending(string order);
 }
 internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : CapabilityQueryBuilder(CapabilityQuery.GetCapabilitiesByDevice), IFindCapabilityQueryBuilder
 {
     private string? _device_id;
+    private bool? active;
     string _order_by = " ORDER BY ";
 
     public override CommandDefinition Build()
@@ -27,7 +29,8 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
             name = capabilityQuery.name,
             type = capabilityQuery.type,
             owner = capabilityQuery.owner,
-            value = capabilityQuery.value
+            value = capabilityQuery.value,
+            active = capabilityQuery.active
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
@@ -36,6 +39,12 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
     public IFindCapabilityQueryBuilder WithDeviceId(string device_id)
     {
         _device_id = device_id;
+        return this;
+    }
+
+    public IFindCapabilityQueryBuilder WithActive(bool active)
+    {
+        this.active = active;
         return this;
     }
 
@@ -77,5 +86,7 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
             _sql += " AND dc.deviceOwner = @owner";
         if (capabilityQuery.value is not null)
             _sql += " AND dc.Value = @value";
+        if (capabilityQuery.active.HasValue)
+            _sql += " AND dc.Active = @active";
     }
 }

@@ -5,7 +5,7 @@ svc:
 	dotnet run --project src/Incomming.Services/IncommingService.csproj
 
 
-api-build:
+build:
 	./build.sh
 
 deploy:

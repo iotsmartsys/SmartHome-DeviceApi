@@ -1,6 +1,6 @@
 namespace Api.Models;
 
-public record class Capability(string capability_name, string? description, string? owner, string type, string? mode, string? value, IEnumerable<string>? platforms, string? value_type, string? updated_at)
+public record class Capability(string capability_name, string? description, string? owner, string type, string? mode, string? value, IEnumerable<string>? platforms, string? value_type, string? updated_at, bool active)
 {
     public int Id { get; private set; }
     public static implicit operator Capability?(Core.Entities.Capability? capability)
@@ -8,7 +8,7 @@ public record class Capability(string capability_name, string? description, stri
         if (capability is null)
             return null;
 
-        return new Capability(capability.Name, capability.Description, capability.Owner, capability.Type, capability.Mode, capability.Value, capability.Platforms, capability.DataType, capability.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")){ Id = capability.Id };
+        return new Capability(capability.Name, capability.Description, capability.Owner, capability.Type, capability.Mode, capability.Value, capability.Platforms, capability.DataType, capability.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"), capability.Active) { Id = capability.Id };
     }
 
     public static implicit operator Core.Entities.Capability(Capability capability) => new()
