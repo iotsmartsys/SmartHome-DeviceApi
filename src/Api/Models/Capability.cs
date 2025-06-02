@@ -21,6 +21,7 @@ public record class Capability(string capability_name, string? description, stri
         Value = capability.value!,
         Description = capability.description,
         Platforms = capability.platforms ?? [],
-        DataType = capability.value_type!
+        DataType = capability.value_type!,
+        Active = capability.active,
     };
 }
