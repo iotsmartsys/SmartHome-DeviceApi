@@ -1,5 +1,6 @@
 using Api.Models;
 using Core.Contracts.Repositories;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SmartHome_Api.Controllers
@@ -14,7 +15,8 @@ namespace SmartHome_Api.Controllers
         public async Task<IActionResult> GetDevices([FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
         {
             var devices = await repository.GetDevicesAsync(cancellationToken);
-            var models = devices.Select(d => {
+            var models = devices.Select(d =>
+            {
                 d.ClearCapabilities();
                 d.ClearProperties();
                 var model = (Device)d;
@@ -45,6 +47,21 @@ namespace SmartHome_Api.Controllers
             var entity = (Core.Entities.Device)device;
             await repository.CreateAsync(entity, cancellationToken);
             return CreatedAtAction(nameof(GetDevice), new { device_id = entity.DeviceId }, null);
+        }
+
+        [HttpPatch("{device_id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateDevice([FromRoute] string device_id, [FromBody] JsonPatchDocument<Device> patch, [FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
+        {
+            var device = await repository.GetDeviceAsync(device_id, cancellationToken);
+            if (device == null)
+                return NotFound();
+
+            patch.ApplyTo(device);
+
+            await repository.UpdateAsync(device, cancellationToken);
+            return NoContent();
         }
     }
 }

@@ -151,4 +151,34 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             connection.Close();
         }
     }
+
+    public async Task UpdateAsync(Device device, CancellationToken cancellationToken)
+    {
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            logger.LogInformation("Updating device {deviceId}", device.DeviceId);
+            const string sql = DeviceQuery.UpdateDevice;
+
+            var command = new CommandDefinition(sql, device, transaction, cancellationToken: cancellationToken);
+            logger.LogInformation("Executing update command for device {deviceId}", device.DeviceId);
+
+            await connection.ExecuteAsync(command);
+            logger.LogInformation("Device {deviceId} updated successfully", device.DeviceId);
+            transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error updating device {deviceId}", device.DeviceId);
+            transaction.Rollback();
+            throw;
+        }
+        finally
+        {
+            connection.Close();
+        }
+        
+    }
 }

@@ -58,4 +58,18 @@ internal static class DeviceQuery
             INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
             VALUES(
                 (SELECT Id FROM Capabilities WHERE Name = @capabilityName AND DeviceId = @idDevice LIMIT 1), (SELECT Id FROM Platforms WHERE Name = @platformName LIMIT 1));";
+
+    public const string UpdateDevice = @"
+        UPDATE Devices 
+        SET 
+            Name = @Name, 
+            Description = @Description, 
+            LastActive = NOW(), 
+            Status = @State, 
+            MacAddress = @MacAddress, 
+            IpAddress = @IpAddress, 
+            CommunicationTypeId = @Protocol, 
+            Platform = @Platform
+        WHERE Id = @Id;
+        ";
 }

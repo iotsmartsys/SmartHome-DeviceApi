@@ -1,4 +1,5 @@
 using Core.Entities;
+using Core.Defaults;
 
 namespace Api.Models;
 
@@ -11,6 +12,7 @@ public record class Device(
     , string ip_address
     , string protocol
     , string platform
+    , string? last_active
     , IEnumerable<Capability> capabilities
     , IEnumerable<Property> properties)
 {
@@ -25,6 +27,7 @@ public record class Device(
         device.IpAddress,
         device.Protocol.ToString(),
         device.Platform,
+        device.LastActive.AsString(),
         device.Capabilities.Select(c => (Capability)c!),
         device.Properties.Select(p => (Property)p)
     )
@@ -43,6 +46,7 @@ public record class Device(
         IpAddress = device.ip_address,
         Protocol = Enum.Parse<CommunicationProtocol>(device.protocol),
         Platform = device.platform,
+        LastActive = device.last_active?.ToDateTime() ?? DateTime.UtcNow,
     }
     .AddCapabilities(device.capabilities.Select(c => (Core.Entities.Capability)c))
     .AddProperties(device.properties.Select(p => (Core.Entities.Property)p));
