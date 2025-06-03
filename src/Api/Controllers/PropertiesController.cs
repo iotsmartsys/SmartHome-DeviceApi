@@ -1,5 +1,6 @@
 using Api.Models;
 using Core.Contracts.Repositories;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/v1/devices/{device_id}/properties")]
@@ -65,27 +66,18 @@ public class PropertiesController(ILogger<PropertiesController> logger) : Contro
         return CreatedAtAction(nameof(GetAllAsync), new { device_id, id = entity.Id }, property);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut()]
+    [HttpPatch()]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateAsync([FromRoute] string device_id, int id, [FromBody] Property property, [FromServices] IPropertyRepository repository, IDeviceRepository deviceRepository, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateUpdateAsync([FromRoute] string device_id, [FromBody] Property property, [FromServices] IPropertyRepository repository, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Request de atualização de property {id} para o device {device_id}", id, device_id);
         var entity = (Core.Entities.Property)property;
-        entity.Id = id;
+        logger.LogInformation("Request de atualização de property {property} para o device {device_id}", entity, device_id);
         logger.LogInformation("Identificando device {device_id}", device_id);
-        var device = await deviceRepository.GetDeviceAsync(device_id, cancellationToken);
-        if (device is null)
-        {
-            logger.LogWarning("Device {device_id} não encontrado", device_id);
-            return NotFound();
-        }
-
-        logger.LogInformation("Device: {device}", device);
-        logger.LogInformation("Atualizando property {property} para o device {device_id}", entity, device_id);
-        await repository.UpdateAsync(device_id, entity, cancellationToken);
+        await repository.CreateOrUpdateAsync(device_id, property, cancellationToken);
         logger.LogInformation("Property atualizada com sucesso");
 
         return NoContent();

@@ -1,4 +1,5 @@
 namespace Core.Entities;
+
 public class Device
 {
     public int Id { get; set; }
@@ -11,7 +12,7 @@ public class Device
     public string IpAddress { get; set; } = default!;
     public CommunicationProtocol Protocol { get; set; } = CommunicationProtocol.HTTP;
     public string Platform { get; set; } = default!;
-    public Device(string device_id, string device_name,  string state)
+    public Device(string device_id, string device_name, string state)
     {
         DeviceId = device_id;
         Name = device_name;
@@ -62,6 +63,16 @@ public class Device
 
         Properties = Properties.Concat(propertiesNotPresentIn);
         return this;
+    }
+    
+    public void ClearCapabilities()
+    {
+        Capabilities = [];
+    }
+    
+    public void ClearProperties()
+    {
+        Properties = [];
     }
 }
 

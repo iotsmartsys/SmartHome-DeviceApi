@@ -20,4 +20,13 @@ internal static class PropertyQuery
         INNER JOIN Devices d ON dp.DeviceId = d.Id
         WHERE  
             d.DeviceId = @device_id ";
+
+    public const string UpSert = @"
+        INSERT INTO DeviceProperties (DeviceId, Name, Description, Value)
+        VALUES ((SELECT Id FROM Devices WHERE deviceId = @device_id), @name, @description, @value)
+        ON DUPLICATE KEY UPDATE
+            Name = @name,
+            Description = @description,
+            Value = @value;
+    ";
 }

@@ -3,11 +3,7 @@ namespace Api.Models;
 
 public record class Property(string? name, string? value, string? description) : ISelfValidate
 {
-    public int Id { get; init; }
-    public static implicit operator Property(Core.Entities.Property property) => new(property.Name, property.Value, property.Description)
-    {
-        Id = property.Id
-    };
+    public static implicit operator Property(Core.Entities.Property property) => new(property.Name, property.Value, property.Description);
 
     public static implicit operator Core.Entities.Property(Property property)
     {

@@ -123,7 +123,7 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
         }
     }
 
-    public async Task UpdateAsync(string device_id, Property property, CancellationToken cancellationToken)
+    public async Task CreateOrUpdateAsync(string device_id, Property property, CancellationToken cancellationToken)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
@@ -131,12 +131,10 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
         try
         {
             logger.LogInformation("Buscando device {deviceId}", device_id);
-            var idDevice = await connection.ExecuteScalarAsync<int>(PropertyQuery.GetIdDevice, new { device_id }, transaction);
             logger.LogInformation("Atualizando property {propertyName} para o device {deviceId}", property.Name, device_id);
-            var command = new CommandDefinition(PropertyQuery.UpdateForDevice, new
+            var command = new CommandDefinition(PropertyQuery.UpSert, new
             {
-                id = property.Id,
-                deviceId = idDevice,
+                device_id = device_id,
                 name = property.Name,
                 description = property.Description,
                 value = property.Value

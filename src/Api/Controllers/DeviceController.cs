@@ -14,7 +14,12 @@ namespace SmartHome_Api.Controllers
         public async Task<IActionResult> GetDevices([FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
         {
             var devices = await repository.GetDevicesAsync(cancellationToken);
-            var models = devices.Select(d => (Device)d);
+            var models = devices.Select(d => {
+                d.ClearCapabilities();
+                d.ClearProperties();
+                var model = (Device)d;
+                return model;
+            });
             return Ok(models);
         }
 

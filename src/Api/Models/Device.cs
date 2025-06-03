@@ -14,6 +14,7 @@ public record class Device(
     , IEnumerable<Capability> capabilities
     , IEnumerable<Property> properties)
 {
+    public int? id { get; set; }
 
     public static implicit operator Device(Core.Entities.Device device) => new(
         device.DeviceId,
@@ -26,7 +27,10 @@ public record class Device(
         device.Platform,
         device.Capabilities.Select(c => (Capability)c!),
         device.Properties.Select(p => (Property)p)
-    );
+    )
+    {
+        id = device.Id
+    };
 
     public static implicit operator Core.Entities.Device(Device device) => new Core.Entities.Device(
         device.device_id,
