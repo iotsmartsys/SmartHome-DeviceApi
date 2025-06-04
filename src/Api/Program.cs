@@ -2,15 +2,16 @@ using Api.Models;
 using Core.DI;
 using Data.Repositories.MySql.DI;
 
-var builder = WebApplication.CreateBuilder(args);
+var cts = new CancellationTokenSource();
 
+var builder = WebApplication.CreateBuilder(args);
 string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
-builder.Services
+await builder.Services
     .AddCore()
     .AddMemoryCache()
     .AddMySqlData(connectionString!)
-    .AddRabbitMq(builder.Configuration);
+    .AddMqttClientAsync(builder.Configuration, cts.Token);
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         {
@@ -47,4 +48,15 @@ app.MapGet("/api/v1/timezone", (string zone) =>
 .WithMetadata(new { Description = "Obtém informações de fuso horário" });
 
 
-await app.RunAsync();
+Console.CancelKeyPress += (sender, eventArgs) =>
+{
+    cts.Cancel();
+    eventArgs.Cancel = true; // Permite shutdown gracioso
+};
+
+AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) =>
+{
+    cts.Cancel();
+};
+
+await app.RunAsync(cts.Token);

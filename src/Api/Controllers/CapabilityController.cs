@@ -1,5 +1,4 @@
 using Api.Models;
-using Core.Contracts.Events;
 using Core.Contracts.Repositories;
 using Core.Contracts.Services;
 using Microsoft.AspNetCore.JsonPatch;
@@ -98,24 +97,4 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         await repository.DeleteAsync(device_id, id);
         return NoContent();
     }
-
-    [HttpPut("{capability_name}/state")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateState([FromRoute] string device_id, [FromRoute] string capability_name, [FromBody] CapabilityStateRequest state, [FromServices] ICapabilityRepository repository, [FromServices] IEventPublisher publisher, CancellationToken cancellationToken)
-    {
-        var capabilities = await repository.GetByDeviceAndNameAsync(device_id, cancellationToken, capability_name);
-        if (capabilities.Any() is false)
-            return NotFound();
-
-        var entity = capabilities.First();
-        if (entity.Owner is null)
-            return NoContent();
-
-        string queue = $"device.{entity.Owner}.command";
-        await publisher.PublishAsync(queue, new CapabilityCommand(entity.Owner, entity.Name, state.state), cancellationToken);
-        return NoContent();
-    }
-    public record class CapabilityStateRequest(string state);
 }

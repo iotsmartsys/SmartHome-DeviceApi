@@ -1,4 +1,5 @@
 api:
+	clear
 	dotnet run --project src/Api/Api.csproj
 
 svc:
