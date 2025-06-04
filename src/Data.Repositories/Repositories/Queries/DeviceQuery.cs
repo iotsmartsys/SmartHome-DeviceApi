@@ -28,6 +28,7 @@ internal static class DeviceQuery
                 dp.Id ,
                 dp.Name,
                 dp.Value,
+                dp.Description Description,
                 p.Id,
                 p.Name Name
             FROM Devices d

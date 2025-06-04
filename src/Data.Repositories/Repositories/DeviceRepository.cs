@@ -69,7 +69,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
                         capInList.AddPlatform(platform.Name);
                     }
                 }
-
+                logger.LogInformation("Adding property {propertyName} to device {deviceId} e description {propertyDescription}", property?.Name, device.DeviceId, property?.Description);
                 result.AddProperty(property!);
 
                 return result;
