@@ -18,7 +18,7 @@ namespace SmartHome_Api.Controllers
             var models = devices.Select(d =>
             {
                 d.ClearCapabilities();
-                d.ClearProperties();
+                // d.ClearProperties();
                 var model = (Device)d;
                 return model;
             });
