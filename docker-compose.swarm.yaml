@@ -5,10 +5,6 @@ services:
     environment:
       - TZ=America/Bahia
       - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;
-      - Mqtt__Host=mqtt_emqx
-      - Mqtt__Port=1883
-      - Mqtt__User=smarthomeiot
-      - Mqtt__Password=Smarthomeiot@123      
       - Logging__LogLevel__Default=Error
       - Logging__LogLevel__Microsoft=Error
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error

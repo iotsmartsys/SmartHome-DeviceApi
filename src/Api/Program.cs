@@ -7,11 +7,11 @@ var cts = new CancellationTokenSource();
 var builder = WebApplication.CreateBuilder(args);
 string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
-await builder.Services
-    .AddCore()
-    .AddMemoryCache()
-    .AddMySqlData(connectionString!)
-    .AddMqttClientAsync(builder.Configuration, cts.Token);
+builder.Services
+   .AddCore()
+   .AddMemoryCache()
+   .AddMySqlData(connectionString!);
+
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
         {
