@@ -22,11 +22,11 @@ internal static class PropertyQuery
             d.DeviceId = @device_id ";
 
     public const string UpSert = @"
-        INSERT INTO DeviceProperties (DeviceId, Name, Description, Value)
-        VALUES ((SELECT Id FROM Devices WHERE deviceId = @device_id), @name, @description, @value)
+        INSERT INTO DeviceProperties (DeviceId, Name, Description, Value, UpdatedAt)
+        VALUES ((SELECT Id FROM Devices WHERE deviceId = @device_id), @name, @description, @value, NOW())
         ON DUPLICATE KEY UPDATE
             Name = @name,
-            Description = @description,
-            Value = @value;
+            Value = @value,
+            UpdatedAt = NOW();
     ";
 }

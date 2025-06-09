@@ -72,7 +72,7 @@ public class PropertiesController(ILogger<PropertiesController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateUpdateAsync([FromRoute] string device_id, [FromBody] Property property, [FromServices] IPropertyRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateOrUpdateAsync([FromRoute] string device_id, [FromBody] Property property, [FromServices] IPropertyRepository repository, CancellationToken cancellationToken)
     {
         var entity = (Core.Entities.Property)property;
         logger.LogInformation("Request de atualização de property {property} para o device {device_id}", entity, device_id);

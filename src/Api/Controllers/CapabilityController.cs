@@ -69,7 +69,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         return NoContent();
     }
 
-    [HttpPatch("patches/{id}")]
+    [HttpPatch("{id}/patches")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

@@ -73,4 +73,14 @@ internal static class DeviceQuery
             Platform = @Platform
         WHERE Id = @Id;
         ";
+
+    public const string DeleteDevice = @"
+        DELETE FROM Devices WHERE DeviceId = @DeviceId;
+        ";
+    public const string DeleteDeviceCapabilities = @"
+        DELETE FROM Capabilities WHERE DeviceId = @DeviceId;
+        ";
+    public const string DeleteProperties = @"
+        DELETE FROM DeviceProperties WHERE DeviceId = @DeviceId;
+        ";
 }

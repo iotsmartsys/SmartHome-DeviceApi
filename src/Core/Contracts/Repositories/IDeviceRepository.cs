@@ -8,4 +8,5 @@ public interface IDeviceRepository : IRepository
     Task<Device?> GetDeviceAsync(string device_id, CancellationToken cancellationToken);
     Task<IEnumerable<Device>> GetDevicesAsync(CancellationToken cancellationToken);
     Task UpdateAsync(Device device, CancellationToken cancellationToken);
+    Task DeleteAsync(string device_id, CancellationToken cancellationToken);
 }
