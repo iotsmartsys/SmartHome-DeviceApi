@@ -7,6 +7,7 @@ public class Device
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
     public DateTime LastActive { get; set; } = default!;
+    public DateTime? PowerOn { get; set; }
     public string State { get; set; } = default!;
     public string MacAddress { get; set; } = default!;
     public string IpAddress { get; set; } = default!;
@@ -64,12 +65,12 @@ public class Device
         Properties = Properties.Concat(propertiesNotPresentIn);
         return this;
     }
-    
+
     public void ClearCapabilities()
     {
         Capabilities = [];
     }
-    
+
     public void ClearProperties()
     {
         Properties = [];

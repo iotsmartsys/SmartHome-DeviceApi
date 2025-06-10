@@ -13,6 +13,7 @@ public record class Device(
     , string protocol
     , string platform
     , string? last_active
+    , string? power_on
     , IEnumerable<Capability> capabilities
     , IEnumerable<Property> properties)
 {
@@ -28,6 +29,7 @@ public record class Device(
         device.Protocol.ToString(),
         device.Platform,
         device.LastActive.AsString(),
+        device.PowerOn?.AsString(),
         device.Capabilities.Select(c => (Capability)c!),
         device.Properties.Select(p => (Property)p)
     )
@@ -47,6 +49,7 @@ public record class Device(
         Protocol = Enum.Parse<CommunicationProtocol>(device.protocol),
         Platform = device.platform,
         LastActive = device.last_active?.ToDateTime() ?? DateTime.UtcNow,
+        PowerOn = device.power_on?.ToDateTime(),
     }
     .AddCapabilities(device.capabilities.Select(c => (Core.Entities.Capability)c))
     .AddProperties(device.properties.Select(p => (Core.Entities.Property)p));
