@@ -4,7 +4,28 @@ namespace Data.Repositories;
 
 internal static class DeviceQuery
 {
-    public const string GetDevices = @"
+    public const string GetAllDevices = @"       
+            SELECT
+                d.Id ,
+                d.DeviceId DeviceId,
+                d.Name Name,
+                d.description,
+                d.LastActive LastActive,
+                d.PowerOn PowerOn,
+                d.Status state,
+                d.MacAddress,
+                d.IpAddress,
+                d.CommunicationTypeId Protocol,
+                d.Platform,
+                dp.Id ,
+                dp.Name,
+                dp.Value,
+                dp.Description Description
+            FROM Devices d 
+                LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
+            WHERE 1 = 1
+        ";
+    public const string GetDevicesWithCapabilities = @"
         SELECT
                 d.Id ,
                 d.DeviceId DeviceId,

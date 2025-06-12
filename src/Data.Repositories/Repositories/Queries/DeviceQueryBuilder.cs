@@ -3,7 +3,7 @@ using Dapper;
 
 namespace Data.Repositories;
 
-internal class DeviceQueryBuilder()
+internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
 {
     private string? _device_id;
     private string? _name;
@@ -36,13 +36,12 @@ internal class DeviceQueryBuilder()
 
     public CommandDefinition Build()
     {
-        var query = DeviceQuery.GetDevices;
         if (!string.IsNullOrEmpty(_device_id))
-            query += " AND d.DeviceId = @device_id";
+            sql += " AND d.DeviceId = @device_id";
         if (!string.IsNullOrEmpty(_name))
-            query += " AND d.Name = @name";
+            sql += " AND d.Name = @name";
 
-        return new CommandDefinition(query, new { device_id = _device_id, name = _name }, transaction: _transaction, cancellationToken: _cancellationToken);
+        return new CommandDefinition(sql, new { device_id = _device_id, name = _name }, transaction: _transaction, cancellationToken: _cancellationToken);
     }
 
 }

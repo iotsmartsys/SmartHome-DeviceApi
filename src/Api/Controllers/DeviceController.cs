@@ -17,8 +17,6 @@ public class DeviceController : ControllerBase
         var devices = await repository.GetDevicesAsync(cancellationToken);
         var models = devices.Select(d =>
         {
-            d.ClearCapabilities();
-            // d.ClearProperties();
             var model = (Device)d;
             return model;
         });
