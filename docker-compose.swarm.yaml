@@ -55,7 +55,7 @@ services:
           memory: 20M
     ports:
       - target: 8080
-        published: 80811
+        published: 8091
         protocol: tcp
         mode: ingress
 
