@@ -7,6 +7,10 @@ var cts = new CancellationTokenSource();
 var builder = WebApplication.CreateBuilder(args);
 string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks()
+    .AddMySql(connectionString: connectionString!);
+builder.Services.AddHostedService<DatabaseWatchdogService>();
+
 builder.Services
    .AddCore()
    .AddMemoryCache()
@@ -29,6 +33,7 @@ builder.Services.AddCors(options =>
 });
 var app = builder.Build();
 
+app.MapHealthChecks("/health");
 app.UseCors("AllowAll");
 app.MapControllers();
 app.UseMiddleware<ExceptionHandler>();

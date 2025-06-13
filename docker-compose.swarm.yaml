@@ -4,7 +4,7 @@ services:
     image: "centraliot.azurecr.io/devices-api:latest"
     environment:
       - TZ=America/Bahia
-      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;
+      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;ConnectionReset=true;ConnectionTimeout=10;
       - Logging__LogLevel__Default=Error
       - Logging__LogLevel__Microsoft=Error
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error
@@ -24,6 +24,11 @@ services:
         reservations:
           cpus: '0'
           memory: 20M
+      health_check:
+        test: ["CMD", "curl", "-f", "http://devices-api_api:8080/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
     ports:
       - target: 8080
         published: 8081
