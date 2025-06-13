@@ -82,7 +82,9 @@ internal static class CapabilityQuery
                 dc.UpdatedAt,
                 dc.Active
             FROM Capabilities dc
-                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id        
+                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
+            WHERE 
+                dc.Active = true        
         ";
 
     public const string AddForDevice = @"

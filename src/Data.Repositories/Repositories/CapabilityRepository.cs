@@ -106,7 +106,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task<IEnumerable<Capability>> GetAllCapabilitiesAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Capability>> GetAllCapabilitiesAsync(CapabilityFind? capabilityFind, CancellationToken cancellationToken)
     {
         try
         {
