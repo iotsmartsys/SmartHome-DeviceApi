@@ -29,6 +29,35 @@ services:
         published: 8081
         protocol: tcp
         mode: ingress
+  api-readonly:
+    image: "centraliot.azurecr.io/devices-api:latest"
+    environment:
+      - TZ=America/Bahia
+      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;ConnectionReset=true;ConnectionTimeout=10;
+      - Logging__LogLevel__Default=Error
+      - Logging__LogLevel__Microsoft=Error
+      - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 100
+      resources:
+        limits:
+          cpus: '1'
+          memory: 200M
+        reservations:
+          cpus: '0'
+          memory: 20M
+    ports:
+      - target: 8080
+        published: 80811
+        protocol: tcp
+        mode: ingress
 
 networks:
   default:
