@@ -3,7 +3,7 @@ namespace Data.Repositories;
 internal static class CapabilityQuery
 {
     public const string AliasOnQuery = "dc";
-    public const string GetByDeviceAndName = $@"
+    public const string GetByName = $@"
            SELECT 
                 dc.Id,
                 dc.DeviceId, 
@@ -23,7 +23,7 @@ internal static class CapabilityQuery
                 INNER JOIN Devices d ON dc.DeviceId = d.Id
                 LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
-            WHERE d.DeviceId = @device_id AND dc.Name IN @capability_name";
+            WHERE dc.Name IN @capability_name";
     public const string GetByDeviceAndId = $@"
            SELECT 
                 dc.Id,
@@ -44,7 +44,7 @@ internal static class CapabilityQuery
                 INNER JOIN Devices d ON dc.DeviceId = d.Id
                 LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
-            WHERE d.DeviceId = @device_id AND dc.Id = @id";
+            WHERE dc.Id = @id";
 
     public const string GetCapabilitiesByDevice = $@"
             SELECT 
@@ -68,6 +68,23 @@ internal static class CapabilityQuery
                 LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id              
         ";
 
+    public const string GetAllCapabilities = $@"
+            SELECT 
+                dc.Id,
+                dc.DeviceId, 
+                dc.Name, 
+                dc.Description, 
+                c.Name Type, 
+                c.ActuatorMode Mode, 
+                dc.Value, 
+                dc.deviceOwner Owner,
+                c.DataType,
+                dc.UpdatedAt,
+                dc.Active
+            FROM Capabilities dc
+                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id        
+        ";
+
     public const string AddForDevice = @"
         INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityId, Value, deviceOwner)
         VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner);
@@ -76,14 +93,13 @@ internal static class CapabilityQuery
     public const string RemoveFromDevice = @"
         DELETE FROM Capabilities 
         WHERE 
-            DeviceId = @DeviceId 
-            AND Id = @id;
+            Id = @id;
     ";
 
     public const string AddPlatformToCapability = @"
                         INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
                         VALUES (
-                            (SELECT Id FROM Capabilities WHERE DeviceId = @DeviceId AND Name = @Name LIMIT 1),
+                            (SELECT Id FROM Capabilities WHERE Name = @Name LIMIT 1),
                             (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1)
                         );
                     ";
@@ -99,8 +115,7 @@ internal static class CapabilityQuery
             Active = @active,
             CapabilityId = (SELECT Id FROM CapabilityTypes WHERE Name = @type LIMIT 1)
         WHERE
-            DeviceId = @DeviceId
-            AND Id = @id;
+            Id = @id;
     ";
 
     public const string RemovePlatformFromCapability = @"

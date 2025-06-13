@@ -65,18 +65,18 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task<Capability?> GetByIdAsync(string device_id, int id, CancellationToken cancellationToken)
+    public async Task<Capability?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         const string sql = CapabilityQuery.GetByDeviceAndId;
-        var command = new CommandDefinition(sql, new { device_id, id = id }, cancellationToken: cancellationToken);
+        var command = new CommandDefinition(sql, new { id = id }, cancellationToken: cancellationToken);
         return (await GetAllAsync(command)).FirstOrDefault();
 
     }
 
-    public async Task<IEnumerable<Capability>> GetByDeviceAndNameAsync(string device_id, CancellationToken cancellationToken, params string[] capability_name)
+    public async Task<IEnumerable<Capability>> GetByNameAsync(CancellationToken cancellationToken, params string[] capability_name)
     {
-        const string sql = CapabilityQuery.GetByDeviceAndName;
-        var command = new CommandDefinition(sql, new { device_id, capability_name = capability_name }, cancellationToken: cancellationToken);
+        const string sql = CapabilityQuery.GetByName;
+        var command = new CommandDefinition(sql, new { capability_name = capability_name }, cancellationToken: cancellationToken);
         return await GetAllAsync(command);
     }
 
@@ -89,7 +89,6 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
             queryBuilder.WithCancellationToken(cancellationToken);
             queryBuilder
-                .WithDeviceId(device_id)
                 .OrderBy("Name");
 
             var command = queryBuilder.Build();
@@ -98,7 +97,27 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error ao buscar capabilities para o device {deviceId}", device_id);
+            logger.LogError(ex, "Error ao buscar capabilities para o device {id}", device_id);
+            throw;
+        }
+        finally
+        {
+            connection.Close();
+        }
+    }
+
+    public async Task<IEnumerable<Capability>> GetAllCapabilitiesAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            connection.Open();
+            CommandDefinition command = new(CapabilityQuery.GetAllCapabilities, cancellationToken: cancellationToken);
+
+            return await connection.QueryAsync<Capability>(command: command);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error ao buscar capabilities");
             throw;
         }
         finally
@@ -126,43 +145,34 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         });
     }
 
-    public async Task DeleteAsync(string device_id, int id)
+    public async Task DeleteAsync(int id)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
 
         try
         {
-            int idDevice = await connection.ExecuteScalarAsync<int>("SELECT Id FROM Devices WHERE DeviceId = @device_id", new { device_id }, transaction);
-            if (idDevice == 0)
-            {
-                logger.LogWarning("Device {deviceId} not found", device_id);
-                throw new NotFoundExceptionDomain($"Device {device_id} not found");
-            }
-
-            logger.LogInformation("Removendo o relacionamento de plataforma para a capability {id} para o device {deviceId}", id, device_id);
+            logger.LogInformation("Removendo o relacionamento de plataforma para a capability {id}", id);
             const string sqlPlatform = CapabilityQuery.RemovePlatformFromCapability;
             await connection.ExecuteAsync(sqlPlatform, new
             {
-                DeviceId = idDevice,
                 CapabilityId = id
             }, transaction);
-            logger.LogInformation("Relacionamento de plataforma removido para a capability {id} para o device {deviceId}", id, device_id);
+            logger.LogInformation("Relacionamento de plataforma removido para a capability {id}", id);
 
-            logger.LogInformation("Removendo capability {id} para o device {deviceId}", id, device_id);
+            logger.LogInformation("Removendo capability {id}", id);
             const string sql = CapabilityQuery.RemoveFromDevice;
             await connection.ExecuteAsync(sql, new
             {
-                DeviceId = idDevice,
                 id = id
             }, transaction);
 
-            logger.LogInformation("Capability {id} removida para o device {deviceId}", id, device_id);
+            logger.LogInformation("Capability {id} removida", id);
             transaction.Commit();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error ao remover capabilities para o device {deviceId}", device_id);
+            logger.LogError(ex, "Error ao remover capabilities para o device {id}", id);
             transaction.Rollback();
             throw;
         }
@@ -172,26 +182,18 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task UpdateAsync(string device_id, Capability capability)
+    public async Task UpdateAsync(Capability capability)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
 
         try
         {
-            int idDevice = await connection.ExecuteScalarAsync<int>("SELECT Id FROM Devices WHERE DeviceId = @device_id", new { device_id }, transaction);
-            if (idDevice == 0)
-            {
-                logger.LogWarning("Device {deviceId} not found", device_id);
-                throw new NotFoundExceptionDomain($"Device {device_id} not found");
-            }
-
-            logger.LogInformation("Atualizando capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
+            logger.LogInformation("Atualizando capability {capabilityName} para o device {id}", capability.Name, capability.Id);
             const string sql = CapabilityQuery.UpdateForDevice;
             await connection.ExecuteAsync(sql, new
             {
                 id = capability.Id,
-                DeviceId = idDevice,
                 capability.Name,
                 capability.Description,
                 capability.Type,
@@ -200,13 +202,13 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 capability.Active
             }, transaction);
 
-            logger.LogInformation("Capability {capabilityName} atualizada para o device {deviceId}", capability.Name, device_id);
+            logger.LogInformation("Capability {capabilityName} atualizada para o device {id}", capability.Name, capability.Id);
 
             transaction.Commit();
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error ao atualizar capability para o device {deviceId}", device_id);
+            logger.LogError(ex, "Error ao atualizar capability para o device {id}", capability.Id);
             transaction.Rollback();
             throw;
         }
