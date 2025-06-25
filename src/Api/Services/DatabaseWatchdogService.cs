@@ -6,7 +6,7 @@ public class DatabaseWatchdogService : BackgroundService
 {
     private readonly IServiceProvider _services;
     private readonly ILogger<DatabaseWatchdogService> _logger;
-    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(60);
+    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(2);
     private readonly int _failureThreshold = 3;
     private int _failureCount = 0;
 

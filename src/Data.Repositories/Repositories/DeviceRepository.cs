@@ -1,4 +1,3 @@
-using System;
 using System.Data;
 using Core.Contracts.Repositories;
 using Core.Entities;

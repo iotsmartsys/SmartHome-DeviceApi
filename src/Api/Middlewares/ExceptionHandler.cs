@@ -36,11 +36,21 @@ class ExceptionHandler(RequestDelegate _next)
                 statusCode = HttpStatusCode.NotFound;
                 break;
             case MySqlException mySqlEx:
+            logger.LogError(mySqlEx, "Erro de banco de dados: {Message}", mySqlEx.Message);
                 message = "Erro ao processar a requisição";
                 if (mySqlEx.Message.Contains("Duplicate entry"))
                 {
                     message = "Já existe um registro com o mesmo valor";
                     statusCode = HttpStatusCode.Conflict;
+                }
+                else if (mySqlEx.Message.Contains("Cannot add or update a child row: a foreign key constraint fails"))
+                {
+                    message = "Não é possível adicionar ou atualizar o registro devido a uma restrição de chave estrangeira";
+                    statusCode = HttpStatusCode.BadRequest;
+                }
+                else
+                {
+                    statusCode = HttpStatusCode.InternalServerError;
                 }
                 break;
             default:

@@ -1,6 +1,5 @@
 using Api.Models;
 using Core.Contracts.Repositories;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 [Route("api/v1/devices/{device_id}/properties")]
