@@ -142,7 +142,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
     async Task<IEnumerable<Group>> GetAllAsync(CommandDefinition command, CancellationToken cancellationToken)
     {
         List<Group> groups = new List<Group>();
-        await connection.QueryAsync<Group, CapabilityGroup?, IconGroup?, Group>(
+        await connection.QueryAsync<Group, Capability?, IconGroup?, Group>(
             command,
             (group, capability, icon) =>
             {

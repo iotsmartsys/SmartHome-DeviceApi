@@ -1,12 +1,12 @@
 
 namespace Api.Models;
 
-public record class Group(int id, string name, bool active, IconGroup? icon, IEnumerable<CapabilityGroup> capabilities)
+public record class Group(int id, string name, bool active, IconGroup? icon, IEnumerable<Capability> capabilities)
 {
     public static implicit operator Group(Core.Entities.Group group)
     {
         IconGroup? icon = group.Icon is null ? null : (IconGroup)group.Icon;
-        var capabilities = group.Capabilities.Select(c => (CapabilityGroup)c).ToList();
+        var capabilities = group.Capabilities.Select(c => (Capability)c!).ToList();
         return new(group.Id, group.Name, group.IsActive, icon, capabilities!);
     }
 
