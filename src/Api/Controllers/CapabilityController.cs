@@ -10,19 +10,6 @@ using Microsoft.Extensions.Caching.Memory;
 [ApiController]
 public class CapabilityController(ILogger<CapabilityController> logger) : ControllerBase
 {
-    [HttpGet("by-device")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetCapabilities([FromRoute] string device_id, [FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
-    {
-        var capabilities = await repository.GetCapabilitiesByDeviceAsync(device_id, capabilityQuery, cancellationToken);
-        if (capabilities.Any())
-            return Ok(capabilities.Select(c => (Capability?)c));
-
-        return NotFound();
-    }
-
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,15 +30,15 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     public async Task<IActionResult> GetCapabilityByName([FromRoute] string capability_name, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
         logger.LogInformation("Buscando capability {capability_name} no Cache", capability_name);
-        IEnumerable<Core.Entities.Capability> capabilities = await repository.GetByNameAsync(cancellationToken, capability_name);
+        var entity = await repository.GetByNameAsync(cancellationToken, capability_name);
 
-        if (capabilities.Any() is false)
+        if (entity is null)
         {
             logger.LogWarning("Capability {capability_name} não encontrado", capability_name);
             return NotFound();
         }
 
-        Capability? capability = (Capability?)capabilities.FirstOrDefault();
+        Capability? capability = (Capability?)entity;
         return Ok(capability);
     }
 
@@ -73,13 +60,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateCapabilities([FromBody] CapabilityUpdate capability, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        var capabilities = await repository.GetByNameAsync(cancellationToken, capability.capability_name);
-        if (capabilities.Any() is false)
-            return NotFound();
-
-        var entity = capabilities.First();
-        entity.UpdateValue(capability.value);
-        await repository.UpdateAsync(entity);
+        await repository.UpdateValueAsync(capability.capability_name, capability.value, cancellationToken);
         return NoContent();
     }
 

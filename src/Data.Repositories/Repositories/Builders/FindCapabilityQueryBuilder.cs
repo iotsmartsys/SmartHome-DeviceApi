@@ -5,15 +5,23 @@ namespace Data.Repositories;
 
 internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
 {
-    IFindCapabilityQueryBuilder WithDeviceId(string device_id);
+    IFindCapabilityQueryBuilder WithId(int id);
     IFindCapabilityQueryBuilder WithActive(bool active);
-    IFindCapabilityQueryBuilder OrderBy(string order);
+    IFindCapabilityQueryBuilder WithName(string name);
+    IFindCapabilityQueryBuilder WithType(string type);
+    IFindCapabilityQueryBuilder WithOwner(string owner);
+    IFindCapabilityQueryBuilder WithValue(string value);
     IFindCapabilityQueryBuilder OrderByDescending(string order);
 }
-internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : CapabilityQueryBuilder(CapabilityQuery.GetCapabilitiesByDevice), IFindCapabilityQueryBuilder
+internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQuery.GetAllCapabilities), IFindCapabilityQueryBuilder
 {
-    private string? _device_id;
+    private int? id;
     private bool? active;
+    private string? name;
+    private string? type;
+    private string? owner;
+    private string? value;
+
     string _order_by = " ORDER BY ";
 
     public override CommandDefinition Build()
@@ -25,20 +33,19 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
         _sql += _order_by;
         return new CommandDefinition(_sql, new
         {
-            device_id = _device_id,
-            name = capabilityQuery.name,
-            type = capabilityQuery.type,
-            owner = capabilityQuery.owner,
-            value = capabilityQuery.value,
-            active = capabilityQuery.active
+            name = name,
+            type = type,
+            owner = owner,
+            value = value,
+            active = active
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
     }
 
-    public IFindCapabilityQueryBuilder WithDeviceId(string device_id)
+    public IFindCapabilityQueryBuilder WithId(int id)
     {
-        _device_id = device_id;
+        this.id = id;
         return this;
     }
 
@@ -48,9 +55,27 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
         return this;
     }
 
-    public IFindCapabilityQueryBuilder OrderBy(string order)
+    public IFindCapabilityQueryBuilder WithName(string name)
     {
-        AddOrderBy(order);
+        this.name = name;
+        return this;
+    }
+
+    public IFindCapabilityQueryBuilder WithType(string type)
+    {
+        this.type = type;
+        return this;
+    }
+    
+    public IFindCapabilityQueryBuilder WithOwner(string owner)
+    {
+        this.owner = owner;
+        return this;
+    }
+
+    public IFindCapabilityQueryBuilder WithValue(string value)
+    {
+        this.value = value;
         return this;
     }
 
@@ -62,7 +87,7 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
 
     private void AddOrderBy(string name, bool orderDesc = false)
     {
-        name = $"{CapabilityQuery.AliasOnQuery}.{name}";
+        name = $"dc.{name}";
         if (_order_by.Contains(name))
             return;
 
@@ -75,18 +100,17 @@ internal class FindCapabilityQueryBuilder(CapabilityFind capabilityQuery) : Capa
 
     void AddCapabilitySpecification()
     {
-        _sql += " WHERE 1 = 1";
-        if (_device_id is not null)
-            _sql += " AND d.DeviceId = @device_id";
-        if (capabilityQuery.name is not null)
+        if (id.HasValue)
+            _sql += " AND dc.Id = @id";
+        if (name is not null)
             _sql += " AND dc.Name = @name";
-        if (capabilityQuery.type is not null)
-            _sql += " AND c.Name = @type";
-        if (capabilityQuery.owner is not null)
+        if (type is not null)
+            _sql += " AND ct.Name = @type";
+        if (owner is not null)
             _sql += " AND dc.deviceOwner = @owner";
-        if (capabilityQuery.value is not null)
+        if (value is not null)
             _sql += " AND dc.Value = @value";
-        if (capabilityQuery.active.HasValue)
+        if (active.HasValue)
             _sql += " AND dc.Active = @active";
     }
 }

@@ -2,109 +2,45 @@ namespace Data.Repositories;
 
 internal static class CapabilityQuery
 {
-    public const string AliasOnQuery = "dc";
-    public const string GetByName = $@"
-           SELECT 
-                dc.Id,
-                dc.DeviceId, 
-                dc.Name, 
-                dc.Description, 
-                c.Name Type, 
-                c.ActuatorMode Mode, 
-                dc.Value, 
-                dc.deviceOwner Owner,
-                c.DataType,
-                dc.UpdatedAt,
-                dc.Active,
-                p.Id,
-                p.Name 
-            FROM Capabilities {AliasOnQuery}
-                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
-                INNER JOIN Devices d ON dc.DeviceId = d.Id
-                LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
-                LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
-            WHERE dc.Name IN @capability_name";
-    public const string GetByDeviceAndId = $@"
-           SELECT 
-                dc.Id,
-                dc.DeviceId, 
-                dc.Name, 
-                dc.Description, 
-                c.Name Type, 
-                c.ActuatorMode Mode, 
-                dc.Value, 
-                dc.deviceOwner Owner,
-                c.DataType,
-                dc.UpdatedAt,
-                dc.Active,
-                p.Id,
-                p.Name 
-            FROM Capabilities {AliasOnQuery}
-                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
-                INNER JOIN Devices d ON dc.DeviceId = d.Id
-                LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
-                LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id 
-            WHERE dc.Id = @id";
-
-    public const string GetCapabilitiesByDevice = $@"
-            SELECT 
-                dc.Id,
-                dc.DeviceId, 
-                dc.Name, 
-                dc.Description, 
-                c.Name Type, 
-                c.ActuatorMode Mode, 
-                dc.Value, 
-                dc.deviceOwner Owner,
-                c.DataType,
-                dc.UpdatedAt,
-                dc.Active,
-                p.Id,
-                p.Name 
-            FROM Capabilities dc
-                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
-                INNER JOIN Devices d ON dc.DeviceId = d.Id
-                LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
-                LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id              
-        ";
-
     public const string GetAllCapabilities = $@"
-            SELECT 
-                dc.Id,
-                dc.DeviceId, 
-                dc.Name, 
-                dc.Description, 
-                c.Name Type, 
-                c.ActuatorMode Mode, 
-                dc.Value, 
-                dc.deviceOwner Owner,
-                c.DataType,
-                dc.UpdatedAt,
-                dc.Active
-            FROM Capabilities dc
-                INNER JOIN CapabilityTypes c ON dc.CapabilityId = c.Id
-            WHERE 
-                dc.Active = true        
+        SELECT 
+            dc.Id,
+            dc.DeviceId, 
+            dc.Name, 
+            dc.Description, 
+            ct.Name Type, 
+            ct.ActuatorMode Mode, 
+            dc.Value, 
+            dc.deviceOwner Owner,
+            ct.DataType,
+            dc.UpdatedAt,
+            dc.Active,
+            crsp.Id,
+            p.Name Platform,
+            crsp.ReferenceId
+        FROM Capabilities dc
+            INNER JOIN CapabilityTypes ct ON dc.CapabilityId = ct.Id
+            LEFT JOIN Capabilities_RelationShip_Platforms crsp ON dc.Id = crsp.DeviceCapabilityId
+            LEFT JOIN Platforms p ON crsp.PlatformId = p.Id 
+        WHERE 1 = 1      
         ";
 
-    public const string AddForDevice = @"
+    public const string GetByName = $@"{GetAllCapabilities} AND dc.Name IN @capability_name";
+
+    public const string GetById = $@"{GetAllCapabilities} AND dc.Id = @id";
+
+    public const string GetAllCapabilitiesActive = $@"{GetAllCapabilities} AND dc.Active = true";
+
+    public const string InsertCapability = @"
         INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityId, Value, deviceOwner)
         VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner);
     ";
 
-    public const string RemoveFromDevice = @"
+    public const string RemoveCapability = @"
         DELETE FROM Capabilities 
         WHERE 
             Id = @id;
     ";
-
-    public const string AddPlatformToCapability = @"
-                        INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
-                        VALUES (
-                            (SELECT Id FROM Capabilities WHERE Name = @Name LIMIT 1),
-                            (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1)
-                        );
-                    ";
 
     public const string UpdateForDevice = @"
         UPDATE Capabilities
@@ -124,4 +60,10 @@ internal static class CapabilityQuery
         DELETE FROM Capabilities_RelationShip_Platforms 
         WHERE DeviceCapabilityId = @CapabilityId;
             ";
+
+    public const string UpdateValue = @"
+        UPDATE Capabilities
+        SET Value = @value, UpdatedAt = CURRENT_TIMESTAMP
+        WHERE Name = @capability_name;
+    ";
 }

@@ -3,7 +3,7 @@ using Dapper;
 
 namespace Data.Repositories;
 
-internal abstract class CapabilityQueryBuilder(string sql) : ICapabilityQueryBuilder
+internal class CapabilityQueryBuilder(string sql = CapabilityQuery.GetAllCapabilities) : ICapabilityQueryBuilder
 {
     protected string _sql = sql;
     protected CancellationToken cancellationToken = default;
@@ -21,5 +21,8 @@ internal abstract class CapabilityQueryBuilder(string sql) : ICapabilityQueryBui
         return this;
     }
 
-    public abstract CommandDefinition Build();
+    public virtual CommandDefinition Build()
+    {
+        return new CommandDefinition(_sql, cancellationToken: cancellationToken, transaction: _transaction);
+    }
 }

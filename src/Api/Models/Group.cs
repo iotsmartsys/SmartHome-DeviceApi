@@ -48,7 +48,7 @@ public record class CapabilityGroup(int id, string capability_name, string? desc
 {
     public static implicit operator CapabilityGroup(Core.Entities.CapabilityGroup group)
     {
-        return new(group.Id, group.Name, group.Description);
+        return new(group.Id, group.Name);
     }
 
     public static implicit operator Core.Entities.CapabilityGroup(CapabilityGroup capabilityGroup)
@@ -57,7 +57,6 @@ public record class CapabilityGroup(int id, string capability_name, string? desc
         {
             Id = capabilityGroup.id,
             Name = capabilityGroup.capability_name,
-            Description = capabilityGroup.description!
         };
     }
 }
