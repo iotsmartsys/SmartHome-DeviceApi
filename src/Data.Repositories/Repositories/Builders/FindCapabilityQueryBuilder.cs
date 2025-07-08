@@ -11,6 +11,7 @@ internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
     IFindCapabilityQueryBuilder WithType(string type);
     IFindCapabilityQueryBuilder WithOwner(string owner);
     IFindCapabilityQueryBuilder WithValue(string value);
+    IFindCapabilityQueryBuilder WithReferenceId(string referenceId);
     IFindCapabilityQueryBuilder OrderByDescending(string order);
 }
 internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQuery.GetAllCapabilities), IFindCapabilityQueryBuilder
@@ -21,6 +22,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     private string? type;
     private string? owner;
     private string? value;
+    private string? referenceId;
 
     string _order_by = " ORDER BY ";
 
@@ -37,10 +39,18 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             type = type,
             owner = owner,
             value = value,
-            active = active
+            active = active,
+            referenceId = referenceId,
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
+    }
+
+    public IFindCapabilityQueryBuilder WithReferenceId(string referenceId)
+    {
+        this.referenceId = referenceId;
+        _sql += " AND crsp.ReferenceId = @referenceId";
+        return this;
     }
 
     public IFindCapabilityQueryBuilder WithId(int id)
@@ -112,5 +122,26 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _sql += " AND dc.Value = @value";
         if (active.HasValue)
             _sql += " AND dc.Active = @active";
+    }
+
+    internal IFindCapabilityQueryBuilder WithFind(CapabilityFind? capabilityFind)
+    {
+        if (capabilityFind is null)
+            return this;
+
+        if (capabilityFind.name is not null)
+            WithName(capabilityFind.name);
+        if (capabilityFind.type is not null)
+            WithType(capabilityFind.type);
+        if (capabilityFind.owner is not null)
+            WithOwner(capabilityFind.owner);
+        if (capabilityFind.value is not null)
+            WithValue(capabilityFind.value);
+        if (capabilityFind.active.HasValue)
+            WithActive(capabilityFind.active.Value);
+        if (capabilityFind.reference_id is not null)
+            WithReferenceId(capabilityFind.reference_id);
+
+        return this;
     }
 }

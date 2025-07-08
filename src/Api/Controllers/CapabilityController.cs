@@ -23,6 +23,26 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         return NotFound();
     }
 
+    [HttpGet("platforms/{reference_id}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetCapabilityByReferenceId([FromRoute] string reference_id, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Buscando capability {reference_id} no Cache", reference_id);
+
+        var entity = await repository.GetByReferenceIdAsync(cancellationToken, reference_id);
+
+        if (entity is null)
+        {
+            logger.LogWarning("Capability {reference_id} não encontrado", reference_id);
+            return NotFound();
+        }
+
+        Capability? capability = (Capability?)entity;
+        return Ok(capability);
+    }
+
     [HttpGet("{capability_name}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -68,7 +88,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> PatchAsync( [FromRoute] int id, [FromBody] JsonPatchDocument<Capability> request, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> PatchAsync([FromRoute] int id, [FromBody] JsonPatchDocument<Capability> request, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
         var entity = await repository.GetByIdAsync(id, cancellationToken);
         if (entity is null)

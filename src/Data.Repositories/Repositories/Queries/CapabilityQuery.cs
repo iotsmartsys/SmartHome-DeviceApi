@@ -22,7 +22,7 @@ internal static class CapabilityQuery
             INNER JOIN CapabilityTypes ct ON dc.CapabilityId = ct.Id
             LEFT JOIN Capabilities_RelationShip_Platforms crsp ON dc.Id = crsp.DeviceCapabilityId
             LEFT JOIN Platforms p ON crsp.PlatformId = p.Id 
-        WHERE 1 = 1      
+        WHERE 1 = 1
         ";
 
     public const string GetByName = $@"{GetAllCapabilities} AND dc.Name IN @capability_name";

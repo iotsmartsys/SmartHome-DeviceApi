@@ -9,11 +9,12 @@ public interface ICapabilityRepository : IRepository
     Task DeleteAsync(int id);
     Task UpdateAsync(Capability capability);
     Task<Capability?> GetByNameAsync(CancellationToken cancellationToken, string capability_name);
+    Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId);
     Task<Capability?> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken);
 }
 public record class CapabilityFind(string? name, string? type, string? owner, string? value,
-    bool? active)
+    bool? active, string? reference_id)
 {
-    public CapabilityFind() : this(null, null, null, null, null) { }
+    public CapabilityFind() : this(null, null, null, null, null, null) { }
 }

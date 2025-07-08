@@ -76,8 +76,10 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
     {
         try
         {
-            connection.Open();
-            CommandDefinition command = new(CapabilityQuery.GetAllCapabilities, cancellationToken: cancellationToken);
+            var command = new FindCapabilityQueryBuilder()
+            .WithFind(capabilityFind)
+            .WithCancellationToken(cancellationToken)
+            .Build();
 
             return await GetAllAsync(command);
         }
@@ -92,10 +94,20 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
+    public async Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId)
+    {
+        var command = new FindCapabilityQueryBuilder()
+            .WithReferenceId(referenceId)
+            .WithCancellationToken(cancellationToken)
+            .Build();
+
+        return (await GetAllAsync(command)).FirstOrDefault();
+    }
+    
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
         List<Capability> capabilitiesSelecteds = [];
-        return await connection.QueryAsync<Capability, CapabilityPlatform, Capability>(command: command, (capability, platform) =>
+        return await connection.QueryAsync<Capability, CapabilityPlatform?, Capability>(command: command, (capability, platform) =>
         {
             var capabilitySelected = capabilitiesSelecteds.FirstOrDefault(c => c.Id == capability.Id);
             if (capabilitySelected == null)
