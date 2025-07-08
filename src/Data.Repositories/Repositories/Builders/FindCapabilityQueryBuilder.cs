@@ -35,6 +35,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
         _sql += _order_by;
         return new CommandDefinition(_sql, new
         {
+            id = id,
             name = name,
             type = type,
             owner = owner,

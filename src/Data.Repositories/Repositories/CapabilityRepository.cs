@@ -103,7 +103,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
         return (await GetAllAsync(command)).FirstOrDefault();
     }
-    
+
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
         List<Capability> capabilitiesSelecteds = [];
@@ -160,13 +160,35 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task UpdateAsync(Capability capability)
+    public async Task UpdateAsync(Capability capability, CancellationToken cancellationToken)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
 
         try
         {
+
+            logger.LogInformation("Removendo o relacionamento de plataforma para a capability {capabilityName} do device {id}", capability.Name, capability.Id);
+            var command = new CommandDefinition(CapabilityQuery.RemovePlatformFromCapability, new
+            {
+                CapabilityId = capability.Id
+            }, transaction: transaction, cancellationToken: cancellationToken);
+            await connection.ExecuteAsync(command);
+            logger.LogInformation("Relacionamento de plataforma removido para a capability {capabilityName} do device {id}", capability.Name, capability.Id);
+
+            foreach (var platform in capability.Platforms)
+            {
+                logger.LogInformation("Adicionando plataforma {platformName} para a capability {capabilityName} do device {id}", platform.Platform, capability.Name, capability.Id);
+                command = new CommandDefinition(CapabilityQuery.InsertPlatformToCapability, new
+                {
+                    DeviceCapabilityId = capability.Id,
+                    Platform = platform.Platform,
+                    ReferenceId = platform.ReferenceId
+                }, transaction: transaction, cancellationToken: cancellationToken);
+                await connection.ExecuteAsync(command);
+                logger.LogInformation("Plataforma {platformName} adicionada para a capability {capabilityName} do device {id}", platform.Platform, capability.Name, capability.Id);
+            }
+
             logger.LogInformation("Atualizando capability {capabilityName} para o device {id}", capability.Name, capability.Id);
             const string sql = CapabilityQuery.UpdateForDevice;
             await connection.ExecuteAsync(sql, new

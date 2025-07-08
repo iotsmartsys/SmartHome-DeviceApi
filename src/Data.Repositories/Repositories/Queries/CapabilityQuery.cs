@@ -66,4 +66,9 @@ internal static class CapabilityQuery
         SET Value = @value, UpdatedAt = CURRENT_TIMESTAMP
         WHERE Name = @capability_name;
     ";
+
+    public const string InsertPlatformToCapability = @"
+        INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId, ReferenceId)
+        VALUES (@DeviceCapabilityId, (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1), @ReferenceId);
+    ";
 }

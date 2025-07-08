@@ -99,7 +99,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         request.ApplyTo(model);
 
         entity = model;
-        await repository.UpdateAsync(entity);
+        await repository.UpdateAsync(entity, cancellationToken);
         return NoContent();
     }
 

@@ -7,7 +7,7 @@ public interface ICapabilityRepository : IRepository
     Task<IEnumerable<Capability>> GetAllCapabilitiesAsync(CapabilityFind? capabilityFind, CancellationToken cancellationToken);
     Task AddAsync(string device_id, IEnumerable<Capability> enumerable);
     Task DeleteAsync(int id);
-    Task UpdateAsync(Capability capability);
+    Task UpdateAsync(Capability capability, CancellationToken cancellationToken);
     Task<Capability?> GetByNameAsync(CancellationToken cancellationToken, string capability_name);
     Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId);
     Task<Capability?> GetByIdAsync(int id, CancellationToken cancellationToken);
