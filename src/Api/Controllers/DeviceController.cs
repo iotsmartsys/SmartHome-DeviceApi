@@ -12,9 +12,9 @@ public class DeviceController : ControllerBase
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Device>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetDevices([FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetDevices([FromQuery] DeviceFind? find, [FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
     {
-        var devices = await repository.GetDevicesAsync(cancellationToken);
+        var devices = await repository.GetDevicesAsync(find, cancellationToken);
         var models = devices.Select(d =>
         {
             var model = (Device)d;

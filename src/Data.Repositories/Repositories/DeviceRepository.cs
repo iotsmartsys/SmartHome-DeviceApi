@@ -8,11 +8,12 @@ namespace Data.Repositories;
 
 internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection connection) : IDeviceRepository
 {
-    public async Task<IEnumerable<Device>> GetDevicesAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Device>> GetDevicesAsync(DeviceFind? find, CancellationToken cancellationToken)
     {
         logger.LogInformation($"Getting devices from database. Connection string: {connection.ConnectionString}");
         var command = new DeviceQueryBuilder()
         .WithCancellationToken(cancellationToken)
+        .WithFind(find)
         .Build();
         List<Device> devicesSelecteds = [];
         var devices = await connection.QueryAsync<Device, Property?, Device>(
