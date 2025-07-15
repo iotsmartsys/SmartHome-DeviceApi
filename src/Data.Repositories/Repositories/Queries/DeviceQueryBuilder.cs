@@ -10,7 +10,7 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
     private string? _device_id;
     private string? _name;
     private string? _description;
-    private string? _platform;
+    private string[]? _platform;
     private IDbTransaction? _transaction;
     private CancellationToken _cancellationToken = default;
 
@@ -46,8 +46,8 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
             sql += " AND d.Name = @name";
         if (!string.IsNullOrEmpty(_description))
             sql += " AND d.Description = @description";
-        if (!string.IsNullOrEmpty(_platform))
-            sql += " AND d.Platform = @platform";
+        if (_platform != null && _platform.Length > 0)
+            sql += " AND d.Platform IN @platform";
 
         return new CommandDefinition(sql, new
         {
@@ -69,7 +69,7 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
         if (!string.IsNullOrEmpty(find.Description))
             _description = find.Description;
         if (!string.IsNullOrEmpty(find.Platform))
-            _platform = find.Platform;
+            _platform = find.Platform.Split(',');
 
         return this;
     }
