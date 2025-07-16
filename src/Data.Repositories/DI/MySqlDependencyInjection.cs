@@ -21,6 +21,7 @@ public static class MySqlDependencyInjection
             .AddScoped<IPlatformRepository, PlatformRepository>()
             .AddScoped<IPropertyRepository, PropertyRepository>()
             .AddScoped<IGroupRepository, GroupRepository>()
+            .AddScoped<IMonitoredPlaceRepository, MonitoredPlaceRepository>()
             ;
 
         return services;

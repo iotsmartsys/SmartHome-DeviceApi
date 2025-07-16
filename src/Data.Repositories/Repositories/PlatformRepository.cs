@@ -13,3 +13,10 @@ internal class PlatformRepository(IDbConnection connection) : IPlatformRepositor
         return await connection.QueryAsync<Platform>(sql);
     }
 }
+internal class MonitoredPlaceRepository(IDbConnection connection) : IMonitoredPlaceRepository
+{
+    public async Task<IEnumerable<MonitoredPlace>> GetAllAsync()
+    {
+        return await connection.QueryAsync<MonitoredPlace>(MonitoredPlaceQuery.GetAll);
+    }
+}
