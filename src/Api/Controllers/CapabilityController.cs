@@ -22,6 +22,26 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
 
         return NotFound();
     }
+ 
+    [HttpGet("tiny")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CapabilityTiny>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetAllCapabilitiesTiny([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    {
+        var capabilities = await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
+        if (capabilities.Any())
+            return Ok(capabilities
+                .Where(x =>
+                    x.Type != "Message"
+                    && x.Type != "Alexa"
+                    && x.Type != "Message"
+                    && x.Type != "TIME_OF_DAY"
+                    && x.Type != "TIME_OF_DAY_RANGE")
+                .Select(c => (CapabilityTiny?)c));
+
+        return NotFound();
+    }
 
     [HttpGet("platforms/{reference_id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
