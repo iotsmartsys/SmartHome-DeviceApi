@@ -34,15 +34,15 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         if (capabilities.Any())
         {
             var filtereds = capabilities
-               .Where(x => !excludeTypes.Contains(x.Type))
-               .Select(c => (CapabilityTiny?)c);
+               .Where(x => !excludeTypes.Contains(x.Type));
+               
             if (string.Compare(format, "mcu", StringComparison.OrdinalIgnoreCase) == 0)
             {
-                var csv = string.Join("\n", filtereds.Select(c => $"{c?.capability_name}:{c?.value}"));
+                var csv = string.Join("\n", filtereds.Select(c => $"{c?.Name};{c?.Value};{c?.UpdatedAt:yyyy-MM-dd HH:mm:ss}"));
                 return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/plain", "capabilities.csv");
             }
 
-            return Ok(filtereds);
+            return Ok(filtereds.Select(c => (CapabilityTiny?)c));
         }
 
         return NotFound();
