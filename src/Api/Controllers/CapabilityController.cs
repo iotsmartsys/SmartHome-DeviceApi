@@ -22,23 +22,28 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
 
         return NotFound();
     }
- 
+
     [HttpGet("tiny")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CapabilityTiny>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllCapabilitiesTiny([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCapabilitiesTiny([FromQuery] CapabilityFind? capabilityQuery, [FromQuery] string? format, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
+        string[] excludeTypes = new[] { "Message", "Alexa", "TIME_OF_DAY", "Scene" };
         var capabilities = await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
         if (capabilities.Any())
-            return Ok(capabilities
-                .Where(x =>
-                    x.Type != "Message"
-                    && x.Type != "Alexa"
-                    && x.Type != "Message"
-                    && x.Type != "TIME_OF_DAY"
-                    && x.Type != "TIME_OF_DAY_RANGE")
-                .Select(c => (CapabilityTiny?)c));
+        {
+            var filtereds = capabilities
+               .Where(x => !excludeTypes.Contains(x.Type))
+               .Select(c => (CapabilityTiny?)c);
+            if (string.Compare(format, "mcu", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                var csv = string.Join("\n", filtereds.Select(c => $"{c?.capability_name}:{c?.value}"));
+                return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/plain", "capabilities.csv");
+            }
+
+            return Ok(filtereds);
+        }
 
         return NotFound();
     }
