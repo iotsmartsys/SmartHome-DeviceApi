@@ -71,4 +71,22 @@ internal static class CapabilityQuery
         INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId, ReferenceId)
         VALUES (@DeviceCapabilityId, (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1), @ReferenceId);
     ";
+
+    public const string RemoveHistory = @"DELETE FROM CapabilityHistory WHERE CapabilityId = @CapabilityId;";
+
+    public const string SelectHistory = @"
+    SELECT 
+        ch.UpdatedAt,
+        ch.Value 
+    FROM CapabilityHistory ch 
+        INNER JOIN Capabilities c ON ch.CapabilityId = c.Id
+    WHERE 
+        c.Id = @CapabilityId
+    -- Use MySQL-compatible datetime arithmetic. For MySQL: NOW() - INTERVAL @LastHours HOUR
+    AND (@LastHours IS NULL OR ch.UpdatedAt >= (NOW() - INTERVAL @LastHours HOUR))
+    AND (@DateStart IS NULL OR ch.UpdatedAt >= @DateStart)
+    AND (@DateEnd IS NULL OR ch.UpdatedAt <= @DateEnd)
+    ORDER BY ch.UpdatedAt DESC;
+
+    ";
 }

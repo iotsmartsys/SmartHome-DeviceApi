@@ -130,6 +130,14 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
         try
         {
+            logger.LogInformation("Removendo o historico de capability {id}", id);
+            const string sqlHistory = CapabilityQuery.RemoveHistory;
+            await connection.ExecuteAsync(sqlHistory, new
+            {
+                CapabilityId = id
+            }, transaction);
+            logger.LogInformation("Historico de capability {id} removido", id);
+
             logger.LogInformation("Removendo o relacionamento de plataforma para a capability {id}", id);
             const string sqlPlatform = CapabilityQuery.RemovePlatformFromCapability;
             await connection.ExecuteAsync(sqlPlatform, new

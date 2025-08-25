@@ -18,3 +18,18 @@ public record class CapabilityFind(string? name, string? type, string? owner, st
 {
     public CapabilityFind() : this(null, null, null, null, null, null) { }
 }
+
+public interface ICappabilityHistoryRepository
+{
+    Task<IEnumerable<CapabilityHistory>> GetByCapabilityIdAsync(int capabilityId, CapabilityHistoryFind? historyFind, CancellationToken cancellationToken);
+}
+public class CapabilityHistory
+{
+    public DateTime UpdatedAt { get; set; }
+    public string Value { get; set; } = string.Empty;
+}
+public record class CapabilityHistoryFind(int? last_hours, string? date_start, string? date_end )
+{
+    public CapabilityHistoryFind() : this(null, null, null) { }
+}
+ 

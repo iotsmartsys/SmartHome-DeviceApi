@@ -4,7 +4,6 @@ using Core.Contracts.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-
 [Route("api/v1/devices/{device_id}/capabilities")]
 [Route("api/v1/capabilities")]
 [ApiController]
