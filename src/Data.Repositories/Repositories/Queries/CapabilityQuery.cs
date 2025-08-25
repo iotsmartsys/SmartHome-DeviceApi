@@ -15,6 +15,9 @@ internal static class CapabilityQuery
             ct.DataType,
             dc.UpdatedAt,
             dc.Active,
+            dc.icon_name AS IconName,
+            dc.icon_color_active AS IconActiveColor,
+            dc.icon_color_inactive AS IconInactiveColor,
             crsp.Id,
             p.Name Platform,
             crsp.ReferenceId
@@ -51,6 +54,9 @@ internal static class CapabilityQuery
             UpdatedAt = CURRENT_TIMESTAMP,
             deviceOwner = @owner,
             Active = @active,
+            icon_name = @icon_name,
+            icon_color_active = @icon_active_color,
+            icon_color_inactive = @icon_inactive_color,
             CapabilityId = (SELECT Id FROM CapabilityTypes WHERE Name = @type LIMIT 1)
         WHERE
             Id = @id;

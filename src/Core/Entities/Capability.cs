@@ -11,6 +11,10 @@ public class Capability
     public string Value { get; set; } = default!;
     public string? Owner { get; set; } = default!;
     public bool Active { get; set; } = true;
+    public string? IconName { get; set; }
+    public string? IconActiveColor { get; set; }
+    public string? IconInactiveColor { get; set; }
+
     public CapabilityDataType? DataType { get; set; } = default!;
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<CapabilityPlatform> Platforms { get; set; } = [];
