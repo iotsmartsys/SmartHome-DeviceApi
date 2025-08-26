@@ -12,9 +12,7 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
     public async Task<IActionResult> GetAllCapabilities([FromRoute] int capability_id, [FromQuery] CapabilityHistoryFind? find, [FromServices] ICappabilityHistoryRepository repository, CancellationToken cancellationToken)
     {
         var capabilities = await repository.GetByCapabilityIdAsync(capability_id, find, cancellationToken);
-        if (capabilities.Any())
-            return Ok(capabilities);
 
-        return NotFound();
+        return Ok(capabilities);
     }
 }
