@@ -85,14 +85,13 @@ internal static class CapabilityQuery
         ch.UpdatedAt,
         ch.Value 
     FROM CapabilityHistory ch 
-        INNER JOIN Capabilities c ON ch.CapabilityId = c.Id
     WHERE 
-        c.Id = @CapabilityId
+        ch.CapabilityId = @CapabilityId
     -- Use MySQL-compatible datetime arithmetic. For MySQL: NOW() - INTERVAL @LastHours HOUR
     AND (@LastHours IS NULL OR ch.UpdatedAt >= (NOW() - INTERVAL @LastHours HOUR))
     AND (@DateStart IS NULL OR ch.UpdatedAt >= @DateStart)
     AND (@DateEnd IS NULL OR ch.UpdatedAt <= @DateEnd)
-    ORDER BY ch.UpdatedAt DESC;
+    ORDER BY ch.UpdatedAt DESC, ch.Id DESC
 
     ";
 }
