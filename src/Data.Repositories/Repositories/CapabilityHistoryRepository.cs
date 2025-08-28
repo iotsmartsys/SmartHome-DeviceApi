@@ -29,4 +29,18 @@ internal class CapabilityHistoryRepository(ILogger<CapabilityHistoryRepository> 
         logger.LogInformation("Histórico de capabilities encontrado para a capability {capabilityId}", capabilityId);
         return history;
     }
+
+    public async Task AddAsync(string capability_name, string value, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Inserindo histórico para a capability {capability_name}", capability_name);
+        const string sql = CapabilityQuery.InsertHistory;
+        var command = new CommandDefinition(sql, new
+        {
+            CapabilityName = capability_name,
+            Value = value
+        }, cancellationToken: cancellationToken);
+
+        await connection.ExecuteAsync(command);
+        logger.LogInformation("Histórico inserido para a capability {capability_name}", capability_name);
+    }
 }

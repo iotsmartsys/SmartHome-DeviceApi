@@ -80,6 +80,11 @@ internal static class CapabilityQuery
 
     public const string RemoveHistory = @"DELETE FROM CapabilityHistory WHERE CapabilityId = @CapabilityId;";
 
+    public const string InsertHistory = @"
+        INSERT INTO CapabilityHistory (CapabilityId, Value, UpdatedAt)
+        VALUES ((SELECT Id FROM Capabilities WHERE Name = @CapabilityName LIMIT 1), @Value, CURRENT_TIMESTAMP);
+    ";
+
     public const string SelectHistory = @"
     SELECT 
         ch.UpdatedAt,

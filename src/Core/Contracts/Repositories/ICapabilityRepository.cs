@@ -22,6 +22,7 @@ public record class CapabilityFind(string? name, string? type, string? owner, st
 public interface ICappabilityHistoryRepository
 {
     Task<IEnumerable<CapabilityHistory>> GetByCapabilityIdAsync(int capabilityId, CapabilityHistoryFind? historyFind, CancellationToken cancellationToken);
+    Task AddAsync(string capability_name, string value, CancellationToken cancellationToken);
 }
 public class CapabilityHistory
 {
