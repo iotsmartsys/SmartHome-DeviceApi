@@ -61,4 +61,3 @@ public record class CapabilityPlatform(string platform, string? referenceId)
 
     public static implicit operator Core.Entities.CapabilityPlatform(CapabilityPlatform platform) => new(platform.platform, platform.referenceId);
 }
-public record class CapabilityIcon(string name, string? active_color, string? inactive_color);

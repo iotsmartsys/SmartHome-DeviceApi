@@ -1,4 +1,5 @@
 using Api.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Core.Contracts.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,5 +44,34 @@ public class CapabilityTypeController : ControllerBase
 
         await repository.CreateAsync((Core.Entities.CapabilityType)capabilityType);
         return CreatedAtRoute("GetCapabilityType", new { name = capabilityType.name }, capabilityType);
+    }
+
+    [HttpPatch("{name}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateCapabilityType([FromRoute] string name, [FromBody] JsonPatchDocument<CapabilityType> patch, [FromServices] ICapabilityTypeRepository repository)
+    {
+        var existing = await repository.GetByNameAsync(name);
+        if (existing is null)
+            return NotFound();
+
+        var model = (CapabilityType)existing;
+        patch.ApplyTo(model);
+
+        var entity = (Core.Entities.CapabilityType)model;
+        entity.Id = existing.Id;
+        entity.Name = name; // mantém a coerência com o recurso da rota
+
+        await repository.UpdateAsync(entity);
+        return NoContent();
+    }
+
+    [HttpDelete("{name}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteCapabilityType([FromRoute] string name, [FromServices] ICapabilityTypeRepository repository)
+    {
+        await repository.DeleteAsync(name);
+        return NoContent();
     }
 }
