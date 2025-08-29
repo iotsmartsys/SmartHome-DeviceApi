@@ -16,7 +16,6 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
         return Ok(capabilities);
     }
 
-    // criação por capability_name na rota absoluta
     [HttpPost("~/api/v1/capabilities/{capability_name}/history")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -32,7 +31,6 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
         if (input is null || string.IsNullOrWhiteSpace(input.value))
             return BadRequest();
 
-        // valida existência e obtém id para Location
         var capability = await capabilityRepository.GetByNameAsync(cancellationToken, capability_name);
         if (capability is null)
             return NotFound();

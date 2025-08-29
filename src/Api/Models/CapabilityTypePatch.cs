@@ -7,6 +7,6 @@ public record class CapabilityTypePatch(
     string? actuator_mode,
     string? data_type,
     bool? computed_value,
+    string? value_symbol,
     IEnumerable<CapabilityIcon>? icons
 );
-

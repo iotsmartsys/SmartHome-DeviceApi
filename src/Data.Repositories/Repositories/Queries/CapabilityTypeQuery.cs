@@ -8,7 +8,8 @@ internal static class CapabilityTypeQuery
             Name, 
             ActuatorMode,
             DataType,
-            DynamicComputedValue
+            DynamicComputedValue AS ComputedValue,
+            value_symbol AS ValueSymbol
         FROM CapabilityTypes
     ";
 
@@ -17,8 +18,8 @@ internal static class CapabilityTypeQuery
     public const string GetByName = $@"{SelectBase} WHERE Name = @name";
 
     public const string Insert = @"
-        INSERT INTO CapabilityTypes (Name, ActuatorMode, DataType, DynamicComputedValue)
-        VALUES (@Name, @ActuatorMode, @DataType, @ComputedValue);
+        INSERT INTO CapabilityTypes (Name, ActuatorMode, DataType, DynamicComputedValue, value_symbol)
+        VALUES (@Name, @ActuatorMode, @DataType, @ComputedValue, @ValueSymbol);
         SELECT LAST_INSERT_ID() AS NewId;
     ";
 
@@ -53,7 +54,8 @@ internal static class CapabilityTypeQuery
             Name = COALESCE(@Name, Name),
             ActuatorMode = COALESCE(@ActuatorMode, ActuatorMode),
             DataType = COALESCE(@DataType, DataType),
-            DynamicComputedValue = COALESCE(@ComputedValue, DynamicComputedValue)
+            DynamicComputedValue = COALESCE(@ComputedValue, DynamicComputedValue),
+            value_symbol = COALESCE(@ValueSymbol, value_symbol)
         WHERE Id = @id;
     ";
 

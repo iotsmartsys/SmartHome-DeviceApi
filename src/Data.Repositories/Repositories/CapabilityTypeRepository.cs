@@ -86,7 +86,7 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         return type;
     }
 
-    public async Task UpdateAsync(string currentName, string? newName, string? actuatorMode, string? dataType, bool? computedValue, IEnumerable<CapabilityIcon>? icons)
+    public async Task UpdateAsync(string currentName, string? newName, string? actuatorMode, string? dataType, bool? computedValue, string? valueSymbol, IEnumerable<CapabilityIcon>? icons)
     {
         var existing = await GetByNameAsync(currentName);
         if (existing is null)
@@ -102,7 +102,8 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
                 Name = newName,
                 ActuatorMode = actuatorMode,
                 DataType = dataType,
-                ComputedValue = computedValue
+                ComputedValue = computedValue,
+                ValueSymbol = valueSymbol
             };
             await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.UpdatePartialById, updateParams, transaction));
 
@@ -174,7 +175,8 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
                 capabilityType.Name,
                 capabilityType.ActuatorMode,
                 capabilityType.DataType,
-                ComputedValue = capabilityType.ComputedValue
+                ComputedValue = capabilityType.ComputedValue,
+                capabilityType.ValueSymbol
             };
             await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.UpdatePartialById, updateParams, transaction));
 
