@@ -107,23 +107,25 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
         List<Capability> capabilitiesSelecteds = [];
-        return await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, Capability>(command: command, (capability, platform, group) =>
-        {
-            var capabilitySelected = capabilitiesSelecteds.FirstOrDefault(c => c.Id == capability.Id);
-            if (capabilitySelected == null)
-            {
-                capabilitiesSelecteds.Add(capability);
-                capabilitySelected = capability;
-            }
+        await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, Capability>(command: command, (capability, platform, group) =>
+       {
+           var capabilitySelected = capabilitiesSelecteds.FirstOrDefault(c => c.Id == capability.Id);
+           if (capabilitySelected == null)
+           {
+               logger.LogInformation("Capability {capabilityName} adicionada na lista", capability.Name);
+               capabilitiesSelecteds.Add(capability);
+               capabilitySelected = capability;
+           }
 
-            if (platform != null)
-                capabilitySelected.AddPlatform(platform);
+           if (platform != null)
+               capabilitySelected.AddPlatform(platform);
 
-            if (group != null)
-                capabilitySelected.AddGroup(group);
+           if (group != null)
+               capabilitySelected.AddGroup(group);
 
-            return capabilitySelected;
-        });
+           return capabilitySelected;
+       });
+        return capabilitiesSelecteds;
     }
 
     public async Task DeleteAsync(int id)

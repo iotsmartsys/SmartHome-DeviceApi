@@ -65,10 +65,10 @@ public record class Capability(
     }
     public record class Icon(string name, string? active_color, string? inactive_color);
 
-    public record class Group(string name, string? iconName)
+    public record class Group(string name, string? icon_name)
     {
         public static implicit operator Group(Core.Entities.CapabilityGroup group) => new(group.Name, group.IconName);
 
-        public static implicit operator Core.Entities.CapabilityGroup(Group group) => new() { Name = group.name, IconName = group.iconName };
+        public static implicit operator Core.Entities.CapabilityGroup(Group group) => new() { Name = group.name, IconName = group.icon_name };
     }
 }
