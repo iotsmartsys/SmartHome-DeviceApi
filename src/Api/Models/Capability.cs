@@ -7,11 +7,12 @@ public record class Capability(
     , string type
     , string? mode
     , string? value
-    , IEnumerable<CapabilityPlatform>? platforms
+    , IEnumerable<Capability.Platform>? platforms
     , string? value_type
     , string? updated_at
     , bool active
-    , CapabilityIcon? icon)
+    , Capability.Icon? icon,
+    IEnumerable<Capability.Group>? groups = null)
 {
     public int Id { get; private set; }
     public static implicit operator Capability?(Core.Entities.Capability? capability)
@@ -19,9 +20,9 @@ public record class Capability(
         if (capability is null)
             return null;
 
-        var platforms = capability.Platforms?.Select(p => (CapabilityPlatform)p) ?? [];
+        var platforms = capability.Platforms?.Select(p => (Capability.Platform)p) ?? [];
 
-        CapabilityIcon? icon = capability.IconName is null ? null : new(capability.IconName, capability.IconActiveColor, capability.IconInactiveColor);
+        Capability.Icon? icon = capability.IconName is null ? null : new(capability.IconName, capability.IconActiveColor, capability.IconInactiveColor);
         return new Capability(capability.Name
         , capability.Description
         , capability.Owner
@@ -32,9 +33,10 @@ public record class Capability(
         , capability.DataType
         , capability.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")
         , capability.Active
-        , icon)
+        , icon
+        , capability.Groups?.Select(g => (Capability.Group)g) ?? [])
         {
-             Id = capability.Id,
+            Id = capability.Id,
         };
     }
 
@@ -54,10 +56,19 @@ public record class Capability(
         IconInactiveColor = capability.icon?.inactive_color,
         Platforms = capability.platforms?.Select(p => (Core.Entities.CapabilityPlatform)p) ?? [],
     };
-}
-public record class CapabilityPlatform(string platform, string? referenceId)
-{
-    public static implicit operator CapabilityPlatform(Core.Entities.CapabilityPlatform platform) => new(platform.Platform, platform.ReferenceId);
 
-    public static implicit operator Core.Entities.CapabilityPlatform(CapabilityPlatform platform) => new(platform.platform, platform.referenceId);
+    public record class Platform(string platform, string? referenceId)
+    {
+        public static implicit operator Platform(Core.Entities.CapabilityPlatform platform) => new(platform.Platform, platform.ReferenceId);
+
+        public static implicit operator Core.Entities.CapabilityPlatform(Capability.Platform platform) => new(platform.platform, platform.referenceId);
+    }
+    public record class Icon(string name, string? active_color, string? inactive_color);
+
+    public record class Group(string name, string? iconName)
+    {
+        public static implicit operator Group(Core.Entities.CapabilityGroup group) => new(group.Name, group.IconName);
+
+        public static implicit operator Core.Entities.CapabilityGroup(Group group) => new() { Name = group.name, IconName = group.iconName };
+    }
 }

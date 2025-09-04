@@ -107,7 +107,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
         List<Capability> capabilitiesSelecteds = [];
-        return await connection.QueryAsync<Capability, CapabilityPlatform?, Capability>(command: command, (capability, platform) =>
+        return await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, Capability>(command: command, (capability, platform, group) =>
         {
             var capabilitySelected = capabilitiesSelecteds.FirstOrDefault(c => c.Id == capability.Id);
             if (capabilitySelected == null)
@@ -118,6 +118,9 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
             if (platform != null)
                 capabilitySelected.AddPlatform(platform);
+
+            if (group != null)
+                capabilitySelected.AddGroup(group);
 
             return capabilitySelected;
         });
@@ -145,6 +148,14 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 CapabilityId = id
             }, transaction);
             logger.LogInformation("Relacionamento de plataforma removido para a capability {id}", id);
+
+            logger.LogInformation("Removendo o relacionamento de grupo para a capability {id}", id);
+            const string sqlGroup = CapabilityQuery.RemoveGroupFromCapability;
+            await connection.ExecuteAsync(sqlGroup, new
+            {
+                CapabilityId = id
+            }, transaction);
+            logger.LogInformation("Relacionamento de grupo removido para a capability {id}", id);
 
             logger.LogInformation("Removendo capability {id}", id);
             const string sql = CapabilityQuery.RemoveCapability;

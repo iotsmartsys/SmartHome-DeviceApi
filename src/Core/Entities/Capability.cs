@@ -18,6 +18,7 @@ public class Capability
     public CapabilityDataType? DataType { get; set; } = default!;
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<CapabilityPlatform> Platforms { get; set; } = [];
+    public IEnumerable<CapabilityGroup> Groups { get; set; } = [];
     public Capability(string name, string type, string mode, string value, string owner, bool active)
     {
         Name = name;
@@ -51,6 +52,19 @@ public class Capability
     public void UpdateValue(string value)
     {
         Value = DataType?.Convert(value.ToLower()) ?? value;
+    }
+
+    public bool HasGroups(string name)
+    {
+        return Groups.Any(g => g.Name == name);
+    }
+
+    public void AddGroup(CapabilityGroup group)
+    {
+        if (group is null || HasGroups(group.Name))
+            return;
+
+        Groups = Groups.Append(group);
     }
 }
 public class CapabilityPlatform

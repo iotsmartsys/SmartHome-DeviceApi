@@ -3,7 +3,7 @@ namespace Data.Repositories;
 internal static class CapabilityQuery
 {
     public const string GetAllCapabilities = $@"
-        SELECT 
+        SELECT
             dc.Id,
             dc.DeviceId, 
             dc.Name, 
@@ -20,9 +20,14 @@ internal static class CapabilityQuery
             dc.icon_color_inactive AS IconInactiveColor,
             crsp.Id,
             p.Name Platform,
-            crsp.ReferenceId
+            crsp.ReferenceId,
+            g.Id,
+            g.Name,
+            g.IconName
         FROM Capabilities dc
             INNER JOIN CapabilityTypes ct ON dc.CapabilityId = ct.Id
+            LEFT JOIN Group_RelationShipCapabilities gsc ON dc.Id = gsc.CapabilityId
+            LEFT JOIN `Groups` g ON gsc.GroupId = g.Id  
             LEFT JOIN Capabilities_RelationShip_Platforms crsp ON dc.Id = crsp.DeviceCapabilityId
             LEFT JOIN Platforms p ON crsp.PlatformId = p.Id 
         WHERE 1 = 1
@@ -65,6 +70,11 @@ internal static class CapabilityQuery
     public const string RemovePlatformFromCapability = @"
         DELETE FROM Capabilities_RelationShip_Platforms 
         WHERE DeviceCapabilityId = @CapabilityId;
+            ";
+
+    public const string RemoveGroupFromCapability = @"
+        DELETE FROM Group_RelationShipCapabilities 
+        WHERE CapabilityId = @CapabilityId;
             ";
 
     public const string UpdateValue = @"
