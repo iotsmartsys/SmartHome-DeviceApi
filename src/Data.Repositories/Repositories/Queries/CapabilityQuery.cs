@@ -23,7 +23,8 @@ internal static class CapabilityQuery
             crsp.ReferenceId,
             g.Id,
             g.Name,
-            g.IconName
+            g.IconName,
+            g.IconColor
         FROM Capabilities dc
             INNER JOIN CapabilityTypes ct ON dc.CapabilityId = ct.Id
             LEFT JOIN Group_RelationShipCapabilities gsc ON dc.Id = gsc.CapabilityId
