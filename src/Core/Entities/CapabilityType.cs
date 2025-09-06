@@ -8,8 +8,9 @@ public class CapabilityType
     public string Name { get; set; } = default!;
     public string ActuatorMode { get; set; } = default!;
     public string DataType { get; set; } = default!;
-    public bool ComputedValue { get; set; } = default!;
+    public bool ComputedValue { get; set; }
     public string? ValueSymbol { get; set; }
+    public string? ActiveValue { get; set; }
     public IEnumerable<CapabilityIcon> Icons { get; set; } = new List<CapabilityIcon>();
 
     public CapabilityType() { }

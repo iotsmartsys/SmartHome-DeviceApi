@@ -9,6 +9,7 @@ public record class CapabilityType(
     string data_type,
     bool computed_value,
     string? value_symbol,
+    string? active_value = null,
     List<CapabilityIcon>? icons = null)
 {
     public static implicit operator CapabilityType(Core.Entities.CapabilityType capabilityType)
@@ -18,6 +19,7 @@ public record class CapabilityType(
             capabilityType.DataType,
             capabilityType.ComputedValue,
             capabilityType.ValueSymbol,
+            capabilityType.ActiveValue,
             capabilityType.Icons?.Select(i => new CapabilityIcon(i.Name, i.ActiveColor, i.InactiveColor)).ToList()
         );
 
@@ -28,9 +30,11 @@ public record class CapabilityType(
             capabilityType.actuator_mode,
             capabilityType.data_type,
             capabilityType.computed_value
-        );
-
-        entity.ValueSymbol = capabilityType.value_symbol;
+        )
+        {
+            ActiveValue = capabilityType.active_value,
+            ValueSymbol = capabilityType.value_symbol
+        };
 
         if (capabilityType.icons is not null)
         {

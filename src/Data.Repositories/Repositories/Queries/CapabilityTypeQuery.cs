@@ -9,7 +9,8 @@ internal static class CapabilityTypeQuery
             ActuatorMode,
             DataType,
             DynamicComputedValue AS ComputedValue,
-            value_symbol AS ValueSymbol
+            value_symbol AS ValueSymbol,
+            ActiveValue
         FROM CapabilityTypes
     ";
 
@@ -24,8 +25,8 @@ internal static class CapabilityTypeQuery
     ";
 
     public const string InsertIcon = @"
-        INSERT INTO CapabilityTypeIcons (CapabilityTypeId, name, active_color, inactive_color)
-        VALUES (@CapabilityTypeId, @Name, @ActiveColor, @InactiveColor);
+        INSERT INTO CapabilityTypeIcons (CapabilityTypeId, name, active_color, inactive_color, ActiveValue)
+        VALUES (@CapabilityTypeId, @Name, @ActiveColor, @InactiveColor, @ActiveValue);
     ";
 
     public const string SelectIconsByTypeIds = @"
@@ -55,7 +56,8 @@ internal static class CapabilityTypeQuery
             ActuatorMode = COALESCE(@ActuatorMode, ActuatorMode),
             DataType = COALESCE(@DataType, DataType),
             DynamicComputedValue = COALESCE(@ComputedValue, DynamicComputedValue),
-            value_symbol = COALESCE(@ValueSymbol, value_symbol)
+            value_symbol = COALESCE(@ValueSymbol, value_symbol),
+            ActiveValue = @ActiveValue
         WHERE Id = @id;
     ";
 
