@@ -11,7 +11,7 @@ public interface ICapabilityRepository : IRepository
     Task<Capability?> GetByNameAsync(CancellationToken cancellationToken, string capability_name);
     Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId);
     Task<Capability?> GetByIdAsync(int id, CancellationToken cancellationToken);
-    Task UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken);
+    Task<bool> UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken);
 }
 public record class CapabilityFind(string? name, string? type, string? owner, string? value,
     bool? active, string? reference_id)

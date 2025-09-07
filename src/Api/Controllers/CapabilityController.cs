@@ -35,7 +35,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         {
             var filtereds = capabilities
                .Where(x => !excludeTypes.Contains(x.Type));
-               
+
             if (string.Compare(format, "mcu", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 var csv = string.Join("\n", filtereds.Select(c => $"{c?.Name};{c?.Value};{c?.UpdatedAt:yyyy-MM-dd HH:mm:ss}"));
@@ -103,10 +103,12 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdateCapabilities([FromBody] CapabilityUpdate capability, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateValueCapability([FromBody] CapabilityUpdate capability, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        await repository.UpdateValueAsync(capability.capability_name, capability.value, cancellationToken);
-        return NoContent();
+        if (await repository.UpdateValueAsync(capability.capability_name, capability.value, cancellationToken))
+            return NoContent();
+
+        return NotFound();
     }
 
     [HttpPatch("{id}/patches")]
