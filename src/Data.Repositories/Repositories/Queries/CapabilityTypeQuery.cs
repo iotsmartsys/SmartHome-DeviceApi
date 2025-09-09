@@ -9,7 +9,7 @@ internal static class CapabilityTypeQuery
             ActuatorMode,
             DataType,
             DynamicComputedValue AS ComputedValue,
-            value_symbol AS ValueSymbol,
+            ValueSymbol AS ValueSymbol,
             ActiveValue
         FROM CapabilityTypes
     ";
@@ -19,22 +19,22 @@ internal static class CapabilityTypeQuery
     public const string GetByName = $@"{SelectBase} WHERE Name = @name";
 
     public const string Insert = @"
-        INSERT INTO CapabilityTypes (Name, ActuatorMode, DataType, DynamicComputedValue, value_symbol)
+        INSERT INTO CapabilityTypes (Name, ActuatorMode, DataType, DynamicComputedValue, ValueSymbol)
         VALUES (@Name, @ActuatorMode, @DataType, @ComputedValue, @ValueSymbol);
         SELECT LAST_INSERT_ID() AS NewId;
     ";
 
     public const string InsertIcon = @"
-        INSERT INTO CapabilityTypeIcons (CapabilityTypeId, name, active_color, inactive_color, ActiveValue)
-        VALUES (@CapabilityTypeId, @Name, @ActiveColor, @InactiveColor, @ActiveValue);
+        INSERT INTO CapabilityTypeIcons (CapabilityTypeId, Name, PrimaryColor, SecondaryColor)
+        VALUES (@CapabilityTypeId, @Name, @PrimaryColor, @SecondaryColor);
     ";
 
     public const string SelectIconsByTypeIds = @"
         SELECT 
             CapabilityTypeId,
-            name AS Name,
-            active_color AS ActiveColor,
-            inactive_color AS InactiveColor
+            Name AS Name,
+            PrimaryColor AS PrimaryColor,
+            SecondaryColor AS SecondaryColor
         FROM CapabilityTypeIcons
         WHERE CapabilityTypeId IN @ids
     ";
@@ -42,9 +42,9 @@ internal static class CapabilityTypeQuery
     public const string SelectIconsByTypeId = @"
         SELECT 
             CapabilityTypeId,
-            name AS Name,
-            active_color AS ActiveColor,
-            inactive_color AS InactiveColor
+            Name AS Name,
+            PrimaryColor AS PrimaryColor,
+            SecondaryColor AS SecondaryColor
         FROM CapabilityTypeIcons
         WHERE CapabilityTypeId = @id
     ";
@@ -56,7 +56,7 @@ internal static class CapabilityTypeQuery
             ActuatorMode = COALESCE(@ActuatorMode, ActuatorMode),
             DataType = COALESCE(@DataType, DataType),
             DynamicComputedValue = COALESCE(@ComputedValue, DynamicComputedValue),
-            value_symbol = COALESCE(@ValueSymbol, value_symbol),
+            ValueSymbol = @ValueSymbol,
             ActiveValue = @ActiveValue
         WHERE Id = @id;
     ";

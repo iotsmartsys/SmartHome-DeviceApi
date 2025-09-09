@@ -4,44 +4,43 @@ internal static class CapabilityQuery
 {
     public const string GetAllCapabilities = $@"
         SELECT
-            dc.Id,
-            dc.DeviceId, 
-            dc.Name, 
-            dc.Description, 
-            ct.Name Type, 
-            ct.ActuatorMode Mode, 
-            dc.Value, 
-            dc.deviceOwner Owner,
-            ct.DataType,
-            dc.UpdatedAt,
-            dc.Active,
-            dc.icon_name AS IconName,
-            dc.icon_color_active AS IconActiveColor,
-            dc.icon_color_inactive AS IconInactiveColor,
-            crsp.Id,
-            p.Name Platform,
-            crsp.ReferenceId,
-            g.Id,
-            g.Name,
-            g.IconName,
-            g.IconColor
-        FROM Capabilities dc
-            INNER JOIN CapabilityTypes ct ON dc.CapabilityId = ct.Id
-            LEFT JOIN Group_RelationShipCapabilities gsc ON dc.Id = gsc.CapabilityId
+            c.Id AS Id,
+            c.Name AS Name,
+            c.Description AS Description,
+            ct.Name AS Type,
+            ct.ActuatorMode AS Mode,
+            c.Value AS Value,
+            c.DeviceOwner AS Owner,
+            ct.DataType AS DataType,
+            c.UpdatedAt AS UpdatedAt,
+            c.Active AS Active,
+            c.IconName AS IconName,
+            c.IconActiveColor AS IconActiveColor,
+            c.IconInactiveColor AS IconInactiveColor,
+            crsp.Id AS Id,
+            p.Name AS Platform,
+            crsp.ReferenceId AS ReferenceId,
+            g.Id AS Id,
+            g.Name AS Name,
+            g.IconName AS IconName,
+            g.IconColor AS IconColor
+        FROM Capabilities c
+            INNER JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id
+            LEFT JOIN Group_RelationShipCapabilities gsc ON c.Id = gsc.CapabilityId
             LEFT JOIN `Groups` g ON gsc.GroupId = g.Id  
-            LEFT JOIN Capabilities_RelationShip_Platforms crsp ON dc.Id = crsp.DeviceCapabilityId
+            LEFT JOIN Capabilities_RelationShip_Platforms crsp ON c.Id = crsp.CapabilityId
             LEFT JOIN Platforms p ON crsp.PlatformId = p.Id 
         WHERE 1 = 1
         ";
 
-    public const string GetByName = $@"{GetAllCapabilities} AND dc.Name IN @capability_name";
+    public const string GetByName = $@"{GetAllCapabilities} AND c.Name IN @capability_name";
 
-    public const string GetById = $@"{GetAllCapabilities} AND dc.Id = @id";
+    public const string GetById = $@"{GetAllCapabilities} AND c.Id = @id";
 
-    public const string GetAllCapabilitiesActive = $@"{GetAllCapabilities} AND dc.Active = true";
+    public const string GetAllCapabilitiesActive = $@"{GetAllCapabilities} AND c.Active = true";
 
     public const string InsertCapability = @"
-        INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityId, Value, deviceOwner)
+        INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityTypeId, Value, deviceOwner)
         VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner);
     ";
 
@@ -58,19 +57,19 @@ internal static class CapabilityQuery
             Name = @name,
             Description = @description,
             UpdatedAt = CURRENT_TIMESTAMP,
-            deviceOwner = @owner,
+            DeviceOwner = @owner,
             Active = @active,
-            icon_name = @icon_name,
-            icon_color_active = @icon_active_color,
-            icon_color_inactive = @icon_inactive_color,
-            CapabilityId = (SELECT Id FROM CapabilityTypes WHERE Name = @type LIMIT 1)
+            IconName = @icon_name,
+            IconActiveColor = @IconActiveColor,
+            IconInactiveColor = @IconInactiveColor,
+            CapabilityTypeId = (SELECT Id FROM CapabilityTypes WHERE Name = @type LIMIT 1)
         WHERE
             Id = @id;
     ";
 
     public const string RemovePlatformFromCapability = @"
         DELETE FROM Capabilities_RelationShip_Platforms 
-        WHERE DeviceCapabilityId = @CapabilityId;
+        WHERE CapabilityId = @CapabilityId;
             ";
 
     public const string RemoveGroupFromCapability = @"
@@ -85,8 +84,8 @@ internal static class CapabilityQuery
     ";
 
     public const string InsertPlatformToCapability = @"
-        INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId, ReferenceId)
-        VALUES (@DeviceCapabilityId, (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1), @ReferenceId);
+        INSERT INTO Capabilities_RelationShip_Platforms (CapabilityId, PlatformId, ReferenceId)
+        VALUES (@CapabilityId, (SELECT Id FROM Platforms WHERE Name = @Platform LIMIT 1), @ReferenceId);
     ";
 
     public const string RemoveHistory = @"DELETE FROM CapabilityHistory WHERE CapabilityId = @CapabilityId;";

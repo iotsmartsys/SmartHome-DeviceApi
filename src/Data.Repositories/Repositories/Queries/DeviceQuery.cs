@@ -27,39 +27,47 @@ internal static class DeviceQuery
         ";
     public const string GetDevicesWithCapabilities = @"
         SELECT
-                d.Id ,
-                d.DeviceId DeviceId,
-                d.Name Name,
-                d.description,
-                d.LastActive LastActive,
-                d.PowerOn PowerOn,
-                d.Status state,
-                d.MacAddress,
-                d.IpAddress,
-                d.CommunicationTypeId Protocol,
-                d.Platform,
-                dc.Id,
-                dc.Name Name,
-                dc.Description,
-                dc.DeviceOwner Owner, 
-                c.Name type,
-                c.ActuatorMode mode,
-                dc.value,
-                c.DataType,
-                dc.UpdatedAt,
-                dp.Id ,
-                dp.Name,
-                dp.Value,
-                dp.Description Description,
-                p.Id,
-                p.Name Name
-            FROM Devices d
-                LEFT JOIN Capabilities dc ON d.Id = dc.DeviceId
-                LEFT JOIN CapabilityTypes c ON dc.CapabilityId = c.Id 
-                LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
-                LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON dc.Id = dcrsp.DeviceCapabilityId 
-                LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id
-            WHERE 1 = 1
+            /* Device */
+            d.Id AS Id,
+            d.DeviceId AS DeviceId,
+            d.Name AS Name,
+            d.Description AS Description,
+            d.LastActive AS LastActive,
+            d.PowerOn AS PowerOn,
+            d.Status AS State,
+            d.MacAddress AS MacAddress,
+            d.IpAddress AS IpAddress,
+            d.CommunicationTypeId AS Protocol,
+            d.Platform AS Platform,
+            /* Capability */
+            c.Id AS Id,
+            c.Name AS Name,
+            c.Description AS Description,
+            ct.Name AS Type,
+            ct.ActuatorMode AS Mode,
+            c.Value AS Value,
+            c.DeviceOwner AS Owner,
+            ct.DataType AS DataType,
+            c.UpdatedAt AS UpdatedAt,
+            c.Active AS Active,
+            c.IconName AS IconName,
+            c.IconActiveColor AS IconActiveColor,
+            c.IconInactiveColor AS IconInactiveColor,
+            /* Property */
+            dp.Id AS Id,
+            dp.Name AS Name,
+            dp.Value AS Value,
+            dp.Description AS Description,
+            /* Platform */
+            p.Id AS Id,
+            p.Name AS Name
+        FROM Devices d
+            LEFT JOIN Capabilities c ON d.Id = c.DeviceId
+            LEFT JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id 
+            LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
+            LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON c.Id = dcrsp.CapabilityId 
+            LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id
+        WHERE 1 = 1
             ";
 
     public const string InsertDevice = @"
@@ -78,7 +86,7 @@ internal static class DeviceQuery
         ";
 
     public const string InsertPlatform = @"
-            INSERT INTO Capabilities_RelationShip_Platforms (DeviceCapabilityId, PlatformId)
+            INSERT INTO Capabilities_RelationShip_Platforms (CapabilityId, PlatformId)
             VALUES(
                 (SELECT Id FROM Capabilities WHERE Name = @capabilityName AND DeviceId = @idDevice LIMIT 1), (SELECT Id FROM Platforms WHERE Name = @platformName LIMIT 1));";
 

@@ -139,4 +139,4 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         await repository.DeleteAsync(id);
         return NoContent();
     }
-}
+}// #3B58E6df

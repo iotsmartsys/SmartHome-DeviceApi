@@ -20,7 +20,7 @@ public record class CapabilityType(
             capabilityType.ComputedValue,
             capabilityType.ValueSymbol,
             capabilityType.ActiveValue,
-            capabilityType.Icons?.Select(i => new CapabilityIcon(i.Name, i.ActiveColor, i.InactiveColor)).ToList()
+            capabilityType.Icons?.Select(i => new CapabilityIcon(i.Name, i.PrimaryColor, i.SecondaryColor)).ToList()
         );
 
     public static implicit operator Core.Entities.CapabilityType(CapabilityType capabilityType)
@@ -39,7 +39,7 @@ public record class CapabilityType(
         if (capabilityType.icons is not null)
         {
             entity.Icons = capabilityType.icons
-                .Select(i => new Core.Entities.CapabilityIcon(i.name, i.active_color, i.inactive_color))
+                .Select(i => new Core.Entities.CapabilityIcon(i.name, i.primary_color, i.secondary_color))
                 .ToList();
         }
 

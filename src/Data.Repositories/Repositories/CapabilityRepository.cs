@@ -202,7 +202,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 logger.LogInformation("Adicionando plataforma {platformName} para a capability {capabilityName} do device {id}", platform.Platform, capability.Name, capability.Id);
                 command = new CommandDefinition(CapabilityQuery.InsertPlatformToCapability, new
                 {
-                    DeviceCapabilityId = capability.Id,
+                    CapabilityId = capability.Id,
                     Platform = platform.Platform,
                     ReferenceId = platform.ReferenceId
                 }, transaction: transaction, cancellationToken: cancellationToken);
@@ -222,8 +222,8 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 capability.Owner,
                 capability.Active,
                 icon_name = capability.IconName,
-                icon_active_color = capability.IconActiveColor,
-                icon_inactive_color = capability.IconInactiveColor
+                IconActiveColor = capability.IconActiveColor,
+                IconInactiveColor = capability.IconInactiveColor
             }, transaction);
 
             logger.LogInformation("Capability {capabilityName} atualizada para o device {id}", capability.Name, capability.Id);

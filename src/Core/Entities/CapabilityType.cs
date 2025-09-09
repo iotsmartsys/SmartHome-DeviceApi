@@ -26,15 +26,15 @@ public class CapabilityType
 public class CapabilityIcon
 {
     public string Name { get; set; } = default!;
-    public string? ActiveColor { get; set; }
-    public string? InactiveColor { get; set; }
+    public string? PrimaryColor { get; set; }
+    public string? SecondaryColor { get; set; }
 
     public CapabilityIcon() { }
 
     public CapabilityIcon(string name, string? active_color, string? inactive_color)
     {
         Name = name;
-        ActiveColor = active_color;
-        InactiveColor = inactive_color;
+        PrimaryColor = active_color;
+        SecondaryColor = inactive_color;
     }
 }

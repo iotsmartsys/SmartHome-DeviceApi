@@ -15,7 +15,7 @@ public class Capability
     public string? IconActiveColor { get; set; }
     public string? IconInactiveColor { get; set; }
 
-    public CapabilityDataType? DataType { get; set; } = default!;
+    public string? DataType { get; set; } = default!;
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<CapabilityPlatform> Platforms { get; set; } = [];
     public IEnumerable<CapabilityGroup> Groups { get; set; } = [];
@@ -51,7 +51,15 @@ public class Capability
 
     public void UpdateValue(string value)
     {
-        Value = DataType?.Convert(value.ToLower()) ?? value;
+        if (!string.IsNullOrWhiteSpace(DataType))
+        {
+            var dt = new CapabilityDataType(DataType);
+            Value = dt.Convert(value.ToLower());
+        }
+        else
+        {
+            Value = value;
+        }
     }
 
     public bool HasGroups(string name)

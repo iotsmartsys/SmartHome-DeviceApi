@@ -98,7 +98,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
 
     private void AddOrderBy(string name, bool orderDesc = false)
     {
-        name = $"dc.{name}";
+        name = $"c.{name}";
         if (_order_by.Contains(name))
             return;
 
@@ -112,17 +112,17 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     void AddCapabilitySpecification()
     {
         if (id.HasValue)
-            _sql += " AND dc.Id = @id";
+            _sql += " AND c.Id = @id";
         if (name is not null)
-            _sql += " AND dc.Name = @name";
+            _sql += " AND c.Name = @name";
         if (type is not null)
             _sql += " AND ct.Name = @type";
         if (owner is not null)
-            _sql += " AND dc.deviceOwner = @owner";
+            _sql += " AND c.deviceOwner = @owner";
         if (value is not null)
-            _sql += " AND dc.Value = @value";
+            _sql += " AND c.Value = @value";
         if (active.HasValue)
-            _sql += " AND dc.Active = @active";
+            _sql += " AND c.Active = @active";
     }
 
     internal IFindCapabilityQueryBuilder WithFind(CapabilityFind? capabilityFind)

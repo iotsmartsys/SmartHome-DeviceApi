@@ -10,7 +10,7 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
 {
     private readonly ILogger<CapabilityTypeRepository> logger;
     private readonly IDbConnection connection;
-    private record CapabilityTypeIconRow(int CapabilityTypeId, string Name, string? ActiveColor, string? InactiveColor);
+    private record CapabilityTypeIconRow(int CapabilityTypeId, string Name, string? PrimaryColor, string? SecondaryColor);
 
     public CapabilityTypeRepository(ILogger<CapabilityTypeRepository> logger, IDbConnection connection)
     {
@@ -33,8 +33,8 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
                 {
                     CapabilityTypeId = newId,
                     i.Name,
-                    i.ActiveColor,
-                    i.InactiveColor
+                    i.PrimaryColor,
+                    i.SecondaryColor
                 });
 
                 await connection.ExecuteAsync(CapabilityTypeQuery.InsertIcon, iconParams, transaction);
@@ -63,7 +63,7 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         var ids = types.Select(t => t.Id).ToArray();
         var iconRows = await connection.QueryAsync<CapabilityTypeIconRow>(CapabilityTypeQuery.SelectIconsByTypeIds, new { ids });
         var grouped = iconRows.GroupBy(r => r.CapabilityTypeId)
-                              .ToDictionary(g => g.Key, g => g.Select(r => new CapabilityIcon(r.Name, r.ActiveColor, r.InactiveColor)).ToList());
+                              .ToDictionary(g => g.Key, g => g.Select(r => new CapabilityIcon(r.Name, r.PrimaryColor, r.SecondaryColor)).ToList());
 
         foreach (var t in types)
         {
@@ -82,7 +82,7 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         if (type is null) return null;
 
         var icons = await connection.QueryAsync<CapabilityTypeIconRow>(CapabilityTypeQuery.SelectIconsByTypeId, new { id = type.Id });
-        type.Icons = icons.Select(r => new CapabilityIcon(r.Name, r.ActiveColor, r.InactiveColor)).ToList();
+        type.Icons = icons.Select(r => new CapabilityIcon(r.Name, r.PrimaryColor, r.SecondaryColor)).ToList();
         return type;
     }
 
@@ -117,8 +117,8 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
                     {
                         CapabilityTypeId = existing.Id,
                         i.Name,
-                        i.ActiveColor,
-                        i.InactiveColor
+                        i.PrimaryColor,
+                        i.SecondaryColor
                     });
 
                     await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.InsertIcon, iconParams, transaction));
@@ -176,7 +176,8 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
                 capabilityType.ActuatorMode,
                 capabilityType.DataType,
                 ComputedValue = capabilityType.ComputedValue,
-                capabilityType.ValueSymbol
+                capabilityType.ValueSymbol,
+                capabilityType.ActiveValue
             };
             await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.UpdatePartialById, updateParams, transaction));
 
@@ -188,8 +189,8 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
                 {
                     CapabilityTypeId = capabilityType.Id,
                     i.Name,
-                    i.ActiveColor,
-                    i.InactiveColor
+                    i.PrimaryColor,
+                    i.SecondaryColor
                 });
                 await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.InsertIcon, iconParams, transaction));
             }
