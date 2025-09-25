@@ -210,6 +210,41 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 logger.LogInformation("Plataforma {platformName} adicionada para a capability {capabilityName} do device {id}", platform.Platform, capability.Name, capability.Id);
             }
 
+            logger.LogInformation($"Removendo os relacionamentos de grupo para a capability {capability.Name} do device {capability.Id}");
+            command = new CommandDefinition(CapabilityQuery.RemoveGroupFromCapability, new
+            {
+                CapabilityId = capability.Id
+            }, transaction: transaction, cancellationToken: cancellationToken);
+            await connection.ExecuteAsync(command);
+            logger.LogInformation($"Relacionamentos de grupo removidos para a capability {capability.Name} do device {capability.Id}");
+
+            foreach (var group in capability.Groups)
+            {
+                logger.LogInformation("Adicionando grupo {groupName} para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
+                int groupId = await connection.ExecuteScalarAsync<int>("SELECT Id FROM `Groups` WHERE Name = @Name LIMIT 1", new { group.Name }, transaction);
+                if (groupId == 0)
+                {
+                    logger.LogWarning("Grupo {groupName} não encontrado. Pulando adição para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
+
+                    logger.LogInformation("Criando novo grupo {groupName} para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
+                    
+                    groupId = await connection.ExecuteScalarAsync<int>(GroupQuery.Insert, new
+                    {
+                        group.Name,
+                        Activated = true
+                    }, transaction);
+                    logger.LogInformation("Novo grupo {groupName} criado com ID {groupId} para a capability {capabilityName} do device {id}", group.Name, groupId, capability.Name, capability.Id);
+                }
+
+                command = new CommandDefinition(GroupQuery.InsertCapabilityForGroup, new
+                {
+                    CapabilityId = capability.Id,
+                    GroupId = groupId
+                }, transaction: transaction, cancellationToken: cancellationToken);
+                await connection.ExecuteAsync(command);
+                logger.LogInformation("Grupo {groupName} adicionado para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
+            }
+            
             logger.LogInformation("Atualizando capability {capabilityName} para o device {id}", capability.Name, capability.Id);
             const string sql = CapabilityQuery.UpdateForDevice;
             await connection.ExecuteAsync(sql, new

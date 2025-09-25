@@ -55,6 +55,7 @@ public record class Capability(
         IconActiveColor = capability.icon?.active_color,
         IconInactiveColor = capability.icon?.inactive_color,
         Platforms = capability.platforms?.Select(p => (Core.Entities.CapabilityPlatform)p) ?? [],
+        Groups = capability.groups?.Select(g => (Core.Entities.CapabilityGroup)g) ?? [],
     };
 
     public record class Platform(string platform, string? referenceId)

@@ -24,6 +24,19 @@ services:
         reservations:
           cpus: '0'
           memory: 20M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.devices.rule=PathPrefix(`/devices`)"
+        - "traefik.http.routers.devices.entrypoints=web"
+        - "traefik.http.services.devices.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.devices-strip.stripPrefix.prefixes=/devices"
+        - "traefik.http.routers.devices.middlewares=devices-strip@swarm,auth-basic@swarm"
+        - "traefik.http.routers.devices-ip.rule=PathPrefix(`/devices`)"
+        - "traefik.http.routers.devices-ip.entrypoints=web"
+        - "traefik.http.routers.devices-ip.service=devices"
+        - "traefik.http.routers.devices-ip.middlewares=devices-strip@swarm,auth-basic@swarm"
+        - "traefik.http.middlewares.auth-basic.basicauth.users=appsmarthome:$$apr1$$9m2Dy96s$$d2TbrWIUvwyTpG.JspGT//"
+        - "traefik.docker.network=overlay-swarm"
     ports:
       - target: 8080
         published: 8081
@@ -53,6 +66,19 @@ services:
         reservations:
           cpus: '0'
           memory: 20M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.devicesro.rule=PathPrefix(`/devices-ro`)"
+        - "traefik.http.routers.devicesro.entrypoints=web"
+        - "traefik.http.services.devicesro.loadbalancer.server.port=8080"
+        - "traefik.http.middlewares.devicesro-strip.stripPrefix.prefixes=/devices-ro"
+        - "traefik.http.routers.devicesro.middlewares=devicesro-strip@swarm,auth-basic@swarm"
+        - "traefik.http.routers.devicesro-ip.rule=PathPrefix(`/devices-ro`)"
+        - "traefik.http.routers.devicesro-ip.entrypoints=web"
+        - "traefik.http.routers.devicesro-ip.service=devicesro"
+        - "traefik.http.routers.devicesro-ip.middlewares=devicesro-strip@swarm,auth-basic@swarm"
+        - "traefik.http.middlewares.auth-basic.basicauth.users=appsmarthome:$$apr1$$9m2Dy96s$$d2TbrWIUvwyTpG.JspGT//"
+        - "traefik.docker.network=overlay-swarm"
     ports:
       - target: 8080
         published: 8091
