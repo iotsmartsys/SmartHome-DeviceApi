@@ -4,7 +4,7 @@ services:
     image: "centraliot.azurecr.io/devices-api:latest"
     environment:
       - TZ=America/Bahia
-      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;ConnectionReset=true;ConnectionTimeout=10;
+      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=30;Connection LifeTime=600;Default Command Timeout=15;Connection Timeout=5;
       - Logging__LogLevel__Default=Error
       - Logging__LogLevel__Microsoft=Error
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error
@@ -30,60 +30,12 @@ services:
         - "traefik.http.routers.devices.entrypoints=web"
         - "traefik.http.services.devices.loadbalancer.server.port=8080"
         - "traefik.http.middlewares.devices-strip.stripPrefix.prefixes=/devices"
-        - "traefik.http.routers.devices.middlewares=devices-strip@swarm,auth-basic@swarm"
+        - "traefik.http.routers.devices.middlewares=global-sec@file,devices-strip@swarm"
         - "traefik.http.routers.devices-ip.rule=PathPrefix(`/devices`)"
         - "traefik.http.routers.devices-ip.entrypoints=web"
         - "traefik.http.routers.devices-ip.service=devices"
-        - "traefik.http.routers.devices-ip.middlewares=devices-strip@swarm,auth-basic@swarm"
-        - "traefik.http.middlewares.auth-basic.basicauth.users=appsmarthome:$$apr1$$9m2Dy96s$$d2TbrWIUvwyTpG.JspGT//"
+        - "traefik.http.routers.devices-ip.middlewares=global-sec@file,devices-strip@swarm"
         - "traefik.docker.network=overlay-swarm"
-    ports:
-      - target: 8080
-        published: 8081
-        protocol: tcp
-        mode: ingress
-  api-readonly:
-    image: "centraliot.azurecr.io/devices-api:latest"
-    environment:
-      - TZ=America/Bahia
-      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;ConnectionReset=true;ConnectionTimeout=10;
-      - Logging__LogLevel__Default=Error
-      - Logging__LogLevel__Microsoft=Error
-      - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error
-    deploy:
-      replicas: 1
-      update_config:
-        parallelism: 2
-        delay: 10s
-      restart_policy:
-        condition: any
-        delay: 5s
-        max_attempts: 100
-      resources:
-        limits:
-          cpus: '1'
-          memory: 200M
-        reservations:
-          cpus: '0'
-          memory: 20M
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.devicesro.rule=PathPrefix(`/devices-ro`)"
-        - "traefik.http.routers.devicesro.entrypoints=web"
-        - "traefik.http.services.devicesro.loadbalancer.server.port=8080"
-        - "traefik.http.middlewares.devicesro-strip.stripPrefix.prefixes=/devices-ro"
-        - "traefik.http.routers.devicesro.middlewares=devicesro-strip@swarm,auth-basic@swarm"
-        - "traefik.http.routers.devicesro-ip.rule=PathPrefix(`/devices-ro`)"
-        - "traefik.http.routers.devicesro-ip.entrypoints=web"
-        - "traefik.http.routers.devicesro-ip.service=devicesro"
-        - "traefik.http.routers.devicesro-ip.middlewares=devicesro-strip@swarm,auth-basic@swarm"
-        - "traefik.http.middlewares.auth-basic.basicauth.users=appsmarthome:$$apr1$$9m2Dy96s$$d2TbrWIUvwyTpG.JspGT//"
-        - "traefik.docker.network=overlay-swarm"
-    ports:
-      - target: 8080
-        published: 8091
-        protocol: tcp
-        mode: ingress
 
 networks:
   default:
