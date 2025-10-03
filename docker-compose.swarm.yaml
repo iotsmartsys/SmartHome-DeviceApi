@@ -4,7 +4,7 @@ services:
     image: "centraliot.azurecr.io/devices-api:latest"
     environment:
       - TZ=America/Bahia
-      - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=30;Connection LifeTime=600;Default Command Timeout=15;Connection Timeout=5;
+  - ConnectionStrings__Devices=Server=mysql;Database=SmartHome-Devices;User ID=smarthomeiot;Password=ma522770;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=30;Connection LifeTime=600;Default Command Timeout=15;Connection Timeout=5;Connection Reset=true;
       - Logging__LogLevel__Default=Error
       - Logging__LogLevel__Microsoft=Error
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error

@@ -281,14 +281,22 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
     {
         logger.LogInformation("Atualizando valor da capability {capabilityName} para {value}", capability_name, value);
         const string sql = CapabilityQuery.UpdateValue;
-        int rows_affecteds = await connection.ExecuteAsync(sql, new
+        try
         {
-            capability_name,
-            value
-        });
+            int rows_affecteds = await connection.ExecuteAsync(sql, new
+            {
+                capability_name,
+                value
+            });
 
-        logger.LogInformation("Valor da capability {capabilityName} atualizado para {value}", capability_name, value);
+            logger.LogInformation("Valor da capability {capabilityName} atualizado para {value}", capability_name, value);
 
-        return rows_affecteds > 0;
+            return rows_affecteds > 0;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
     }
 }

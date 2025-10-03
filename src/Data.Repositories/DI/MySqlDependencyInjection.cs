@@ -13,7 +13,7 @@ public static class MySqlDependencyInjection
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new ArgumentException("A ConnectionString deve ser informada.");
 
-        services.AddScoped<IDbConnection>(_ => new MySqlConnection(connectionString));
+    services.AddTransient<IDbConnection>(_ => new MySqlConnection(connectionString));
         services
             .AddScoped<IDeviceRepository, DeviceRepository>()
             .AddScoped<ICapabilityRepository, CapabilityRepository>()

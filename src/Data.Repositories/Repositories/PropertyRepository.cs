@@ -12,7 +12,6 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
-
         try
         {
             int idDevice = await connection.ExecuteScalarAsync<int>(PropertyQuery.GetIdDevice, new { device_id }, transaction);
@@ -43,13 +42,15 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
             transaction.Rollback();
             throw;
         }
+        finally
+        {
+            // Garantir que a conexão volte para o pool
+            connection.Close();
+        }
     }
 
     public async Task<IEnumerable<Property>> GetByDeviceAsync(string device_id, Criteria<Property>? criteria, CancellationToken cancellationToken)
     {
-        connection.Open();
-        using var transaction = connection.BeginTransaction();
-
         try
         {
             logger.LogInformation("Buscando properties para o device {deviceId}", device_id);
@@ -67,6 +68,11 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
         {
             logger.LogError(ex, "Erro ao buscar properties para o device {deviceId}", device_id);
             throw;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
         }
     }
 
@@ -91,13 +97,16 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
             logger.LogError(ex, "Erro ao buscar property para o device {deviceId}", device_id);
             throw;
         }
+        finally
+        {
+            connection.Close();
+        }
     }
 
     public async Task RemoveAsync(string device_id, Property property, CancellationToken cancellationToken)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
-
         try
         {
             logger.LogInformation("Buscando device {deviceId}", device_id);
@@ -121,13 +130,16 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
             transaction.Rollback();
             throw;
         }
+        finally
+        {
+            connection.Close();
+        }
     }
 
     public async Task CreateOrUpdateAsync(string device_id, Property property, CancellationToken cancellationToken)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
-
         try
         {
             logger.LogInformation("Buscando device {deviceId}", device_id);
@@ -151,6 +163,10 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
             logger.LogError(ex, "Erro ao atualizar property para o device {deviceId}", device_id);
             transaction.Rollback();
             throw;
+        }
+        finally
+        {
+            connection.Close();
         }
     }
 }

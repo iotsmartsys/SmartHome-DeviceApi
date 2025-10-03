@@ -10,13 +10,29 @@ internal class PlatformRepository(IDbConnection connection) : IPlatformRepositor
     public async Task<IEnumerable<Platform>> GetAllAsync()
     {
         const string sql = "SELECT Id, Name, Description FROM Platforms";
-        return await connection.QueryAsync<Platform>(sql);
+        try
+        {
+            return await connection.QueryAsync<Platform>(sql);
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
     }
 }
 internal class MonitoredPlaceRepository(IDbConnection connection) : IMonitoredPlaceRepository
 {
     public async Task<IEnumerable<MonitoredPlace>> GetAllAsync()
     {
-        return await connection.QueryAsync<MonitoredPlace>(MonitoredPlaceQuery.GetAll);
+        try
+        {
+            return await connection.QueryAsync<MonitoredPlace>(MonitoredPlaceQuery.GetAll);
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
     }
 }

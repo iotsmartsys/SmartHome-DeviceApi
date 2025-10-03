@@ -26,7 +26,15 @@ public class DatabaseWatchdogService : BackgroundService
             {
                 using var scope = _services.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<IDbConnection>();
-                await db.ExecuteScalarAsync("SELECT 1");
+                try
+                {
+                    await db.ExecuteScalarAsync("SELECT 1");
+                }
+                finally
+                {
+                    if (db.State != ConnectionState.Closed)
+                        db.Close();
+                }
     
                 _failureCount = 0;
                 _logger.LogInformation("Conexão com o banco de dados verificada com sucesso.");

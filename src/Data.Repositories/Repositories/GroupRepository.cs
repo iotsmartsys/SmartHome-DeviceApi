@@ -41,6 +41,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
         finally
         {
             transaction.Dispose();
+            connection.Close();
         }
         logger.LogInformation($"Grupo {group.Name} adicionado com sucesso com ID {group.Id}");
     }
@@ -109,6 +110,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
         finally
         {
             transaction.Dispose();
+            connection.Close();
         }   
     }
     public async Task UpdateOnlyGroupAsync(Group group, CancellationToken cancellationToken)

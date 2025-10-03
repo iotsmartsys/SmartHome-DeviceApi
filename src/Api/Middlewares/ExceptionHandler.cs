@@ -36,21 +36,46 @@ class ExceptionHandler(RequestDelegate _next)
                 statusCode = HttpStatusCode.NotFound;
                 break;
             case MySqlException mySqlEx:
-            logger.LogError(mySqlEx, "Erro de banco de dados: {Message}", mySqlEx.Message);
+                logger.LogError(mySqlEx, "Erro de banco de dados: {Message}", mySqlEx.Message);
                 message = "Erro ao processar a requisição";
-                if (mySqlEx.Message.Contains("Duplicate entry"))
+                // Mapear códigos de erro MySQL mais comuns
+                switch (mySqlEx.Number)
                 {
-                    message = "Já existe um registro com o mesmo valor";
-                    statusCode = HttpStatusCode.Conflict;
-                }
-                else if (mySqlEx.Message.Contains("Cannot add or update a child row: a foreign key constraint fails"))
-                {
-                    message = "Não é possível adicionar ou atualizar o registro devido a uma restrição de chave estrangeira";
-                    statusCode = HttpStatusCode.BadRequest;
-                }
-                else
-                {
-                    statusCode = HttpStatusCode.InternalServerError;
+                    // Duplicate entry
+                    case 1062:
+                        message = "Já existe um registro com o mesmo valor";
+                        statusCode = HttpStatusCode.Conflict;
+                        break;
+                    // Cannot add or update a child row: a foreign key constraint fails / Cannot delete or update a parent row
+                    case 1451:
+                    case 1452:
+                        message = "Violação de integridade: restrição de chave estrangeira";
+                        statusCode = HttpStatusCode.BadRequest;
+                        break;
+                    // Lock wait timeout exceeded
+                    case 1205:
+                        message = "Timeout ao aguardar lock de banco de dados";
+                        statusCode = HttpStatusCode.ServiceUnavailable;
+                        break;
+                    // Deadlock found when trying to get lock
+                    case 1213:
+                        message = "Deadlock detectado. Tente novamente";
+                        statusCode = HttpStatusCode.ServiceUnavailable;
+                        break;
+                    // Too many connections
+                    case 1040:
+                        message = "Banco indisponível no momento (muitas conexões)";
+                        statusCode = HttpStatusCode.ServiceUnavailable;
+                        break;
+                    // Server has gone away/ lost connection
+                    case 2006:
+                    case 2013:
+                        message = "Conexão com o banco foi perdida";
+                        statusCode = HttpStatusCode.ServiceUnavailable;
+                        break;
+                    default:
+                        statusCode = HttpStatusCode.InternalServerError;
+                        break;
                 }
                 break;
             default:
