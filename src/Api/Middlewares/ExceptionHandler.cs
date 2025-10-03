@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 class ExceptionHandler(RequestDelegate _next)
 {
@@ -81,10 +81,20 @@ class ExceptionHandler(RequestDelegate _next)
             default:
                 break;
         }
-        context.Response.ContentType = "application/json; charset=utf-8";
-        context.Response.StatusCode = (int)statusCode;
-        context.Response.Headers.Append("X-Trace-Id", traceId);
-
-        await context.Response.WriteAsync(message, Encoding.UTF8);
+        // Evitar escrever em response já finalizada
+        if (!context.Response.HasStarted)
+        {
+            context.Response.ContentType = "application/json; charset=utf-8";
+            context.Response.StatusCode = (int)statusCode;
+            context.Response.Headers["X-Trace-Id"] = traceId;
+            try
+            {
+                await context.Response.WriteAsync(message, Encoding.UTF8);
+            }
+            catch (ObjectDisposedException)
+            {
+                // Conexão HTTP já foi encerrada, não há o que fazer
+            }
+        }
     }
 }

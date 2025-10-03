@@ -44,7 +44,6 @@ internal class PropertyRepository(ILogger<PropertyRepository> logger, IDbConnect
         }
         finally
         {
-            // Garantir que a conexão volte para o pool
             connection.Close();
         }
     }

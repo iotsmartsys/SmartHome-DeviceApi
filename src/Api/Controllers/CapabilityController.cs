@@ -5,6 +5,7 @@ using Core.Contracts.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.OutputCaching;
 [Route("api/v1/devices/{device_id}/capabilities")]
 [Route("api/v1/capabilities")]
 [ApiController]
@@ -14,9 +15,15 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllCapabilities([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    // [OutputCache(Duration = 2, VaryByQueryKeys = new[] { "name", "type", "owner", "value", "active", "reference_id" })]
+    public async Task<IActionResult> GetAllCapabilities([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, [FromServices] IMemoryCache cache, CancellationToken cancellationToken)
     {
-        var capabilities = await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
+        string cacheKey = $"capabilities:all:{capabilityQuery?.name}:{capabilityQuery?.type}:{capabilityQuery?.owner}:{capabilityQuery?.value}:{capabilityQuery?.active}:{capabilityQuery?.reference_id}";
+        var capabilities = await cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(2);
+            return await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
+        }) ?? Enumerable.Empty<Core.Entities.Capability>();
         if (capabilities.Any())
             return Ok(capabilities.Select(c => (Capability?)c));
 
@@ -27,10 +34,16 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CapabilityTiny>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllCapabilitiesTiny([FromQuery] CapabilityFind? capabilityQuery, [FromQuery] string? format, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    // [OutputCache(Duration = 2, VaryByQueryKeys = new[] { "name", "type", "owner", "value", "active", "reference_id", "format" })]
+    public async Task<IActionResult> GetAllCapabilitiesTiny([FromQuery] CapabilityFind? capabilityQuery, [FromQuery] string? format, [FromServices] ICapabilityRepository repository, [FromServices] IMemoryCache cache, CancellationToken cancellationToken)
     {
         string[] excludeTypes = new[] { "Message", "Alexa", "TIME_OF_DAY", "Scene" };
-        var capabilities = await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
+        string cacheKey = $"capabilities:tiny:{capabilityQuery?.name}:{capabilityQuery?.type}:{capabilityQuery?.owner}:{capabilityQuery?.value}:{capabilityQuery?.active}:{capabilityQuery?.reference_id}:{format}";
+        var capabilities = await cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(2);
+            return await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
+        }) ?? Enumerable.Empty<Core.Entities.Capability>();
         if (capabilities.Any())
         {
             var filtereds = capabilities

@@ -106,26 +106,46 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
-        List<Capability> capabilitiesSelecteds = [];
-        await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, Capability>(command: command, (capability, platform, group) =>
-       {
-           var capabilitySelected = capabilitiesSelecteds.FirstOrDefault(c => c.Id == capability.Id);
-           if (capabilitySelected == null)
-           {
-               logger.LogInformation("Capability {capabilityName} adicionada na lista", capability.Name);
-               capabilitiesSelecteds.Add(capability);
-               capabilitySelected = capability;
-           }
+        // Use a dictionary for O(1) aggregation instead of O(N^2) FirstOrDefault scans
+        var map = new Dictionary<int, Capability>();
+        try
+        {
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
 
-           if (platform != null)
-               capabilitySelected.AddPlatform(platform);
+            await Data.Repositories.Utils.DbRetry.ExecuteAsync(async () =>
+            {
+                await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, Capability>(
+                    command: command,
+                    map: (capability, platform, group) =>
+                    {
+                        if (!map.TryGetValue(capability.Id, out var capabilitySelected))
+                        {
+                            // Reduce log noise in hot path; switch to Debug if needed
+                            // logger.LogDebug("Capability {capabilityName} adicionada na lista", capability.Name);
+                            map[capability.Id] = capability;
+                            capabilitySelected = capability;
+                        }
 
-           if (group != null)
-               capabilitySelected.AddGroup(group);
+                        if (platform != null)
+                            capabilitySelected.AddPlatform(platform);
 
-           return capabilitySelected;
-       });
-        return capabilitiesSelecteds;
+                        if (group != null)
+                            capabilitySelected.AddGroup(group);
+
+                        return capabilitySelected;
+                    },
+                    splitOn: "Id,Id");
+                return true;
+            }, logger, command.CancellationToken);
+
+            return map.Values;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
     }
 
     public async Task DeleteAsync(int id)
@@ -279,18 +299,20 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
     public async Task<bool> UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Atualizando valor da capability {capabilityName} para {value}", capability_name, value);
+        // Log em nível debug para reduzir overhead em cenários de alta taxa
+        logger.LogDebug("Atualizando valor da capability {capabilityName}", capability_name);
         const string sql = CapabilityQuery.UpdateValue;
         try
         {
-            int rows_affecteds = await connection.ExecuteAsync(sql, new
+            var rows_affecteds = await Data.Repositories.Utils.DbRetry.ExecuteAsync(async () =>
             {
-                capability_name,
-                value
-            });
+                if (connection.State != ConnectionState.Open)
+                    connection.Open();
+                var cmd = new CommandDefinition(sql, new { capability_name, value }, cancellationToken: cancellationToken);
+                return await connection.ExecuteAsync(cmd);
+            }, logger, cancellationToken);
 
-            logger.LogInformation("Valor da capability {capabilityName} atualizado para {value}", capability_name, value);
-
+            logger.LogDebug("Valor da capability {capabilityName} atualizado", capability_name);
             return rows_affecteds > 0;
         }
         finally

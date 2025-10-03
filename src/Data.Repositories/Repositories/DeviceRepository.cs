@@ -47,7 +47,9 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             .WithDeviceId(device_id)
                 .Build();
         Device? result = null;
-        var devices = await connection.QueryAsync<Device, Capability?, Property?, Platform?, Device>(
+                var devices = await Data.Repositories.Utils.DbRetry.ExecuteAsync(async () =>
+                {
+                        return await connection.QueryAsync<Device, Capability?, Property?, Platform?, Device>(
           command: command,
           map: (device, capability, property, platform) =>
             {
@@ -70,10 +72,10 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             },
             splitOn: "Id, Id, Id, Id"
         );
+        }, logger, cancellationToken);
 
-        logger.LogInformation($"Found {devices.Count()} devices");
-
-        return result;
+    logger.LogInformation($"Found {devices.Count()} devices");
+    return result;
     }
 
     public async Task CreateAsync(Device entity, CancellationToken cancellationToken)

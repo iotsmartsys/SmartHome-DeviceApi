@@ -1,6 +1,7 @@
 using Api.Models;
 using Core.DI;
 using Data.Repositories.MySql.DI;
+using Microsoft.AspNetCore.OutputCaching;
 
 var cts = new CancellationTokenSource();
 
@@ -14,6 +15,12 @@ builder.Services
    .AddCore()
    .AddMemoryCache()
    .AddMySqlData(connectionString!);
+
+builder.Services.AddOutputCache(options =>
+{
+    // Default policy is fine; per-endpoint attributes will set TTL
+    options.AddBasePolicy(b => b.Expire(TimeSpan.FromSeconds(2)));
+});
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
@@ -33,6 +40,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors("AllowAll");
+app.UseOutputCache();
 app.MapControllers();
 app.UseMiddleware<ExceptionHandler>();
 

@@ -2,7 +2,7 @@
 using System.Data;
 using Core.Contracts.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Data.Repositories.MySql.DI;
 

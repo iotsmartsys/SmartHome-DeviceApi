@@ -80,7 +80,8 @@ internal static class CapabilityQuery
     public const string UpdateValue = @"
         UPDATE Capabilities
         SET Value = @value, UpdatedAt = CURRENT_TIMESTAMP
-        WHERE Name = @capability_name;
+        WHERE Name = @capability_name
+        LIMIT 1;
     ";
 
     public const string InsertPlatformToCapability = @"
