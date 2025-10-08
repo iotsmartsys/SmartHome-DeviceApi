@@ -8,6 +8,14 @@ services:
       - Logging__LogLevel__Default=Error
       - Logging__LogLevel__Microsoft=Error
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Error
+      # OpenTelemetry (Grafana): usar as variáveis padrão OTEL_*
+      - OTEL_RESOURCE_ATTRIBUTES="service.name=SmartHome-Api,service.namespace=iot-smart-home,deployment.environment=production"
+      - OTEL_EXPORTER_OTLP_ENDPOINT="https://otlp-gateway-prod-sa-east-1.grafana.net/otlp"
+      - OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic MTM5NTM3MTpnbGNfZXlKdklqb2lNVFUxTVRNeE55SXNJbTRpT2lKaGNHa3RjMjFoY25Sb2IyMWxJaXdpYXlJNkltWXdaamhvZW5oTE4zRjZPVE01ZFhSRE5YUnROblEzTWlJc0ltMGlPbnNpY2lJNkluQnliMlF0YzJFdFpXRnpkQzB4SW4xOQ=="
+      - OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
+      - OTEL_TRACES_SAMPLER=parentbased_always_on
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
     deploy:
       replicas: 1
       update_config:
