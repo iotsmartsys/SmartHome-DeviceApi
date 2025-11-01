@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using MySqlConnector;
+using Microsoft.Extensions.Hosting;
 
 class ExceptionHandler(RequestDelegate _next)
 {
@@ -24,6 +25,7 @@ class ExceptionHandler(RequestDelegate _next)
         string message = "Ocorreu um erro inesperado ao processar a requisição.";
         string traceId = Guid.NewGuid().ToString();
         HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
+        bool shouldTerminate = false;
 
         switch (exception)
         {
@@ -56,6 +58,7 @@ class ExceptionHandler(RequestDelegate _next)
                     case 1205:
                         message = "Timeout ao aguardar lock de banco de dados";
                         statusCode = HttpStatusCode.ServiceUnavailable;
+                        shouldTerminate = true;
                         break;
                     // Deadlock found when trying to get lock
                     case 1213:
@@ -72,11 +75,19 @@ class ExceptionHandler(RequestDelegate _next)
                     case 2013:
                         message = "Conexão com o banco foi perdida";
                         statusCode = HttpStatusCode.ServiceUnavailable;
+                        // Em muitos ambientes isso indica falha grave de rede/DB
+                        shouldTerminate = true;
                         break;
                     default:
                         statusCode = HttpStatusCode.InternalServerError;
                         break;
                 }
+                break;
+            case TimeoutException:
+                // Timeout genérico, considerar fatal para reinício
+                statusCode = HttpStatusCode.ServiceUnavailable;
+                message = "Timeout de operação com o banco de dados";
+                shouldTerminate = true;
                 break;
             default:
                 break;
@@ -94,6 +105,22 @@ class ExceptionHandler(RequestDelegate _next)
             catch (ObjectDisposedException)
             {
                 // Conexão HTTP já foi encerrada, não há o que fazer
+            }
+        }
+
+        // Se detectamos timeout/falha crítica de DB, solicitar término do processo
+        if (shouldTerminate)
+        {
+            try
+            {
+                var lifetime = context.RequestServices.GetService<IHostApplicationLifetime>();
+                logger.LogCritical("Encerrando processo devido a erro crítico de banco (timeout/conexão)");
+                // Solicita parada graciosa; Swarm com restart condition=any irá reiniciar
+                lifetime?.StopApplication();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Falha ao solicitar StopApplication");
             }
         }
     }
