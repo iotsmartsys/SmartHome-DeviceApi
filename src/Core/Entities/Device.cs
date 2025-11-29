@@ -11,15 +11,15 @@ public class Device
     public string State { get; set; } = default!;
     public string MacAddress { get; set; } = default!;
     public string IpAddress { get; set; } = default!;
-    public CommunicationProtocol Protocol { get; set; } = CommunicationProtocol.HTTP;
+    public CommunicationProtocol Protocol { get; set; } = CommunicationProtocol.AMQP;
     public string Platform { get; set; } = default!;
+    public Device() { }
     public Device(string device_id, string device_name, string state)
     {
         DeviceId = device_id;
         Name = device_name;
         State = state;
     }
-    public Device() { }
     public IEnumerable<Capability> Capabilities { get; private set; } = [];
     public Capability AddCapability(Capability capability)
     {
@@ -46,6 +46,8 @@ public class Device
     }
 
     public IEnumerable<Property> Properties { get; private set; } = [];
+
+    public IEnumerable<Settings> Settings { get; private set; } = [];
 
     public Device AddProperty(Property property)
     {
@@ -74,6 +76,30 @@ public class Device
     public void ClearProperties()
     {
         Properties = [];
+    }
+
+    public void ClearSettings()
+    {
+        Settings = [];
+    }
+
+    public Device AddSetting(Settings setting)
+    {
+
+        if (setting == null || Settings.Any(s => s.Id == setting.Id))
+            return this;
+        Settings = Settings.Append(setting);
+        return this;
+    }
+
+    public Device AddSettings(IEnumerable<Settings> settings)
+    {
+        var settingsNotPresentIn = settings.Where(s => !Settings.Any(s2 => s2.Id == s.Id)).ToArray();
+        if (settingsNotPresentIn.Length == 0)
+            return this;
+
+        Settings = Settings.Concat(settingsNotPresentIn);
+        return this;
     }
 }
 

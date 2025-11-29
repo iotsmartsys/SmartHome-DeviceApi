@@ -58,6 +58,15 @@ app.MapGet("/api/v1/timezone", (string zone) =>
 })
 .WithMetadata(new { Description = "Obtém informações de fuso horário" });
 
+app.MapGet("/api/v1/timezone/datetime", () =>
+{
+    return Results.Ok(DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+})
+.WithMetadata(new { Description = "Obtém informações de data e hora para um fuso horário específico" });
+
+app.MapGet("/api/v1/health", () => Results.Ok(new { status = "Healthy" }))
+   .WithMetadata(new { Description = "Verifica o status de saúde da API" });
+
 
 Console.CancelKeyPress += (sender, eventArgs) =>
 {

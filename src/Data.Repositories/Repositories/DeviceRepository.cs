@@ -10,25 +10,29 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
 {
     public async Task<IEnumerable<Device>> GetDevicesAsync(DeviceFind? find, CancellationToken cancellationToken)
     {
-        logger.LogInformation($"Getting devices from database. Connection string: {connection.ConnectionString}");
         var command = new DeviceQueryBuilder()
         .WithCancellationToken(cancellationToken)
         .WithFind(find)
         .Build();
+        return await GetByCommandAsync(command);
+    }
+
+    private async Task<IEnumerable<Device>> GetByCommandAsync(CommandDefinition command)
+    {
         List<Device> devicesSelecteds = [];
-        var devices = await connection.QueryAsync<Device, Property?, Device>(
+        var devices = await connection.QueryAsync<Device, Property?, Settings?, Device>(
             command,
-            (device, property) =>
+            (device, property, settings) =>
             {
-                logger.LogInformation("Mapping device {deviceId} property", device.DeviceId);
                 var deviceSelected = devicesSelecteds.FirstOrDefault(d => d.DeviceId == device.DeviceId);
                 if (deviceSelected == null)
                 {
                     deviceSelected = device;
                     devicesSelecteds.Add(deviceSelected);
                 }
-                
+
                 deviceSelected.AddProperty(property!);
+                deviceSelected.AddSetting(settings!);
 
                 return deviceSelected;
             },
@@ -39,43 +43,19 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
 
         return devicesSelecteds;
     }
+
     public async Task<Device?> GetDeviceAsync(string device_id, CancellationToken cancellationToken)
     {
-        logger.LogInformation($"Getting devices from database. Connection string: {connection.ConnectionString}");
         var command = new DeviceQueryBuilder(DeviceQuery.GetDevicesWithCapabilities)
             .WithCancellationToken(cancellationToken)
             .WithDeviceId(device_id)
                 .Build();
         Device? result = null;
-                var devices = await Data.Repositories.Utils.DbRetry.ExecuteAsync(async () =>
-                {
-                        return await connection.QueryAsync<Device, Capability?, Property?, Platform?, Device>(
-          command: command,
-          map: (device, capability, property, platform) =>
-            {
-                result ??= device;
+        var devices = await GetByCommandAsync(command);
+        result = devices.FirstOrDefault();
 
-                if (capability != null)
-                {
-                    var capInList = result.AddCapability(capability);
-                    logger.LogInformation("Capability {capabilityName} added to device {deviceId}", capInList.Name, device.DeviceId);
-                    if (capInList != null && platform != null)
-                    {
-                        logger.LogInformation("Adding platform {platformName} to capability {capabilityName} of device {deviceId}", platform.Name, capability.Name, device.DeviceId);
-                        capInList.AddPlatform(platform.Name);
-                    }
-                }
-                logger.LogInformation("Adding property {propertyName} to device {deviceId} e description {propertyDescription}", property?.Name, device.DeviceId, property?.Description);
-                result.AddProperty(property!);
-
-                return result;
-            },
-            splitOn: "Id, Id, Id, Id"
-        );
-        }, logger, cancellationToken);
-
-    logger.LogInformation($"Found {devices.Count()} devices");
-    return result;
+        logger.LogInformation($"Found {devices.Count()} devices");
+        return result;
     }
 
     public async Task CreateAsync(Device entity, CancellationToken cancellationToken)

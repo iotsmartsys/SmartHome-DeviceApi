@@ -15,9 +15,11 @@ public record class Device(
     , string? last_active
     , string? power_on
     , IEnumerable<Capability> capabilities
-    , IEnumerable<Property> properties)
+    , IEnumerable<Property> properties
+)
 {
     public int? id { get; set; }
+    public IDictionary<string, string> settings = new Dictionary<string, string>();
 
     public static implicit operator Device(Core.Entities.Device device) => new(
         device.DeviceId,
@@ -34,7 +36,8 @@ public record class Device(
         device.Properties.Select(p => (Property)p)
     )
     {
-        id = device.Id
+        id = device.Id,
+        settings = device.Settings.ToDictionary(s => s.Name, s => s.Value)
     };
 
     public static implicit operator Core.Entities.Device(Device device) => new Core.Entities.Device(
@@ -49,9 +52,14 @@ public record class Device(
         Protocol = Enum.Parse<CommunicationProtocol>(device.protocol),
         Platform = device.platform,
         LastActive = device.last_active?.ToDateTime() ?? DateTime.UtcNow,
-        PowerOn = device.power_on?.ToDateTime(),
+        PowerOn = device.power_on?.ToDateTime()
     }
     .AddCapabilities(device.capabilities.Select(c => (Core.Entities.Capability)c))
-    .AddProperties(device.properties.Select(p => (Core.Entities.Property)p));
+    .AddProperties(device.properties.Select(p => (Core.Entities.Property)p))
+    .AddSettings(device.settings.Select(s => new Core.Entities.Settings
+    {
+        Name = s.Key,
+        Value = s.Value
+    }));
 
 }

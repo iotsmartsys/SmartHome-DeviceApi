@@ -20,9 +20,14 @@ internal static class DeviceQuery
                 dp.Id ,
                 dp.Name,
                 dp.Value,
-                dp.Description Description
+                dp.Description Description,
+                ds.Id ,
+                ds.Name,
+                ds.Value,
+                ds.Description Description
             FROM Devices d 
                 LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
+                LEFT JOIN DeviceSettings ds ON d.Id = ds.DeviceId
             WHERE 1 = 1
         ";
     public const string GetDevicesWithCapabilities = @"
@@ -60,13 +65,19 @@ internal static class DeviceQuery
             dp.Description AS Description,
             /* Platform */
             p.Id AS Id,
-            p.Name AS Name
+            p.Name AS Name,
+            /* Settings */
+            ds.Id AS Id,
+            ds.Name AS Name,
+            ds.Value AS Value,
+            ds.Description AS Description
         FROM Devices d
             LEFT JOIN Capabilities c ON d.Id = c.DeviceId
             LEFT JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id 
             LEFT JOIN DeviceProperties dp ON d.Id = dp.DeviceId
             LEFT JOIN Capabilities_RelationShip_Platforms dcrsp ON c.Id = dcrsp.CapabilityId 
             LEFT JOIN Platforms p ON dcrsp.PlatformId = p.Id
+            LEFT JOIN DeviceSettings ds ON d.Id = ds.DeviceId
         WHERE 1 = 1
             ";
 

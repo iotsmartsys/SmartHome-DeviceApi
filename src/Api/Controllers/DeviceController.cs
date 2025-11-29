@@ -35,6 +35,18 @@ public class DeviceController : ControllerBase
         return Ok((Device)device);
     }
 
+    [HttpGet("{device_id}/settings")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Settings))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetDeviceSettings([FromRoute] string device_id, [FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
+    {
+        var device = await repository.GetDeviceAsync(device_id, cancellationToken);
+        if (device == null)
+            return NotFound();
+        Device model = (Device)device;
+        return Ok(model.settings);
+    }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
