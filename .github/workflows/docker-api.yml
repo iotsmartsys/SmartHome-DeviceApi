@@ -70,7 +70,7 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           echo "Triggering Portainer webhook..."
-          curl -fsS -X POST "https://portainer.iotsmartsys.tech/api/webhooks/b66e4cff-c662-472d-9d15-2fbd13870dfc" \
+          curl -fsS -X POST "https://portainer.iotsmartsys.tech/api/webhooks/c9cf4bcb-c8e7-443d-a64e-2426a04601a3" \
             && echo "Webhook triggered successfully" \
             || echo "WARNING: Portainer webhook call failed (non-blocking)"
 

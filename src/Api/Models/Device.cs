@@ -19,7 +19,7 @@ public record class Device(
 )
 {
     public int? id { get; set; }
-    public IDictionary<string, string> settings = new Dictionary<string, string>();
+    public IDictionary<string, object> settings = new Dictionary<string, object>();
 
     public static implicit operator Device(Core.Entities.Device device) => new(
         device.DeviceId,
@@ -37,7 +37,7 @@ public record class Device(
     )
     {
         id = device.Id,
-        settings = device.Settings.ToDictionary(s => s.Name, s => s.Value)
+        settings = ConvertSettingsToDictionary(device.Settings)
     };
 
     public static implicit operator Core.Entities.Device(Device device) => new Core.Entities.Device(
@@ -55,11 +55,30 @@ public record class Device(
         PowerOn = device.power_on?.ToDateTime()
     }
     .AddCapabilities(device.capabilities.Select(c => (Core.Entities.Capability)c))
-    .AddProperties(device.properties.Select(p => (Core.Entities.Property)p))
-    .AddSettings(device.settings.Select(s => new Core.Entities.Settings
+    .AddProperties(device.properties.Select(p => (Core.Entities.Property)p));
+   
+
+   static Dictionary<string, object> ConvertSettingsToDictionary(IEnumerable<Core.Entities.Settings> settings)
     {
-        Name = s.Key,
-        Value = s.Value
-    }));
+        var dict = new Dictionary<string, object>();
+        foreach (var setting in settings)
+        {
+            dict[setting.Name] = Parse(setting.Value);
+        }
+        return dict;
+    }
+   static object Parse(string value)
+    {
+        if (int.TryParse(value, out int intValue))
+            return intValue;
+        if (bool.TryParse(value, out bool boolValue))
+            return boolValue;
+        if (double.TryParse(value, out double doubleValue))
+            return doubleValue;
+        if (DateTime.TryParse(value, out DateTime dateTimeValue))
+            return dateTimeValue;
+
+        return value;
+    }
 
 }
