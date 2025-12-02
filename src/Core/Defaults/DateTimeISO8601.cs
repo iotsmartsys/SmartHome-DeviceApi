@@ -11,3 +11,11 @@ public record struct DateTimeISO8601
     public static implicit operator string(DateTimeISO8601 dateTime) => dateTime.Value;
     public static implicit operator DateTimeISO8601(string dateTime) => new(dateTime);
 }
+
+public static class Helpers
+{
+public static bool IsIPAddress(this string input)
+    {
+        return System.Net.IPAddress.TryParse(input, out _);
+    }
+}

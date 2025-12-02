@@ -51,7 +51,6 @@ public class Device
 
     public Device AddProperty(Property property)
     {
-
         if (property == null || Properties.Any(p => p.Id == property.Id))
             return this;
         Properties = Properties.Append(property);
@@ -85,21 +84,23 @@ public class Device
 
     public Device AddSetting(Settings setting)
     {
-
         if (setting == null || Settings.Any(s => s.Id == setting.Id))
             return this;
+
         Settings = Settings.Append(setting);
         return this;
     }
 
     public Device AddSettings(IEnumerable<Settings> settings)
     {
-        var settingsNotPresentIn = settings.Where(s => !Settings.Any(s2 => s2.Id == s.Id)).ToArray();
+        var settingsNotPresentIn = settings.Where(s => !Settings.Any(s2 => s2.Name == s.Name)).ToArray();
         if (settingsNotPresentIn.Length == 0)
             return this;
 
         Settings = Settings.Concat(settingsNotPresentIn);
         return this;
     }
+
+    public bool HasSettingsMqtt() => Settings.Any(s => SettingsKeyTypes.mqtt_primary_broker.Is(s.Name));
 }
 

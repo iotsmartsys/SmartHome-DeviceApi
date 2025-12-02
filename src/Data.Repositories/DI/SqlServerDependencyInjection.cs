@@ -16,6 +16,8 @@ public static class SqlServerDependencyInjection
             .AddScoped<ICapabilityRepository, CapabilityRepository>()
             .AddScoped<ICapabilityTypeRepository, CapabilityTypeRepository>()
             .AddScoped<IPlatformRepository, PlatformRepository>();
+            
+        services.AddScoped<ISettingsRepository, SettingsRepository>();
 
         return services;
     }

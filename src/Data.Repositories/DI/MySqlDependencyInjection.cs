@@ -23,6 +23,7 @@ public static class MySqlDependencyInjection
             .AddScoped<IGroupRepository, GroupRepository>()
             .AddScoped<IMonitoredPlaceRepository, MonitoredPlaceRepository>()
             .AddScoped<ICappabilityHistoryRepository, CapabilityHistoryRepository>()
+            .AddScoped<ISettingsRepository, SettingsRepository>()
             ;
 
         return services;
