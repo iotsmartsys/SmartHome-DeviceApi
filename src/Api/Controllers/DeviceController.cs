@@ -47,11 +47,8 @@ public class DeviceController : ControllerBase
             return NotFound();
 
         var settings = await settingsRepository.GetAllAsync(cancellationToken);
-        if (!device.HasSettingsMqtt())
-        {
-            var mqttSettings = settings.Where(s => s.Name.StartsWith("mqtt_"));
-            device = device.AddSettings(mqttSettings);
-        }
+        device = device.AddSettings(settings);
+
         Device model = (Device)device;
 
         var response = DataParserHelper.ToDictionary(device.Settings, settings.Where(s => SettingsKeyTypes.prefix_auto_format_properies_json.Is(s.Name)).SelectMany(s => s.Value.Split(',')));
