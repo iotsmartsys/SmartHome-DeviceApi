@@ -9,7 +9,7 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CapabilityHistory>))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllCapabilities([FromRoute] int capability_id, [FromQuery] CapabilityHistoryFind? find, [FromServices] ICappabilityHistoryRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCapabilities([FromRoute] int capability_id, [FromQuery] CapabilityHistoryFind? find, [FromServices] ICapabilityHistoryRepository repository, CancellationToken cancellationToken)
     {
         var capabilities = await repository.GetByCapabilityIdAsync(capability_id, find, cancellationToken);
 
@@ -24,7 +24,7 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
     public async Task<IActionResult> CreateCapabilityHistory(
         [FromRoute] string capability_name,
         [FromBody] Api.Models.CapabilityHistoryCreate input,
-        [FromServices] ICappabilityHistoryRepository repository,
+        [FromServices] ICapabilityHistoryRepository repository,
         [FromServices] ICapabilityRepository capabilityRepository,
         CancellationToken cancellationToken)
     {

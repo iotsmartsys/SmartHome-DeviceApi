@@ -15,8 +15,9 @@ internal class SettingsRepository(ILogger<SettingsRepository> logger, IDbConnect
             logger.LogInformation("Buscando todas as settings");
             const string query = @"SELECT Id, Name, Value, Description FROM Settings";
             var command = new CommandDefinition(query, cancellationToken: cancellationToken);
-            var settings = await connection.QueryAsync<Settings>(command);
-            logger.LogInformation("Settings encontradas: {count}", settings?.AsList().Count ?? 0);
+            IEnumerable<Settings> settings = await connection.QueryAsync<Settings>(command);
+            logger.LogInformation("Settings encontradas: {count}", settings.AsList().Count);
+
             return settings;
         }
         catch (Exception ex)

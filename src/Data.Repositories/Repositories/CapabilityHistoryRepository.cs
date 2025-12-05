@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Repositories;
 
-internal class CapabilityHistoryRepository(ILogger<CapabilityHistoryRepository> logger, IDbConnection connection) : ICappabilityHistoryRepository, IRepository
+internal class CapabilityHistoryRepository(ILogger<CapabilityHistoryRepository> logger, IDbConnection connection) : ICapabilityHistoryRepository, IRepository
 {
     public async Task<IEnumerable<CapabilityHistory>> GetByCapabilityIdAsync(int capabilityId, CapabilityHistoryFind? historyFind, CancellationToken cancellationToken)
     {
