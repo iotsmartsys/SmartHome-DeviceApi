@@ -165,24 +165,6 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
 
         try
         {
-            logger.LogInformation($"Identificando device {device_id} para exclusão");
-            var existingDevice = await GetDeviceAsync(device_id, cancellationToken);
-            if (existingDevice == null)
-            {
-                logger.LogWarning("Device {deviceId} não encontrado para exclusão", device_id);
-                return;
-            }
-
-            logger.LogInformation("Excluindo as propriedades do device {deviceId}", device_id);
-            const string deletePropertiesSql = DeviceQuery.DeleteProperties;
-            await connection.ExecuteAsync(deletePropertiesSql, new { DeviceId = existingDevice.Id }, transaction);
-            logger.LogInformation("Propriedades do device {deviceId} excluídas com sucesso", device_id);
-
-            logger.LogInformation("Excluindo as capacidades do device {deviceId}", device_id);
-            const string deleteCapabilitiesSql = DeviceQuery.DeleteDeviceCapabilities;
-            await connection.ExecuteAsync(deleteCapabilitiesSql, new { DeviceId = existingDevice.Id }, transaction);
-            logger.LogInformation("Capacidades do device {deviceId} excluídas com sucesso", device_id);
-
             logger.LogInformation("Excluindo o device {deviceId}", device_id);
             const string sql = DeviceQuery.DeleteDevice;
             var command = new CommandDefinition(sql, new { DeviceId = device_id }, transaction, cancellationToken: cancellationToken);

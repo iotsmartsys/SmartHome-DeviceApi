@@ -19,7 +19,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
                 name = group.Name,
                 activated = group.IsActive,
                 IconName = group.Icon?.Name
-            }, cancellationToken: cancellationToken,transaction: transaction);
+            }, cancellationToken: cancellationToken, transaction: transaction);
             group.Id = await connection.ExecuteScalarAsync<int>(command);
 
             foreach (var capability in group.Capabilities)
@@ -68,10 +68,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var command = new CommandDefinition(GroupQuery.DeleteAllCapabilityForGroup, new { groupId = id }, cancellationToken: cancellationToken);
-        await connection.ExecuteAsync(command);
-
-        command = new CommandDefinition(GroupQuery.Delete, new { id }, cancellationToken: cancellationToken);
+        var command = new CommandDefinition(GroupQuery.Delete, new { id }, cancellationToken: cancellationToken);
         await connection.ExecuteAsync(command);
     }
 
@@ -111,7 +108,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
         {
             transaction.Dispose();
             connection.Close();
-        }   
+        }
     }
     public async Task UpdateOnlyGroupAsync(Group group, CancellationToken cancellationToken)
     {

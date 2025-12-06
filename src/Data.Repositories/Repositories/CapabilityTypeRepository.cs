@@ -148,7 +148,6 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         using var transaction = connection.BeginTransaction();
         try
         {
-            await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.DeleteIconsByTypeId, new { id = existing.Id }, transaction));
             await connection.ExecuteAsync(new CommandDefinition(CapabilityTypeQuery.DeleteTypeById, new { id = existing.Id }, transaction));
             transaction.Commit();
         }

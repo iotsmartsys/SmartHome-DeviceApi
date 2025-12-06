@@ -1,6 +1,8 @@
 # Objetivo
 Esta Api tem como objetivo o gerenciamento dos dispositovs (devices) IoT SmartHome. As funcionalidades da api estão listadas na seção Endpoints, que são os métodos HTTP disponíveis para interagir com a API.
 
+# OBSERVAÇÃO: A EXCLUSÃO USA O RECURSO NATIVO DO MYSQL, DE EXCLUSÃO EM CASCATA, POR ISSO NÃO DELETAMOS MAIS AS TABELAS FILHAS ANTES DE EXCLUIR A PRINCIPAL 
+
 # Endpoints
 Os endpoints estão divididos nas categorias CRUD (Create, Read, Update, Delete) e Gereciamento de dispositivos. A Api usa o recurso de versionamento, portanto a versão da API é passada na rota da requisição.
 ## Devices
