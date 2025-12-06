@@ -23,9 +23,14 @@ public class DeviceSettingsController : ControllerBase
     [HttpPut()]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDeviceSettingsAsync([FromRoute] string device_id, [FromBody] Settings model, [FromServices] IDeviceSettingsRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateDeviceSettingsAsync([FromRoute] string device_id, [FromBody] IEnumerable<Settings> settings, [FromServices] IDeviceSettingsRepository repository, CancellationToken cancellationToken)
     {
-        await repository.SaveAsync(device_id, model, cancellationToken);
+        if (settings == null || !settings.Any())
+        {
+            return BadRequest("Settings cannot be null or empty.");
+        }
+
+        await repository.SaveAsync(device_id, settings.Select(s => (Core.Entities.Settings)s), cancellationToken);
 
         return NoContent();
     }

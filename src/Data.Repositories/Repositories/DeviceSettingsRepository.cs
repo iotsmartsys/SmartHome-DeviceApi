@@ -8,26 +8,33 @@ namespace Data.Repositories;
 
 internal class DeviceSettingsRepository(ILogger<DeviceSettingsRepository> logger, IDbConnection connection) : IDeviceSettingsRepository
 {
-    public async Task SaveAsync(string deviceId, Settings settings, CancellationToken cancellationToken)
+    public async Task SaveAsync(string deviceId, IEnumerable<Settings> settings, CancellationToken cancellationToken)
     {
+        connection.Open();
+        var transaction = connection.BeginTransaction();
         try
         {
             logger.LogInformation("Salvando settings");
-            var command = new CommandDefinition(DeviceSettingsQuery.InsertOrUpdateDeviceSettingsByDeviceId, new
+            foreach (var setting in settings)
             {
-                DeviceId = deviceId,
-                Name = settings.Name,
-                Value = settings.Value,
-                Description = settings.Description
-            }, cancellationToken: cancellationToken);
+                var command = new CommandDefinition(DeviceSettingsQuery.InsertOrUpdateDeviceSettingsByDeviceId, new
+                {
+                    DeviceId = deviceId,
+                    Name = setting.Name,
+                    Value = setting.Value,
+                    Description = setting.Description
+                }, transaction: transaction, cancellationToken: cancellationToken);
 
-            await connection.ExecuteAsync(command);
-            logger.LogInformation("Settings salvas com sucesso");
+                await connection.ExecuteAsync(command);
+                logger.LogInformation("Settings salvas com sucesso");
+            }
 
+            transaction.Commit();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Erro ao salvar settings");
+            transaction.Rollback();
             throw;
         }
         finally
