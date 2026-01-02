@@ -6,5 +6,6 @@ public enum CommunicationProtocol
     MQTT = 2,
     HTTP = 3,
     AMQP = 4,
+    Zigbee = 5,
 }
 
