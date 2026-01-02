@@ -7,5 +7,6 @@ public enum CommunicationProtocol
     HTTP = 3,
     AMQP = 4,
     Zigbee = 5,
+    Espnow = 6
 }
 
