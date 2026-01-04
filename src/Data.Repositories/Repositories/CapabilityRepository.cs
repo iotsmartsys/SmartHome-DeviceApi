@@ -106,7 +106,6 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
-        // Use a dictionary for O(1) aggregation instead of O(N^2) FirstOrDefault scans
         var map = new Dictionary<int, Capability>();
         try
         {
@@ -121,8 +120,6 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                     {
                         if (!map.TryGetValue(capability.Id, out var capabilitySelected))
                         {
-                            // Reduce log noise in hot path; switch to Debug if needed
-                            // logger.LogDebug("Capability {capabilityName} adicionada na lista", capability.Name);
                             map[capability.Id] = capability;
                             capabilitySelected = capability;
                         }

@@ -9,7 +9,8 @@ public class Capability
     public string Type { get; set; } = default!;
     public string Mode { get; set; } = default!;
     public string Value { get; set; } = default!;
-    public string? Owner { get; set; } = default!;
+    public string? Owner { get; set; }
+    public string DeviceId { get; set; }
     public bool Active { get; set; } = true;
     public string? IconName { get; set; }
     public string? IconActiveColor { get; set; }

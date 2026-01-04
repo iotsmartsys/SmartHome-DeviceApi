@@ -4,6 +4,7 @@ public record class Capability(
     string capability_name
     , string? description
     , string? owner
+    , string device_id
     , string type
     , string? mode
     , string? value
@@ -26,6 +27,7 @@ public record class Capability(
         return new Capability(capability.Name
         , capability.Description
         , capability.Owner
+        , capability.DeviceId
         , capability.Type
         , capability.Mode
         , capability.Value

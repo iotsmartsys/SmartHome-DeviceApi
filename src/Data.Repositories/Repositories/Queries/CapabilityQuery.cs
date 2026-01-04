@@ -11,6 +11,7 @@ internal static class CapabilityQuery
             ct.ActuatorMode AS Mode,
             c.Value AS Value,
             c.DeviceOwner AS Owner,
+            d.DeviceId AS DeviceId,
             ct.DataType AS DataType,
             c.UpdatedAt AS UpdatedAt,
             c.Active AS Active,
@@ -26,6 +27,7 @@ internal static class CapabilityQuery
             g.IconColor AS IconColor
         FROM Capabilities c
             INNER JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id
+            INNER JOIN Devices d ON c.DeviceId = d.Id
             LEFT JOIN Group_RelationShipCapabilities gsc ON c.Id = gsc.CapabilityId
             LEFT JOIN `Groups` g ON gsc.GroupId = g.Id  
             LEFT JOIN Capabilities_RelationShip_Platforms crsp ON c.Id = crsp.CapabilityId
