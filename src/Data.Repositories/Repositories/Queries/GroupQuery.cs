@@ -17,6 +17,7 @@ internal static class GroupQuery
         ct.ActuatorMode AS Mode,
         c.Value AS Value,
         c.DeviceOwner AS Owner,
+        d.DeviceId AS DeviceId,
         ct.DataType AS DataType,
         c.UpdatedAt AS UpdatedAt,
         c.Active AS Active,
@@ -28,7 +29,8 @@ internal static class GroupQuery
         g.IconName AS Name
     FROM `Groups` g
         LEFT JOIN Group_RelationShipCapabilities grsc ON g.Id = grsc.GroupId
-        LEFT JOIN Capabilities c ON grsc.CapabilityId = c.Id  
+        LEFT JOIN Capabilities c ON grsc.CapabilityId = c.Id
+        LEFT JOIN Devices d ON c.DeviceId = d.Id
         LEFT JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id
     WHERE 
         1 = 1
