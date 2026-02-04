@@ -23,6 +23,9 @@ jobs:
     permissions:
       contents: read
       packages: write  # required for GHCR
+    env:
+      PORTAINER_URL: ${{ vars.PORTAINER_URL }}
+      PORTAINER_WEBHOOK_SECRET_KEY: ${{ secrets.PORTAINER_WEBHOOK_SECRET_KEY }}
 
     steps:
       - name: Checkout
