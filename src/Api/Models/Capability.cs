@@ -16,7 +16,7 @@ public record class Capability(
     IEnumerable<Capability.Group>? groups = null)
 {
     public int Id { get; private set; }
-    public IDictionary<string, string> smart_home = new Dictionary<string, string>();
+    public IDictionary<string, object> smart_home = new Dictionary<string, object>();
     public static implicit operator Capability?(Core.Entities.Capability? capability)
     {
         if (capability is null)
@@ -24,7 +24,19 @@ public record class Capability(
 
         var platforms = capability.Platforms?.Select(p => (Capability.Platform)p) ?? [];
 
-        IDictionary<string, string> smartHomeTypes = capability.SmartHomeTypes.ToDictionary(s => s.Name, s => s.Value);
+        /*
+        Exemplo de json que gera:
+            {
+                "Alexa": {"type": "LIGHT"}
+            }
+        */
+        IDictionary<string, object> smartHomeTypes = capability.SmartHomeTypes.ToDictionary(
+            kvp => kvp.SmartHomeId,
+            kvp => (object)new Dictionary<string, string>
+            {
+                { kvp.Name, kvp.Value }
+            }
+        );
 
         Capability.Icon? icon = capability.IconName is null ? null : new(capability.IconName, capability.IconActiveColor, capability.IconInactiveColor);
         return new Capability(capability.Name

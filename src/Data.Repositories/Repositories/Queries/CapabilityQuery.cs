@@ -25,17 +25,19 @@ internal static class CapabilityQuery
             g.Name AS Name,
             g.IconName AS IconName,
             g.IconColor AS IconColor,
-            ctsh.Id AS Id,
+            sh.Id AS Id,
+            sh.Name SmartHomeId,
             ctsh.Name AS Name,
             ctsh.Value AS Value
         FROM Capabilities c
-            INNER JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id
+            INNER JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id 
             INNER JOIN Devices d ON c.DeviceId = d.Id
             LEFT JOIN Group_RelationShipCapabilities gsc ON c.Id = gsc.CapabilityId
             LEFT JOIN `Groups` g ON gsc.GroupId = g.Id  
             LEFT JOIN Capabilities_RelationShip_Platforms crsp ON c.Id = crsp.CapabilityId
             LEFT JOIN Platforms p ON crsp.PlatformId = p.Id
             LEFT JOIN CapabilityTypesSmartHome ctsh ON ct.Id = ctsh.CapabilityTypeId
+            LEFT JOIN SmartHome sh ON ctsh.SmartHomeId = sh.Id
         WHERE 1 = 1
         ";
 

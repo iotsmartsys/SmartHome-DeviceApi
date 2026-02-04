@@ -131,7 +131,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
         if (active.HasValue)
             _sql += " AND c.Active = @active";
         if (smartHomeId is not null)
-            _sql += " AND ctsh.Name = @smartHomeId";
+            _sql += " AND sh.Name = @smartHomeId";
         if (referenceId is not null)
             _sql += " AND crsp.ReferenceId = @referenceId";
     }
