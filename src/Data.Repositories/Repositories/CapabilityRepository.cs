@@ -114,9 +114,9 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
             await Data.Repositories.Utils.DbRetry.ExecuteAsync(async () =>
             {
-                await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, Capability>(
+                await connection.QueryAsync<Capability, CapabilityPlatform?, CapabilityGroup?, CapabilityTypeSmartHome?, Capability>(
                     command: command,
-                    map: (capability, platform, group) =>
+                    map: (capability, platform, group, smartHome) =>
                     {
                         if (!map.TryGetValue(capability.Id, out var capabilitySelected))
                         {
@@ -130,9 +130,12 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                         if (group != null)
                             capabilitySelected.AddGroup(group);
 
+                        if (smartHome != null)
+                            capabilitySelected.AddSmartHomeType(smartHome);
+
                         return capabilitySelected;
                     },
-                    splitOn: "Id,Id");
+                    splitOn: "Id");
                 return true;
             }, logger, command.CancellationToken);
 
@@ -220,7 +223,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                     logger.LogWarning("Grupo {groupName} não encontrado. Pulando adição para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
 
                     logger.LogInformation("Criando novo grupo {groupName} para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
-                    
+
                     groupId = await connection.ExecuteScalarAsync<int>(GroupQuery.Insert, new
                     {
                         group.Name,
@@ -237,7 +240,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 await connection.ExecuteAsync(command);
                 logger.LogInformation("Grupo {groupName} adicionado para a capability {capabilityName} do device {id}", group.Name, capability.Name, capability.Id);
             }
-            
+
             logger.LogInformation("Atualizando capability {capabilityName} para o device {id}", capability.Name, capability.Id);
             const string sql = CapabilityQuery.UpdateForDevice;
             await connection.ExecuteAsync(sql, new

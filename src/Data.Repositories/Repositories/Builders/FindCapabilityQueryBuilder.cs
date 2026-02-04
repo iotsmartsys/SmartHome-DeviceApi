@@ -12,6 +12,7 @@ internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
     IFindCapabilityQueryBuilder WithOwner(string owner);
     IFindCapabilityQueryBuilder WithValue(string value);
     IFindCapabilityQueryBuilder WithReferenceId(string referenceId);
+    IFindCapabilityQueryBuilder WithSmartHomeId(string smartHomeId);
     IFindCapabilityQueryBuilder OrderByDescending(string order);
 }
 internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQuery.GetAllCapabilities), IFindCapabilityQueryBuilder
@@ -23,6 +24,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     private string? owner;
     private string? value;
     private string? referenceId;
+    private string? smartHomeId;
 
     string _order_by = " ORDER BY ";
 
@@ -42,6 +44,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             value = value,
             active = active,
             referenceId = referenceId,
+            smartHomeId = smartHomeId
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
@@ -50,7 +53,6 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     public IFindCapabilityQueryBuilder WithReferenceId(string referenceId)
     {
         this.referenceId = referenceId;
-        _sql += " AND crsp.ReferenceId = @referenceId";
         return this;
     }
 
@@ -77,7 +79,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
         this.type = type;
         return this;
     }
-    
+
     public IFindCapabilityQueryBuilder WithOwner(string owner)
     {
         this.owner = owner;
@@ -87,6 +89,12 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     public IFindCapabilityQueryBuilder WithValue(string value)
     {
         this.value = value;
+        return this;
+    }
+
+    public IFindCapabilityQueryBuilder WithSmartHomeId(string smartHomeId)
+    {
+        this.smartHomeId = smartHomeId;
         return this;
     }
 
@@ -106,7 +114,6 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _order_by += name + (orderDesc ? " DESC" : "");
         else
             _order_by += ", " + name + (orderDesc ? " DESC" : "");
-
     }
 
     void AddCapabilitySpecification()
@@ -123,6 +130,10 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _sql += " AND c.Value = @value";
         if (active.HasValue)
             _sql += " AND c.Active = @active";
+        if (smartHomeId is not null)
+            _sql += " AND ctsh.Name = @smartHomeId";
+        if (referenceId is not null)
+            _sql += " AND crsp.ReferenceId = @referenceId";
     }
 
     internal IFindCapabilityQueryBuilder WithFind(CapabilityFind? capabilityFind)
@@ -142,6 +153,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             WithActive(capabilityFind.active.Value);
         if (capabilityFind.reference_id is not null)
             WithReferenceId(capabilityFind.reference_id);
+        if (capabilityFind.smart_home_id is not null)
+            WithSmartHomeId(capabilityFind.smart_home_id);
 
         return this;
     }

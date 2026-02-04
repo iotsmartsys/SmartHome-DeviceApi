@@ -20,6 +20,7 @@ public class Capability
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<CapabilityPlatform> Platforms { get; set; } = [];
     public IEnumerable<CapabilityGroup> Groups { get; set; } = [];
+    public IEnumerable<CapabilityTypeSmartHome> SmartHomeTypes { get; set; } = [];
     public Capability(string name, string type, string mode, string value, string owner, bool active)
     {
         Name = name;
@@ -50,6 +51,15 @@ public class Capability
         return this;
     }
 
+    public Capability AddSmartHomeType(CapabilityTypeSmartHome smartHomeType)
+    {
+        if (smartHomeType is null || SmartHomeTypes.Any(x => x.Name == smartHomeType.Name))
+            return this;
+
+        SmartHomeTypes = SmartHomeTypes.Append(smartHomeType);
+        return this;
+    }
+
     public void UpdateValue(string value)
     {
         if (!string.IsNullOrWhiteSpace(DataType))
@@ -76,22 +86,9 @@ public class Capability
         Groups = Groups.Append(group);
     }
 }
-public class CapabilityPlatform
+public class CapabilityTypeSmartHome
 {
     public int Id { get; set; }
-    public string Platform { get; set; } = default!;
-    public string? ReferenceId { get; set; }
-    public CapabilityPlatform(int id, string platform, string? referenceId = null)
-    {
-        Id = id;
-        Platform = platform;
-        ReferenceId = referenceId;
-    }
-
-    public CapabilityPlatform(string platform, string? referenceId = null)
-    {
-        Platform = platform;
-        ReferenceId = referenceId;
-    }
-    public CapabilityPlatform() { }
+    public string Name { get; set; } = default!;
+    public string Value { get; set; } = default!;
 }

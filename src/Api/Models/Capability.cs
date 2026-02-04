@@ -16,12 +16,15 @@ public record class Capability(
     IEnumerable<Capability.Group>? groups = null)
 {
     public int Id { get; private set; }
+    public IDictionary<string, string> smart_home = new Dictionary<string, string>();
     public static implicit operator Capability?(Core.Entities.Capability? capability)
     {
         if (capability is null)
             return null;
 
         var platforms = capability.Platforms?.Select(p => (Capability.Platform)p) ?? [];
+
+        IDictionary<string, string> smartHomeTypes = capability.SmartHomeTypes.ToDictionary(s => s.Name, s => s.Value);
 
         Capability.Icon? icon = capability.IconName is null ? null : new(capability.IconName, capability.IconActiveColor, capability.IconInactiveColor);
         return new Capability(capability.Name
@@ -39,7 +42,9 @@ public record class Capability(
         , capability.Groups?.Select(g => (Capability.Group)g) ?? [])
         {
             Id = capability.Id,
+            smart_home = smartHomeTypes
         };
+
     }
 
     public static implicit operator Core.Entities.Capability(Capability capability) => new()

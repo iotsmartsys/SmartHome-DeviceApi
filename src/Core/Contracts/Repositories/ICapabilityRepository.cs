@@ -14,9 +14,9 @@ public interface ICapabilityRepository : IRepository
     Task<bool> UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken);
 }
 public record class CapabilityFind(string? name, string? type, string? owner, string? value,
-    bool? active, string? reference_id)
+    bool? active, string? reference_id, string? smart_home_id = null)
 {
-    public CapabilityFind() : this(null, null, null, null, null, null) { }
+    public CapabilityFind() : this(null, null, null, null, null, null, null) { }
 }
 public class CapabilityHistory
 {
