@@ -104,6 +104,17 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         return (await GetAllAsync(command)).FirstOrDefault();
     }
 
+    public async Task<Capability?> GetByUidAsync(string uid, string smart_home_id, CancellationToken cancellationToken)
+    {
+        var command = new FindCapabilityQueryBuilder()
+            .WithUid(uid)
+            .WithSmartHomeId(smart_home_id)
+            .WithCancellationToken(cancellationToken)
+            .Build();
+
+        return (await GetAllAsync(command)).FirstOrDefault();
+    }
+
     async Task<IEnumerable<Capability>> GetAllAsync(CommandDefinition command)
     {
         var map = new Dictionary<int, Capability>();

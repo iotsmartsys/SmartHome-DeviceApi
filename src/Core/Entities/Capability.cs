@@ -4,6 +4,7 @@ namespace Core.Entities;
 public class Capability
 {
     public int Id { get; set; }
+    public string UID { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string? Description { get; set; }
     public string Type { get; set; } = default!;
@@ -15,14 +16,15 @@ public class Capability
     public string? IconName { get; set; }
     public string? IconActiveColor { get; set; }
     public string? IconInactiveColor { get; set; }
-
     public string? DataType { get; set; } = default!;
     public DateTime UpdatedAt { get; set; }
     public IEnumerable<CapabilityPlatform> Platforms { get; set; } = [];
     public IEnumerable<CapabilityGroup> Groups { get; set; } = [];
     public IEnumerable<CapabilityTypeSmartHome> SmartHomeTypes { get; set; } = [];
-    public Capability(string name, string type, string mode, string value, string owner, bool active)
+    public Capability(string uid, string deviceid, string name, string type, string mode, string value, string owner, bool active)
     {
+        UID = uid;
+        DeviceId = deviceid;
         Name = name;
         Type = type;
         Mode = mode;

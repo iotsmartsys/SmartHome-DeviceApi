@@ -5,6 +5,7 @@ internal static class CapabilityQuery
     public const string GetAllCapabilities = $@"
         SELECT
             c.Id AS Id,
+            c.UID AS UID,
             c.Name AS Name,
             c.Description AS Description,
             ct.Name AS Type,
@@ -48,8 +49,8 @@ internal static class CapabilityQuery
     public const string GetAllCapabilitiesActive = $@"{GetAllCapabilities} AND c.Active = true";
 
     public const string InsertCapability = @"
-        INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityTypeId, Value, deviceOwner)
-        VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner);
+        INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityTypeId, Value, deviceOwner, UID)
+        VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner, SHA1(CONCAT(@Name, RAND(), UUID(), @Type, NOW())));
     ";
 
     public const string RemoveCapability = @"
@@ -116,6 +117,5 @@ internal static class CapabilityQuery
     AND (@DateStart IS NULL OR ch.UpdatedAt >= @DateStart)
     AND (@DateEnd IS NULL OR ch.UpdatedAt <= @DateEnd)
     ORDER BY ch.UpdatedAt DESC, ch.Id DESC
-
     ";
 }

@@ -6,6 +6,7 @@ namespace Data.Repositories;
 internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
 {
     IFindCapabilityQueryBuilder WithId(int id);
+    IFindCapabilityQueryBuilder WithUid(string uid);
     IFindCapabilityQueryBuilder WithActive(bool active);
     IFindCapabilityQueryBuilder WithName(string name);
     IFindCapabilityQueryBuilder WithType(string type);
@@ -25,6 +26,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     private string? value;
     private string? referenceId;
     private string? smartHomeId;
+    private string? uid;
 
     string _order_by = " ORDER BY ";
 
@@ -35,6 +37,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _order_by = "";
 
         _sql += _order_by;
+
         return new CommandDefinition(_sql, new
         {
             id = id,
@@ -44,7 +47,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             value = value,
             active = active,
             referenceId = referenceId,
-            smartHomeId = smartHomeId
+            smartHomeId = smartHomeId,
+            uid = uid
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
@@ -98,6 +102,12 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
         return this;
     }
 
+    public IFindCapabilityQueryBuilder WithUid(string uid)
+    {
+        this.uid = uid;
+        return this;
+    }
+
     public IFindCapabilityQueryBuilder OrderByDescending(string order)
     {
         AddOrderBy(order, true);
@@ -134,6 +144,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _sql += " AND sh.Name = @smartHomeId";
         if (referenceId is not null)
             _sql += " AND crsp.ReferenceId = @referenceId";
+        if (uid is not null)
+            _sql += " AND c.UID = @uid";
     }
 
     internal IFindCapabilityQueryBuilder WithFind(CapabilityFind? capabilityFind)
@@ -155,6 +167,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             WithReferenceId(capabilityFind.reference_id);
         if (capabilityFind.smart_home_id is not null)
             WithSmartHomeId(capabilityFind.smart_home_id);
+        if (capabilityFind.uid is not null)
+            WithUid(capabilityFind.uid);
 
         return this;
     }

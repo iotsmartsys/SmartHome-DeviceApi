@@ -25,6 +25,9 @@ public static class MySqlDependencyInjection
             .AddScoped<ICapabilityHistoryRepository, CapabilityHistoryRepository>()
             .AddScoped<ISettingsRepository, SettingsRepository>()
             .AddScoped<IDeviceSettingsRepository, DeviceSettingsRepository>()
+            .AddScoped<IOAuthAuthorizationCodeRepository, OAuthAuthorizationCodeRepository>()
+            .AddScoped<IOAuthClientRepository, OAuthClientRepository>()
+            .AddScoped<IOAuthAccessTokenRepository, OAuthAccessTokenRepository>()
             ;
 
         return services;

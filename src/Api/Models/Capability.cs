@@ -2,6 +2,7 @@ namespace Api.Models;
 
 public record class Capability(
     string capability_name
+    , string uid
     , string? description
     , string? owner
     , string device_id
@@ -24,22 +25,21 @@ public record class Capability(
 
         var platforms = capability.Platforms?.Select(p => (Capability.Platform)p) ?? [];
 
-        /*
-        Exemplo de json que gera:
-            {
-                "Alexa": {"type": "LIGHT"}
-            }
-        */
-        IDictionary<string, object> smartHomeTypes = capability.SmartHomeTypes.ToDictionary(
-            kvp => kvp.SmartHomeId,
-            kvp => (object)new Dictionary<string, string>
-            {
-                { kvp.Name, kvp.Value }
-            }
-        );
+        IDictionary<string, object> smartHomeTypes = capability.SmartHomeTypes
+            .Where(x => !string.IsNullOrWhiteSpace(x.SmartHomeId))
+            .GroupBy(x => x.SmartHomeId)
+            .ToDictionary(
+                group => group.Key,
+                group => (object)group
+                    .OrderBy(x => x.Id)
+                    .GroupBy(x => x.Name)
+                    .ToDictionary(nameGroup => nameGroup.Key, nameGroup => nameGroup.First().Value)
+            );
 
         Capability.Icon? icon = capability.IconName is null ? null : new(capability.IconName, capability.IconActiveColor, capability.IconInactiveColor);
-        return new Capability(capability.Name
+        return new Capability(
+        capability.Name
+        , capability.UID
         , capability.Description
         , capability.Owner
         , capability.DeviceId

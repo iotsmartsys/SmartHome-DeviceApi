@@ -67,7 +67,6 @@ app.MapGet("/api/v1/timezone/datetime", () =>
 app.MapGet("/api/v1/health", () => Results.Ok(new { status = "Healthy" }))
    .WithMetadata(new { Description = "Verifica o status de saúde da API" });
 
-
 Console.CancelKeyPress += (sender, eventArgs) =>
 {
     cts.Cancel();

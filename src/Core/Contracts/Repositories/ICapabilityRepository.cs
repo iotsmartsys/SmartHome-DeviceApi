@@ -10,21 +10,21 @@ public interface ICapabilityRepository : IRepository
     Task UpdateAsync(Capability capability, CancellationToken cancellationToken);
     Task<Capability?> GetByNameAsync(CancellationToken cancellationToken, string capability_name);
     Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId);
+    Task<Capability?> GetByUidAsync(string uid, string smart_home_id, CancellationToken cancellationToken);
     Task<Capability?> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task<bool> UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken);
 }
-public record class CapabilityFind(string? name, string? type, string? owner, string? value,
-    bool? active, string? reference_id, string? smart_home_id = null)
+public record class CapabilityFind(string? name = null, string? type = null, string? owner = null, string? value = null, bool? active = null, string? reference_id = null, string? smart_home_id = null, string? uid = null)
 {
-    public CapabilityFind() : this(null, null, null, null, null, null, null) { }
+    public CapabilityFind() : this(null, null, null, null, null, null, null, null) { }
 }
 public class CapabilityHistory
 {
     public DateTime UpdatedAt { get; set; }
     public string Value { get; set; } = string.Empty;
 }
-public record class CapabilityHistoryFind(int? last_hours, string? date_start, string? date_end )
+public record class CapabilityHistoryFind(int? last_hours, string? date_start, string? date_end)
 {
     public CapabilityHistoryFind() : this(null, null, null) { }
 }
- 
+
