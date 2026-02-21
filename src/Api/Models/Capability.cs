@@ -2,7 +2,7 @@ namespace Api.Models;
 
 public record class Capability(
     string capability_name
-    , string uid
+    , string? uid
     , string? description
     , string? owner
     , string device_id
