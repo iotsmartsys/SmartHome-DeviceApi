@@ -1,18 +1,22 @@
 using Api.Models;
 using Core.Contracts.Repositories;
 using Microsoft.AspNetCore.Mvc;
+
 [Route("api/v1/smart-home/{smart_home_id}/capabilities")]
 [ApiController]
-public class SmartHomeCapabilityController() : ControllerBase
+public class SmartHomeCapabilityController : ControllerBase
 {
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SmartHomeCapability))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllCapabilities([FromRoute] string smart_home_id, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCapabilities([FromRoute] string smart_home_id, [FromQuery] CapabilityFind? capabilityFind, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        CapabilityFind find = new(smart_home_id: smart_home_id);
-        var capabilities = await repository.GetAllCapabilitiesAsync(find, cancellationToken);
+        if (capabilityFind == null)
+            capabilityFind = new CapabilityFind();
+
+        capabilityFind = capabilityFind with { smart_home_id = smart_home_id };
+        var capabilities = await repository.GetAllCapabilitiesAsync(capabilityFind, cancellationToken);
         if (capabilities.Any())
             return Ok(capabilities.Select(c => (SmartHomeCapability)c));
 

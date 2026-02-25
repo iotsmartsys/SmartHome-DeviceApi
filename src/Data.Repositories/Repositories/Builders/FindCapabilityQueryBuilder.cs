@@ -14,6 +14,7 @@ internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
     IFindCapabilityQueryBuilder WithValue(string value);
     IFindCapabilityQueryBuilder WithReferenceId(string referenceId);
     IFindCapabilityQueryBuilder WithSmartHomeId(string smartHomeId);
+    IFindCapabilityQueryBuilder WithGroupName(string groupName);
     IFindCapabilityQueryBuilder OrderByDescending(string order);
 }
 internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQuery.GetAllCapabilities), IFindCapabilityQueryBuilder
@@ -27,6 +28,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     private string? referenceId;
     private string? smartHomeId;
     private string? uid;
+    private string? groupName;
 
     string _order_by = " ORDER BY ";
 
@@ -48,7 +50,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             active = active,
             referenceId = referenceId,
             smartHomeId = smartHomeId,
-            uid = uid
+            uid = uid,
+            groupName = groupName
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
@@ -108,6 +111,12 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
         return this;
     }
 
+    public IFindCapabilityQueryBuilder WithGroupName(string groupName)
+    {
+        this.groupName = groupName;
+        return this;
+    }
+
     public IFindCapabilityQueryBuilder OrderByDescending(string order)
     {
         AddOrderBy(order, true);
@@ -146,6 +155,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _sql += " AND crsp.ReferenceId = @referenceId";
         if (uid is not null)
             _sql += " AND c.UID = @uid";
+        if (groupName is not null)
+            _sql += " AND g.Name = @groupName";
     }
 
     internal IFindCapabilityQueryBuilder WithFind(CapabilityFind? capabilityFind)
@@ -169,6 +180,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             WithSmartHomeId(capabilityFind.smart_home_id);
         if (capabilityFind.uid is not null)
             WithUid(capabilityFind.uid);
+        if (capabilityFind.group_name is not null)
+            WithGroupName(capabilityFind.group_name);
 
         return this;
     }
