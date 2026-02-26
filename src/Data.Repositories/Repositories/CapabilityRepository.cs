@@ -104,11 +104,10 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         return (await GetAllAsync(command)).FirstOrDefault();
     }
 
-    public async Task<Capability?> GetByUidAsync(string uid, string smart_home_id, CancellationToken cancellationToken)
+    public async Task<Capability?> GetByUidAsync(string uid, CancellationToken cancellationToken)
     {
         var command = new FindCapabilityQueryBuilder()
             .WithUid(uid)
-            .WithSmartHomeId(smart_home_id)
             .WithCancellationToken(cancellationToken)
             .Build();
 

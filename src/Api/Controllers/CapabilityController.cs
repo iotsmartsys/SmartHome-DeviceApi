@@ -16,14 +16,9 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     // [OutputCache(Duration = 2, VaryByQueryKeys = new[] { "name", "type", "owner", "value", "active", "reference_id" })]
-    public async Task<IActionResult> GetAllCapabilities([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, [FromServices] IMemoryCache cache, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCapabilities([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, [FromServices] CancellationToken cancellationToken)
     {
-        string cacheKey = $"capabilities:all:{capabilityQuery?.name}:{capabilityQuery?.type}:{capabilityQuery?.owner}:{capabilityQuery?.value}:{capabilityQuery?.active}:{capabilityQuery?.reference_id}";
-        var capabilities = await cache.GetOrCreateAsync(cacheKey, async entry =>
-        {
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(2);
-            return await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
-        }) ?? Enumerable.Empty<Core.Entities.Capability>();
+        var capabilities = await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
         if (capabilities.Any())
             return Ok(capabilities.Select(c => (Capability?)c));
 
@@ -93,6 +88,25 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         if (entity is null)
         {
             logger.LogWarning("Capability {capability_name} não encontrado", capability_name);
+            return NotFound();
+        }
+
+        Capability? capability = (Capability?)entity;
+        return Ok(capability);
+    }
+
+    [HttpGet("uid/{uid}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Capability>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetCapabilityByUid([FromRoute] string uid, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Buscando capability {uid} no Cache", uid);
+        var entity = await repository.GetByUidAsync(uid, cancellationToken);
+
+        if (entity is null)
+        {
+            logger.LogWarning("Capability {uid} não encontrado", uid);
             return NotFound();
         }
 

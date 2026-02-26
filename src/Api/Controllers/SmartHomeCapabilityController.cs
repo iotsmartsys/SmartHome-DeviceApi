@@ -29,7 +29,7 @@ public class SmartHomeCapabilityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByUidCapabilities([FromRoute] string smart_home_id, [FromRoute] string uid, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        var capability = await repository.GetByUidAsync(uid, smart_home_id, cancellationToken);
+        var capability = await repository.GetByUidAsync(uid, cancellationToken);
         if (capability != null)
             return Ok((SmartHomeCapability)capability);
 

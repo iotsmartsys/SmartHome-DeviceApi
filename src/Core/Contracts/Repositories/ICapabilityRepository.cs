@@ -10,7 +10,7 @@ public interface ICapabilityRepository : IRepository
     Task UpdateAsync(Capability capability, CancellationToken cancellationToken);
     Task<Capability?> GetByNameAsync(CancellationToken cancellationToken, string capability_name);
     Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId);
-    Task<Capability?> GetByUidAsync(string uid, string smart_home_id, CancellationToken cancellationToken);
+    Task<Capability?> GetByUidAsync(string uid, CancellationToken cancellationToken);
     Task<Capability?> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task<bool> UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken);
 }
