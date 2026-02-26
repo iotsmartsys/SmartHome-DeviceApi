@@ -16,7 +16,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     // [OutputCache(Duration = 2, VaryByQueryKeys = new[] { "name", "type", "owner", "value", "active", "reference_id" })]
-    public async Task<IActionResult> GetAllCapabilities([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, [FromServices] CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllCapabilities([FromQuery] CapabilityFind? capabilityQuery, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
         var capabilities = await repository.GetAllCapabilitiesAsync(capabilityQuery, cancellationToken);
         if (capabilities.Any())

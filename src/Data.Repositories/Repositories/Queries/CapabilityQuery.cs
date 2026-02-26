@@ -29,7 +29,9 @@ internal static class CapabilityQuery
             sh.Id AS Id,
             sh.Name SmartHomeId,
             ctsh.Name AS Name,
-            ctsh.Value AS Value
+            ctsh.Value AS Value,
+            ctsh.ParentName AS Parent,
+            ctsh.GroupName AS `Group`
         FROM Capabilities c
             INNER JOIN CapabilityTypes ct ON c.CapabilityTypeId = ct.Id 
             INNER JOIN Devices d ON c.DeviceId = d.Id

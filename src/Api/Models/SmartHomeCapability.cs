@@ -17,10 +17,7 @@ public record class SmartHomeCapability(
             .GroupBy(x => x.SmartHomeId)
             .ToDictionary(
                 group => group.Key,
-                group => (object)group
-                    .OrderBy(x => x.Id)
-                    .GroupBy(x => x.Name)
-                    .ToDictionary(nameGroup => nameGroup.Key, nameGroup => nameGroup.First().Value)
+                group => (object)BuildSmartHomePayload(group.OrderBy(x => x.Id))
             );
 
         return new SmartHomeCapability(
@@ -34,5 +31,33 @@ public record class SmartHomeCapability(
         {
             smart_home = smartHomeTypes
         };
+    }
+
+    private static IDictionary<string, object> BuildSmartHomePayload(IEnumerable<Core.Entities.CapabilityTypeSmartHome> entries)
+    {
+        var payload = new Dictionary<string, object>();
+
+        foreach (var item in entries.Where(x => string.IsNullOrWhiteSpace(x.Parent)))
+            payload[item.Name] = item.Value;
+
+        foreach (var parentGroup in entries
+            .Where(x => !string.IsNullOrWhiteSpace(x.Parent))
+            .GroupBy(x => x.Parent!))
+        {
+            var withGroup = parentGroup.Where(x => !string.IsNullOrWhiteSpace(x.Group)).ToList();
+            if (withGroup.Count > 0)
+            {
+                payload[parentGroup.Key] = withGroup
+                    .GroupBy(x => x.Group!)
+                    .Select(group => (object)group.ToDictionary(x => x.Name, x => (object)x.Value))
+                    .ToList();
+                continue;
+            }
+
+            payload[parentGroup.Key] = parentGroup
+                .ToDictionary(x => x.Name, x => (object)x.Value);
+        }
+
+        return payload;
     }
 }

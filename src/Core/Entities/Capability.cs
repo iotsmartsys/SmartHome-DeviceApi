@@ -55,7 +55,11 @@ public class Capability
 
     public Capability AddSmartHomeType(CapabilityTypeSmartHome smartHomeType)
     {
-        if (smartHomeType is null || SmartHomeTypes.Any(x => x.Name == smartHomeType.Name))
+        if (smartHomeType is null || SmartHomeTypes.Any(x =>
+            x.SmartHomeId == smartHomeType.SmartHomeId
+            && x.Parent == smartHomeType.Parent
+            && x.Group == smartHomeType.Group
+            && x.Name == smartHomeType.Name))
             return this;
 
         SmartHomeTypes = SmartHomeTypes.Append(smartHomeType);
@@ -94,4 +98,6 @@ public class CapabilityTypeSmartHome
     public string SmartHomeId { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string Value { get; set; } = default!;
+    public string? Parent { get; set; }
+    public string? Group { get; set; }
 }
