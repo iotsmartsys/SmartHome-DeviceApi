@@ -5,7 +5,7 @@ public record class SmartHomeCapability(
     , string uid
     , string? description
     , string type
-    , string? mode
+    , string? value_type
     , string? value
     , bool active)
 {
@@ -25,7 +25,7 @@ public record class SmartHomeCapability(
         , capability.UID
         , capability.Description
         , capability.Type
-        , capability.Mode
+        , capability.DataType
         , capability.Value
         , capability.Active)
         {
