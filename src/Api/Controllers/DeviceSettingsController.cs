@@ -15,6 +15,10 @@ public class DeviceSettingsController : ControllerBase
     public async Task<IActionResult> GetDeviceSettingsAsync([FromRoute] string device_id, [FromServices] IDeviceSettingsRepository repository, CancellationToken cancellationToken)
     {
         var settings = await repository.GetByDeviceIdAsync(device_id, cancellationToken);
+        if (!settings.Any())
+        {
+            return NotFound($"No settings found for device with ID '{device_id}'.");
+        }
 
         var response = DataParserHelper.ToDictionary(settings, settings.Where(s => SettingsKeyTypes.prefix_auto_format_properies_json.Is(s.Name)).SelectMany(s => s.Value.Split(',')));
         return Ok(response);
