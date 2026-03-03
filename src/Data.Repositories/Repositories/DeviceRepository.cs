@@ -46,13 +46,13 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
 
     public async Task<Device?> GetDeviceAsync(string device_id, CancellationToken cancellationToken)
     {
-        var command = new DeviceQueryBuilder(DeviceQuery.GetDevicesWithCapabilities)
+        var command = new DeviceQueryBuilder(DeviceQuery.GetAllDevices)
             .WithCancellationToken(cancellationToken)
             .WithDeviceId(device_id)
                 .Build();
-        Device? result = null;
+
         var devices = await GetByCommandAsync(command);
-        result = devices.FirstOrDefault();
+        var result = devices.FirstOrDefault();
 
         logger.LogInformation($"Found {devices.Count()} devices");
         return result;

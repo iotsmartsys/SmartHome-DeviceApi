@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Api.Models;
 using Core.Contracts.Repositories;
 using Microsoft.AspNetCore.JsonPatch;
@@ -35,7 +36,7 @@ public class DeviceController : ControllerBase
 
         return Ok((Device)device);
     }
-    
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -50,11 +51,14 @@ public class DeviceController : ControllerBase
     [HttpPatch("{device_id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateDevice([FromRoute] string device_id, [FromBody] JsonPatchDocument<Device> patch, [FromServices] IDeviceRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateDevice([FromRoute] string device_id, [FromBody] JsonPatchDocument<Device> patch, [FromServices] IDeviceRepository repository, ILogger<DeviceController> logger, CancellationToken cancellationToken)
     {
+
         var device = await repository.GetDeviceAsync(device_id, cancellationToken);
         if (device == null)
             return NotFound();
+
+        logger.LogInformation($"Device found: {JsonSerializer.Serialize(device)}, applying patch...");
 
         var model = (Device)device;
 
