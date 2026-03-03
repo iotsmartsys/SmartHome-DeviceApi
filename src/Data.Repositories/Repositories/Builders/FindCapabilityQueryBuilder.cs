@@ -7,6 +7,7 @@ internal interface IFindCapabilityQueryBuilder : ICapabilityQueryBuilder
 {
     IFindCapabilityQueryBuilder WithId(int id);
     IFindCapabilityQueryBuilder WithUid(string uid);
+    IFindCapabilityQueryBuilder WithDeviceId(string deviceId);
     IFindCapabilityQueryBuilder WithActive(bool active);
     IFindCapabilityQueryBuilder WithName(string name);
     IFindCapabilityQueryBuilder WithType(string type);
@@ -29,6 +30,7 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
     private string? smartHomeId;
     private string? uid;
     private string? groupName;
+    private string? deviceId;
 
     string _order_by = " ORDER BY ";
 
@@ -51,7 +53,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             referenceId = referenceId,
             smartHomeId = smartHomeId,
             uid = uid,
-            groupName = groupName
+            groupName = groupName,
+            deviceId = deviceId
         },
         transaction: _transaction,
         cancellationToken: cancellationToken);
@@ -111,6 +114,12 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
         return this;
     }
 
+    public IFindCapabilityQueryBuilder WithDeviceId(string deviceId)
+    {
+        this.deviceId = deviceId;
+        return this;
+    }
+
     public IFindCapabilityQueryBuilder WithGroupName(string groupName)
     {
         this.groupName = groupName;
@@ -157,6 +166,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             _sql += " AND c.UID = @uid";
         if (groupName is not null)
             _sql += " AND g.Name = @groupName";
+        if (deviceId is not null)
+            _sql += " AND d.DeviceId = @deviceId";
     }
 
     internal IFindCapabilityQueryBuilder WithFind(CapabilityFind? capabilityFind)
@@ -182,6 +193,8 @@ internal class FindCapabilityQueryBuilder() : CapabilityQueryBuilder(CapabilityQ
             WithUid(capabilityFind.uid);
         if (capabilityFind.group_name is not null)
             WithGroupName(capabilityFind.group_name);
+        if (capabilityFind.device_id is not null)
+            WithDeviceId(capabilityFind.device_id);
 
         return this;
     }

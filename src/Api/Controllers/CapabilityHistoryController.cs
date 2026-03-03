@@ -16,13 +16,13 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
         return Ok(capabilities);
     }
 
-    [HttpPost("~/api/v1/capabilities/{capability_name}/history")]
+    [HttpPost("~/api/v1/capabilities/{capability_id}/history")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateCapabilityHistory(
-        [FromRoute] string capability_name,
+        [FromRoute] int capability_id,
         [FromBody] Api.Models.CapabilityHistoryCreate input,
         [FromServices] ICapabilityHistoryRepository repository,
         [FromServices] ICapabilityRepository capabilityRepository,
@@ -31,11 +31,11 @@ public class CapabilityHistoryController(ILogger<CapabilityHistoryController> lo
         if (input is null || string.IsNullOrWhiteSpace(input.value))
             return BadRequest();
 
-        var capability = await capabilityRepository.GetByNameAsync(cancellationToken, capability_name);
+        var capability = await capabilityRepository.GetByIdAsync(capability_id, cancellationToken);
         if (capability is null)
             return NotFound();
 
-        await repository.AddAsync(capability_name, input.value, cancellationToken);
+        await repository.AddAsync(capability.Name, input.value, cancellationToken);
         return CreatedAtRoute("GetCapabilityHistory", new { capability_id = capability.Id }, null);
     }
 }

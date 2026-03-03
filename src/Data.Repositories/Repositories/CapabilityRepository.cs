@@ -62,10 +62,11 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         return (await GetAllAsync(command)).FirstOrDefault();
     }
 
-    public async Task<Capability?> GetByNameAsync(CancellationToken cancellationToken, string capability_name)
+    public async Task<Capability?> GetByNameAsync(string device_id, string capability_name, CancellationToken cancellationToken)
     {
         var command = new FindCapabilityQueryBuilder()
             .WithName(capability_name)
+            .WithDeviceId(device_id)
             .WithCancellationToken(cancellationToken)
             .Build();
 
@@ -94,7 +95,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task<Capability?> GetByReferenceIdAsync(CancellationToken cancellationToken, string referenceId)
+    public async Task<Capability?> GetByReferenceIdAsync(string referenceId, CancellationToken cancellationToken)
     {
         var command = new FindCapabilityQueryBuilder()
             .WithReferenceId(referenceId)
@@ -283,10 +284,9 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task<bool> UpdateValueAsync(string capability_name, string value, CancellationToken cancellationToken)
+    public async Task<bool> UpdateValueAsync(string device_id, string capability_name, string value, CancellationToken cancellationToken)
     {
-        // Log em nível debug para reduzir overhead em cenários de alta taxa
-        logger.LogDebug("Atualizando valor da capability {capabilityName}", capability_name);
+        logger.LogDebug("Atualizando valor da capability {capabilityName} para o device {deviceId}", capability_name, device_id);
         const string sql = CapabilityQuery.UpdateValue;
         try
         {
@@ -294,7 +294,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
             {
                 if (connection.State != ConnectionState.Open)
                     connection.Open();
-                var cmd = new CommandDefinition(sql, new { capability_name, value }, cancellationToken: cancellationToken);
+                var cmd = new CommandDefinition(sql, new { device_id, capability_name, value }, cancellationToken: cancellationToken);
                 return await connection.ExecuteAsync(cmd);
             }, logger, cancellationToken);
 

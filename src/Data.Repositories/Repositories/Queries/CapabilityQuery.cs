@@ -89,10 +89,14 @@ internal static class CapabilityQuery
             ";
 
     public const string UpdateValue = @"
-        UPDATE Capabilities
-        SET Value = @value, UpdatedAt = CURRENT_TIMESTAMP
-        WHERE Name = @capability_name
-        LIMIT 1;
+        UPDATE Capabilities c
+            INNER JOIN Devices d ON d.Id = c.DeviceId
+            SET 
+                c.Value = @value,
+                c.UpdatedAt = CURRENT_TIMESTAMP
+        WHERE
+            c.Name = @capability_name
+            AND d.DeviceId = @device_id;
     ";
 
     public const string InsertPlatformToCapability = @"
