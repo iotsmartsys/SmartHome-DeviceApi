@@ -16,4 +16,5 @@ public record class DeviceFind()
     public string? Name { get; init; }
     public string? Description { get; init; }
     public string? Platform { get; init; }
+    public bool? IsActive { get; init; }
 };

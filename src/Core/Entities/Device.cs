@@ -13,6 +13,8 @@ public class Device
     public string IpAddress { get; set; } = default!;
     public CommunicationProtocol Protocol { get; set; } = CommunicationProtocol.AMQP;
     public string Platform { get; set; } = default!;
+    public bool IsActive { get; set; } = true;
+
     public Device() { }
     public Device(string device_id, string device_name, string state)
     {

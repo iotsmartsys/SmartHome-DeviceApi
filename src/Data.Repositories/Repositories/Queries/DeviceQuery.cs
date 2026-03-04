@@ -17,6 +17,7 @@ internal static class DeviceQuery
                 d.IpAddress,
                 d.CommunicationTypeId Protocol,
                 d.Platform,
+                d.Active IsActive,
                 dp.Id ,
                 dp.Name,
                 dp.Value,
