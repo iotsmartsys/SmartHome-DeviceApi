@@ -1,6 +1,5 @@
 using Api.Models;
 using Core.Contracts.Repositories;
-using Core.Contracts.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -116,9 +115,9 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> AddCapabilitiesAsync([FromRoute] string device_id, [FromBody] Capability capability, [FromServices] IAddCapabilityService service, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddCapabilitiesAsync([FromRoute] string device_id, [FromBody] Capability capability, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
-        await service.AddAsync(new(device_id, capability), cancellationToken);
+        await repository.AddAsync(device_id, capability, cancellationToken);
         return CreatedAtAction(nameof(GetCapabilityByUid), new { uid = device_id }, capability);
     }
 

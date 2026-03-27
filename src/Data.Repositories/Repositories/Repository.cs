@@ -43,10 +43,11 @@ internal abstract class Repository<TRepository>(IServiceProvider serviceProvider
         return true;
     }
 
-    protected async Task<bool> SaveChanges(IEvent @event)
+    protected async Task<bool> SaveChanges(IEvent @event, CancellationToken cancellationToken)
     {
+        await notificationEventFacade.PublishAsync(@event, cancellationToken);
         SaveChanges();
-        await notificationEventFacade.PublishAsync(@event, CancellationToken.None);
+        CloseConnection();
         return true;
     }
 

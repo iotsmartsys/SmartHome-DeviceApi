@@ -8,7 +8,7 @@ namespace Data.Repositories;
 
 internal class CapabilityRepository(IServiceProvider serviceProvider) : Repository<CapabilityRepository>(serviceProvider), ICapabilityRepository, IRepository
 {
-    public async Task AddAsync(string device_id, Capability capability)
+    public async Task AddAsync(string device_id, Capability capability, CancellationToken cancellationToken)
     {
         using var transaction = BeginTransaction();
         try
@@ -21,7 +21,7 @@ internal class CapabilityRepository(IServiceProvider serviceProvider) : Reposito
             }
             logger.LogInformation("Adicionando capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
             const string sql = CapabilityQuery.InsertCapability;
-            string? uid = await connection.ExecuteScalarAsync<string>(sql, new
+            CommandDefinition command = new CommandDefinition(sql, new
             {
                 DeviceId = idDevice,
                 capability.Name,
@@ -29,10 +29,11 @@ internal class CapabilityRepository(IServiceProvider serviceProvider) : Reposito
                 capability.Type,
                 capability.Value,
                 capability.Owner
-            }, transaction);
+            }, transaction: transaction, cancellationToken: cancellationToken);
+            string? uid = await connection.ExecuteScalarAsync<string>(command);
 
             logger.LogInformation("Capability {capabilityName} adicionada para o device {deviceId}", capability.Name, device_id);
-            await SaveChanges(new CapabilityAddedOrUpdateEvent(uid ?? capability.Name));
+            await SaveChanges(new CapabilityAddedOrUpdateEvent(uid ?? capability.Name), cancellationToken);
         }
         catch (Exception ex)
         {

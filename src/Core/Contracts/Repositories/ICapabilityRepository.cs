@@ -5,7 +5,7 @@ namespace Core.Contracts.Repositories;
 public interface ICapabilityRepository : IRepository
 {
     Task<IEnumerable<Capability>> GetAllCapabilitiesAsync(CapabilityFind? capabilityFind, CancellationToken cancellationToken);
-    Task AddAsync(string device_id, Capability capability);
+    Task AddAsync(string device_id, Capability capability, CancellationToken cancellationToken);
     Task DeleteAsync(int id);
     Task UpdateAsync(Capability capability, CancellationToken cancellationToken);
     Task<Capability?> GetByNameAsync(string device_id, string capability_name, CancellationToken cancellationToken);

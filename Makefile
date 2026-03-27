@@ -1,6 +1,6 @@
 api:
 	clear
-	dotnet run --project src/Api/Api.csproj
+	set -a; [ -f .env ] && . ./.env; set +a; ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/Api/Api.csproj
 
 svc:
 	dotnet run --project src/Incomming.Services/IncommingService.csproj
