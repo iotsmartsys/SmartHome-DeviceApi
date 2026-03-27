@@ -31,9 +31,11 @@ internal class CapabilityRepository(IServiceProvider serviceProvider) : Reposito
                 capability.Owner
             }, transaction: transaction, cancellationToken: cancellationToken);
             string? uid = await connection.ExecuteScalarAsync<string>(command);
+            if (!string.IsNullOrEmpty(uid))
+                capability.UID = uid;
 
             logger.LogInformation("Capability {capabilityName} adicionada para o device {deviceId}", capability.Name, device_id);
-            await SaveChanges(new CapabilityAddedOrUpdateEvent(uid ?? capability.Name), cancellationToken);
+            await SaveChanges(new CapabilityAddedOrUpdateEvent(capability.UID ?? capability.Name), cancellationToken);
         }
         catch (Exception ex)
         {

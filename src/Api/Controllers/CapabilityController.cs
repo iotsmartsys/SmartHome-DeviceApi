@@ -118,7 +118,7 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     public async Task<IActionResult> AddCapabilitiesAsync([FromRoute] string device_id, [FromBody] Capability capability, [FromServices] ICapabilityRepository repository, CancellationToken cancellationToken)
     {
         await repository.AddAsync(device_id, capability, cancellationToken);
-        return CreatedAtAction(nameof(GetCapabilityByUid), new { uid = device_id }, capability);
+        return CreatedAtAction(nameof(GetCapabilityByUid), new { uid = capability.uid }, capability);
     }
 
     [HttpPatch()]
