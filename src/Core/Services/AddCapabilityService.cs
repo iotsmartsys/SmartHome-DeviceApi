@@ -11,7 +11,7 @@ internal class AddCapabilityService(ILogger<AddCapabilityService> logger
     public async Task AddAsync(CapabilityRequest request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Adicionando novas capacidades ao dispositivo {DeviceId}", request.DeviceId);
-        await repository.AddAsync(request.DeviceId, request.Capabilities);
+        await repository.AddAsync(request.DeviceId, request.Capability);
         logger.LogInformation("Capacidades adicionadas ao dispositivo {DeviceId}", request.DeviceId);
     }
 }

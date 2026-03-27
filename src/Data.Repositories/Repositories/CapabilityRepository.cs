@@ -6,13 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Data.Repositories;
 
-internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbConnection connection) : ICapabilityRepository, IRepository
+internal class CapabilityRepository(IServiceProvider serviceProvider) : Repository<CapabilityRepository>(serviceProvider), ICapabilityRepository, IRepository
 {
-    public async Task AddAsync(string device_id, IEnumerable<Capability> capabilities)
+    public async Task AddAsync(string device_id, Capability capability)
     {
-        connection.Open();
-        using var transaction = connection.BeginTransaction();
-
+        using var transaction = BeginTransaction();
         try
         {
             int idDevice = await connection.ExecuteScalarAsync<int>("SELECT Id FROM Devices WHERE DeviceId = @device_id", new { device_id }, transaction);
@@ -21,34 +19,29 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 logger.LogWarning("Device {deviceId} not found", device_id);
                 throw new NotFoundExceptionDomain($"Device {device_id} not found");
             }
-
-            foreach (var capability in capabilities)
+            logger.LogInformation("Adicionando capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
+            const string sql = CapabilityQuery.InsertCapability;
+            string? uid = await connection.ExecuteScalarAsync<string>(sql, new
             {
-                logger.LogInformation("Adicionando capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
-                const string sql = CapabilityQuery.InsertCapability;
-                await connection.ExecuteAsync(sql, new
-                {
-                    DeviceId = idDevice,
-                    capability.Name,
-                    capability.Description,
-                    capability.Type,
-                    capability.Value,
-                    capability.Owner
-                }, transaction);
+                DeviceId = idDevice,
+                capability.Name,
+                capability.Description,
+                capability.Type,
+                capability.Value,
+                capability.Owner
+            }, transaction);
 
-                logger.LogInformation("Capability {capabilityName} adicionada para o device {deviceId}", capability.Name, device_id);
-            }
-            transaction.Commit();
+            logger.LogInformation("Capability {capabilityName} adicionada para o device {deviceId}", capability.Name, device_id);
+            await SaveChanges(new CapabilityAddedOrUpdateEvent(uid ?? capability.Name));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error ao adicionar capabilities para o device {deviceId}", device_id);
-            transaction.Rollback();
+            RollbackChanges();
             throw;
         }
         finally
         {
-            connection.Close();
         }
     }
 

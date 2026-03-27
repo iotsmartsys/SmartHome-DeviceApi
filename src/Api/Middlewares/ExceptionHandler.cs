@@ -1,7 +1,8 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using MySqlConnector;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc;
 
 class ExceptionHandler(RequestDelegate _next)
 {
@@ -48,12 +49,51 @@ class ExceptionHandler(RequestDelegate _next)
                         message = "Já existe um registro com o mesmo valor";
                         statusCode = HttpStatusCode.Conflict;
                         break;
-                    // Cannot add or update a child row: a foreign key constraint fails / Cannot delete or update a parent row
+                    // Cannot delete or update a parent row: a foreign key constraint fails
                     case 1451:
+                        // Retornar RFC 7807 ProblemDetails com 422 Unprocessable Entity
+                        var pdDelete = new ProblemDetails
+                        {
+                            Type = "/problems/foreign-key-violation",
+                            Title = "Operação não pode ser processada",
+                            Status = StatusCodes.Status422UnprocessableEntity,
+                            Detail = "Não é possível remover este recurso porque existem recursos dependentes. Remova ou reatribua-os antes de tentar novamente."
+                        };
+                        pdDelete.Extensions["traceId"] = traceId;
+                        pdDelete.Extensions["instance"] = context.Request.Path.Value;
+
+                        if (!context.Response.HasStarted)
+                        {
+                            context.Response.ContentType = "application/problem+json; charset=utf-8";
+                            context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                            context.Response.Headers["X-Trace-Id"] = traceId;
+                            var opts = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                            var json = JsonSerializer.Serialize(pdDelete, opts);
+                            await context.Response.WriteAsync(json, Encoding.UTF8);
+                        }
+                        return;
+                    // Cannot add or update a child row: a foreign key constraint fails
                     case 1452:
-                        message = "Violação de integridade: restrição de chave estrangeira";
-                        statusCode = HttpStatusCode.BadRequest;
-                        break;
+                        var pdUpdate = new ProblemDetails
+                        {
+                            Type = "/problems/foreign-key-violation",
+                            Title = "Operação inválida",
+                            Status = StatusCodes.Status422UnprocessableEntity,
+                            Detail = "Operação inválida devido a referência ausente ou inconsistente de outro recurso. Verifique os dados e tente novamente."
+                        };
+                        pdUpdate.Extensions["traceId"] = traceId;
+                        pdUpdate.Extensions["instance"] = context.Request.Path.Value;
+
+                        if (!context.Response.HasStarted)
+                        {
+                            context.Response.ContentType = "application/problem+json; charset=utf-8";
+                            context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                            context.Response.Headers["X-Trace-Id"] = traceId;
+                            var opts2 = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                            var json2 = JsonSerializer.Serialize(pdUpdate, opts2);
+                            await context.Response.WriteAsync(json2, Encoding.UTF8);
+                        }
+                        return;
                     // Lock wait timeout exceeded
                     case 1205:
                         message = "Timeout ao aguardar lock de banco de dados";

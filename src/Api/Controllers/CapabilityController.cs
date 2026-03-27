@@ -116,10 +116,10 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> AddCapabilitiesAsync([FromRoute] string device_id, [FromBody] IEnumerable<Capability> capabilities, [FromServices] IAddCapabilityService service, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddCapabilitiesAsync([FromRoute] string device_id, [FromBody] Capability capability, [FromServices] IAddCapabilityService service, CancellationToken cancellationToken)
     {
-        await service.AddAsync(new(device_id, capabilities.Select(c => (Core.Entities.Capability)c)), cancellationToken);
-        return NoContent();
+        await service.AddAsync(new(device_id, capability), cancellationToken);
+        return CreatedAtAction(nameof(GetCapabilityByUid), new { uid = device_id }, capability);
     }
 
     [HttpPatch()]

@@ -16,6 +16,15 @@ builder.Services
    .AddMemoryCache()
    .AddMySqlData(connectionString!);
 
+builder.Services.Configure<NotificationEventOptions>(builder.Configuration.GetSection("NotificationEvent"));
+builder.Services.AddSingleton<INotificationEventFacade, NotificationEventFacade>();
+builder.Services.AddHttpClient<INotificationEventFacade, NotificationEventFacade>(client =>
+{
+    // Configurações do HttpClient, como base address e headers
+    client.BaseAddress = new Uri(builder.Configuration["NotificationEvent:MqttBrokerUrl"]!);
+    client.DefaultRequestHeaders.Add("Authorization", builder.Configuration["NotificationEvent:Authorization"]!);
+});
+
 builder.Services.AddOutputCache(options =>
 {
     // Default policy is fine; per-endpoint attributes will set TTL

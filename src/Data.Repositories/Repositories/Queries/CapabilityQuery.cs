@@ -53,6 +53,8 @@ internal static class CapabilityQuery
     public const string InsertCapability = @"
         INSERT INTO Capabilities (DeviceId, Name, Description, CapabilityTypeId, Value, deviceOwner, UID)
         VALUES (@DeviceId, @Name, @Description, (SELECT Id FROM CapabilityTypes WHERE Name = @Type LIMIT 1), @Value, @Owner, uuid_v4());
+
+        SELECT uid FROM Capabilities WHERE Id = LAST_INSERT_ID();
     ";
 
     public const string RemoveCapability = @"
