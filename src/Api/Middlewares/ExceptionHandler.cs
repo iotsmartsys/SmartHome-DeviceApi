@@ -1,5 +1,7 @@
 using System.Net;
+using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using MySqlConnector;
 using Microsoft.Extensions.Hosting;
 
@@ -51,7 +53,9 @@ class ExceptionHandler(RequestDelegate _next)
                     // Cannot add or update a child row: a foreign key constraint fails / Cannot delete or update a parent row
                     case 1451:
                     case 1452:
-                        message = "Violação de integridade: restrição de chave estrangeira";
+                        var foreignKeyContext = ExtractForeignKeyContext(mySqlEx.Message);
+                        message = BuildForeignKeyViolationMessage(mySqlEx.Number, foreignKeyContext);
+                        logger.LogWarning("Violação de FK detectada: {Message}", mySqlEx.Message);
                         statusCode = HttpStatusCode.BadRequest;
                         break;
                     // Lock wait timeout exceeded
@@ -124,4 +128,74 @@ class ExceptionHandler(RequestDelegate _next)
             }
         }
     }
+
+    private static ForeignKeyContext? ExtractForeignKeyContext(string? message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return null;
+        }
+
+        var match = Regex.Match(
+            message,
+            @"foreign key constraint fails\s*\(`[^`]+`\.`(?<dependentTable>[^`]+)`,\s*CONSTRAINT\s*`(?<constraint>[^`]+)`\s*FOREIGN KEY\s*\(`(?<column>[^`]+)`\)\s*REFERENCES\s*`(?<referencedTable>[^`]+)`\s*\(`(?<referencedColumn>[^`]+)`\)",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        return new ForeignKeyContext(
+            DependentTable: match.Groups["dependentTable"].Value,
+            ReferencedTable: match.Groups["referencedTable"].Value,
+            Column: match.Groups["column"].Value,
+            ReferencedColumn: match.Groups["referencedColumn"].Value,
+            Constraint: match.Groups["constraint"].Value);
+    }
+
+    private static string BuildForeignKeyViolationMessage(int errorNumber, ForeignKeyContext? context)
+    {
+        if (context is null)
+        {
+            return errorNumber == 1451
+                ? "Não foi possível excluir este registro porque ele está sendo utilizado por outros elementos do domínio. Remova primeiro os vínculos existentes e tente novamente."
+                : "Não foi possível salvar este vínculo porque o registro relacionado não foi encontrado ou não está mais disponível.";
+        }
+
+        var referencedEntity = HumanizeEntityName(context.ReferencedTable);
+        var dependentEntity = HumanizeEntityName(context.DependentTable);
+
+        return errorNumber switch
+        {
+            1451 => $"Não foi possível excluir {referencedEntity} porque ela está vinculada a {dependentEntity}. Remova primeiro esses relacionamentos e tente novamente.",
+            1452 => $"Não foi possível salvar {dependentEntity} porque a referência para {referencedEntity} é inválida ou não existe mais.",
+            _ => "Não foi possível concluir a operação devido a um relacionamento inválido entre entidades do domínio."
+        };
+    }
+
+    private static string HumanizeEntityName(string? tableName)
+    {
+        if (string.IsNullOrWhiteSpace(tableName))
+        {
+            return "o registro";
+        }
+
+        return $"'{tableName}'";
+    }
+
+    private static string HumanizeTableName(string tableName)
+    {
+        var withSpaces = Regex.Replace(tableName, "([a-z])([A-Z])", "$1 $2");
+        withSpaces = withSpaces.Replace("_", " ").Trim().ToLowerInvariant();
+
+        return $"o registro de {withSpaces}";
+    }
+
+    private sealed record ForeignKeyContext(
+        string DependentTable,
+        string ReferencedTable,
+        string Column,
+        string ReferencedColumn,
+        string Constraint);
 }
