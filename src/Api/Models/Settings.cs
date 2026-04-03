@@ -26,4 +26,4 @@ public record class Settings(string? name, string? value, string? description) :
             throw new ArgumentDomainException("Value é obrigatório", nameof(value));
     }
 }
-
+public record class ValueSettings(string value);

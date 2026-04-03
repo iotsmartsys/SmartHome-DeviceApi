@@ -19,4 +19,17 @@ public class SettingsController(ILogger<SettingsController> logger) : Controller
 
         return NoContent();
     }
+
+    [HttpPut("{name}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateValueSettingAsync(string name, [FromBody] ValueSettings settings, [FromServices] ISettingsRepository repository, CancellationToken cancellationToken)
+    {
+        logger.LogInformation($"Request de atualização da setting: {name}");
+
+        await repository.SetValueAsync(name, settings.value, cancellationToken);
+        return NoContent();
+    }
+
 }
