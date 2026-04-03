@@ -57,29 +57,62 @@ internal class SettingsRepository(ILogger<SettingsRepository> logger, IDbConnect
         }
     }
 
-        public async Task SetValueAsync(string name, string value, CancellationToken cancellationToken)
+    public async Task SetValueAsync(string name, string value, CancellationToken cancellationToken)
+    {
+        try
         {
-            try
+            logger.LogInformation("Definindo valor da setting: {name}", name);
+            const string query = @"UPDATE Settings SET Value = @Value WHERE Name = @Name";
+            var parameters = new { Name = name, Value = value };
+            var command = new CommandDefinition(query, parameters, cancellationToken: cancellationToken);
+            int rowsAffected = await connection.ExecuteAsync(command);
+            if (rowsAffected == 0)
+                throw new KeyNotFoundException($"Setting com nome '{name}' não encontrada");
+
+            logger.LogInformation("Valor da setting definido com sucesso: {name}", name);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao definir valor da setting: {name}", name);
+            throw;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
+    }
+
+    public async Task SetValuesAsync(IEnumerable<Settings> settings, CancellationToken cancellationToken)
+    {
+        connection.Open();
+        var transaction = connection.BeginTransaction();
+        try
+        {
+            logger.LogInformation("Definindo valores de múltiplas settings");
+            foreach (var setting in settings)
             {
-                logger.LogInformation("Definindo valor da setting: {name}", name);
+                logger.LogInformation("Definindo valor da setting: {name}", setting.Name);
                 const string query = @"UPDATE Settings SET Value = @Value WHERE Name = @Name";
-                var parameters = new { Name = name, Value = value };
-                var command = new CommandDefinition(query, parameters, cancellationToken: cancellationToken);
+                var command = new CommandDefinition(query, new { Name = setting.Name, Value = setting.Value }, transaction: transaction, cancellationToken: cancellationToken);
                 int rowsAffected = await connection.ExecuteAsync(command);
                 if (rowsAffected == 0)
-                    throw new KeyNotFoundException($"Setting com nome '{name}' não encontrada");
-    
-                logger.LogInformation("Valor da setting definido com sucesso: {name}", name);
+                    throw new KeyNotFoundException("Nenhuma das settings fornecidas foi encontrada");
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Erro ao definir valor da setting: {name}", name);
-                throw;
-            }
-            finally
-            {
-                if (connection.State != ConnectionState.Closed)
-                    connection.Close();
-            }
+
+            transaction.Commit();
+            logger.LogInformation("Valores das settings definidos com sucesso");
         }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao definir valores das settings");
+            transaction.Rollback();
+            throw;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
+    }
 }

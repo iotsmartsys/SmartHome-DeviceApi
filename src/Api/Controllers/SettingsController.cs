@@ -32,4 +32,16 @@ public class SettingsController(ILogger<SettingsController> logger) : Controller
         return NoContent();
     }
 
+    [HttpPut()]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateValuesSettingAsync([FromBody] IEnumerable<Settings> settings, [FromServices] ISettingsRepository repository, CancellationToken cancellationToken)
+    {
+        logger.LogInformation($"Request de atualização das settings");
+
+        await repository.SetValuesAsync(settings.Select(s => (Core.Entities.Settings)s), cancellationToken);
+        return NoContent();
+    }
+
 }
