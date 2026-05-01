@@ -1,5 +1,6 @@
 using System.Data;
 using Core.Contracts.Repositories;
+using Core.Entities;
 using Dapper;
 
 namespace Data.Repositories;
@@ -9,6 +10,8 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
     private string? _device_id;
     private string? _name;
     private string? _description;
+    private string? _settings_key;
+    private string? _settings_value;
     private bool? _is_active;
     private string[]? _platform;
     private IDbTransaction? _transaction;
@@ -29,6 +32,18 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
     public DeviceQueryBuilder WithIsActive(bool is_active)
     {
         _is_active = is_active;
+        return this;
+    }
+
+    public DeviceQueryBuilder WithSettingsKey(string settings_key)
+    {
+        _settings_key = settings_key;
+        return this;
+    }
+
+    public DeviceQueryBuilder WithSettingsValue(string settings_value)
+    {
+        _settings_value = settings_value;
         return this;
     }
 
@@ -56,6 +71,10 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
             sql += " AND d.Platform IN @platform";
         if (_is_active.HasValue)
             sql += " AND d.Active = @is_active";
+        if (!string.IsNullOrEmpty(_settings_key) && !string.IsNullOrEmpty(_settings_value))
+        {
+            sql += DeviceQuery.ClauseDeviceSettings;
+        }
 
         return new CommandDefinition(sql, new
         {
@@ -63,7 +82,9 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
             name = _name,
             description = _description,
             platform = _platform,
-            is_active = _is_active
+            is_active = _is_active,
+            settings_key = _settings_key,
+            settings_value = _settings_value
         }, transaction: _transaction, cancellationToken: _cancellationToken);
     }
 
@@ -81,6 +102,10 @@ internal class DeviceQueryBuilder(string sql = DeviceQuery.GetAllDevices)
             _platform = find.Platform.Split(',');
         if (find.IsActive.HasValue)
             _is_active = find.IsActive.Value;
+        if (!string.IsNullOrEmpty(find.SettingsKey))
+            _settings_key = find.SettingsKey;
+        if (!string.IsNullOrEmpty(find.SettingsValue))
+            _settings_value = find.SettingsValue;
 
         return this;
     }

@@ -31,6 +31,19 @@ internal static class DeviceQuery
                 LEFT JOIN DeviceSettings ds ON d.Id = ds.DeviceId
             WHERE 1 = 1
         ";
+
+        public const string ClauseDeviceSettings = @"
+        AND EXISTS
+        (
+            SELECT 
+                1
+            FROM v_DeviceEffectiveSettings ds 
+            WHERE 
+                ds.DeviceDbId = d.Id
+                AND ds.Name =  @settings_key
+                AND value = @settings_value
+        )";
+
     public const string GetDevicesWithCapabilities = @"
         SELECT
             /* Device */
