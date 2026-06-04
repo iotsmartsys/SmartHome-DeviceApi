@@ -12,15 +12,15 @@ public class DeviceSettingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Settings))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetDeviceSettingsAsync([FromRoute] string device_id, [FromServices] IDeviceSettingsRepository repository, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetDeviceSettingsAsync([FromRoute] string device_id, [FromQuery] string? prefix_auto_format_properies_json, [FromServices] IDeviceSettingsRepository repository, CancellationToken cancellationToken)
     {
         var settings = await repository.GetByDeviceIdAsync(device_id, cancellationToken);
         if (!settings.Any())
         {
             return NotFound($"No settings found for device with ID '{device_id}'.");
         }
-
-        var response = DataParserHelper.ToDictionary(settings, settings.Where(s => SettingsKeyTypes.prefix_auto_format_properies_json.Is(s.Name)).SelectMany(s => s.Value.Split(',')));
+        string[] prefixAutoFormatProperties = prefix_auto_format_properies_json?.Split(',') ?? [.. settings.Where(s => SettingsKeyTypes.prefix_auto_format_properies_json.Is(s.Name)).SelectMany(s => s.Value.Split(','))];
+        var response = DataParserHelper.ToDictionary(settings, prefixAutoFormatProperties);
         return Ok(response);
     }
 

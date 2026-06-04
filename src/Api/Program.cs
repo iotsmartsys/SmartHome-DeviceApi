@@ -8,6 +8,11 @@ var cts = new CancellationTokenSource();
 var builder = WebApplication.CreateBuilder(args);
 string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.CustomSchemaIds(type => type.FullName?.Replace('+', '.') ?? type.Name);
+});
 
 builder.Services.AddHostedService<DatabaseWatchdogService>();
 
@@ -48,6 +53,8 @@ app.UseMiddleware<ExceptionHandler>();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.MapGet("/api/v1/timezone", (string zone) =>
