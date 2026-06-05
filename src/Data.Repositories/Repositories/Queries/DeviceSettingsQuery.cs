@@ -10,7 +10,10 @@ internal class DeviceSettingsQuery
         ) AS new
         ON DUPLICATE KEY UPDATE
             Value = new.Value,
-            Description = new.Description;
+            Description = CASE
+                WHEN new.Description IS NOT NULL AND TRIM(new.Description) <> '' THEN new.Description
+                ELSE DeviceSettings.Description
+            END;
         ";
 
     public const string GetDeviceSettingsByDeviceId = @"
