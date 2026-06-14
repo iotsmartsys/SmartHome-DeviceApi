@@ -19,7 +19,7 @@ public class DeviceSettingsController : ControllerBase
         {
             return NotFound($"No settings found for device with ID '{device_id}'.");
         }
-        string[] prefixAutoFormatProperties = query?.prefix_auto_format_properies_json?.Split(',') ?? [.. settings.Where(s => SettingsKeyTypes.prefix_auto_format_properies_json.Is(s.Name)).SelectMany(s => s.Value.Split(','))];
+        string[] prefixAutoFormatProperties = query?.prefix_auto_format_properties_json?.Split(',') ?? [.. settings.Where(s => SettingsKeyTypes.prefix_auto_format_properies_json.Is(s.Name)).SelectMany(s => s.Value.Split(','))];
 
         switch (query?.use_key_value)
         {
@@ -49,4 +49,4 @@ public class DeviceSettingsController : ControllerBase
 
 
 }
-public record class DeviceSettingsQuery(string? prefix_auto_format_properies_json, string? use_key_value);
+public record class DeviceSettingsQuery(string? prefix_auto_format_properties_json, string? use_key_value);
