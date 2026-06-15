@@ -23,6 +23,7 @@ internal class DeviceSettingsQuery
             Value,
             Type
         FROM v_DeviceEffectiveSettings
-        WHERE DeviceKey = @DeviceId;
+        WHERE DeviceKey = @DeviceId
+        ORDER BY Name;
         ";
 }
