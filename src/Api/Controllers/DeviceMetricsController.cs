@@ -2,27 +2,27 @@ using Api.Models;
 using Core.Contracts.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/v1/devices")]
+[Route("api/v1/devices/{deviceId}/metrics")]
 [ApiController]
 public sealed class DeviceMetricsController(ILogger<DeviceMetricsController> logger) : ControllerBase
 {
-    [HttpPost("metrics")]
+    [HttpPost()]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Save(
+        [FromRoute] string deviceId,
         [FromBody] DeviceMetricsRequest request,
         [FromServices] IDeviceMetricsRepository repository,
         CancellationToken cancellationToken)
     {
-        var externalDeviceId = request.device_id!.Trim();
-        if (!await repository.SaveAsync(externalDeviceId, request.ToEntity(), cancellationToken))
+        if (!await repository.SaveAsync(deviceId, request.ToEntity(), cancellationToken))
             return NotFound();
 
         return NoContent();
     }
 
-    [HttpGet("{deviceId}/metrics/current")]
+    [HttpGet("current")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DeviceMetricsCurrentResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCurrent(
@@ -40,7 +40,7 @@ public sealed class DeviceMetricsController(ILogger<DeviceMetricsController> log
         return Ok(DeviceMetricsCurrentResponse.FromEntity(metrics));
     }
 
-    [HttpGet("{deviceId}/metrics/history")]
+    [HttpGet("history")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DeviceMetricsHistoryResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
