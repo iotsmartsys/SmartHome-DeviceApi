@@ -69,4 +69,32 @@ internal class DeviceSettingsRepository(ILogger<DeviceSettingsRepository> logger
                 connection.Close();
         }
     }
+
+    public async Task<bool> ResetAsync(string deviceId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var getDeviceKeyCommand = new CommandDefinition(DeviceSettingsQuery.GetDeviceKeyByDeviceId, new
+            {
+                DeviceId = deviceId
+            }, cancellationToken: cancellationToken);
+
+            var deviceKey = await connection.QuerySingleOrDefaultAsync<long?>(getDeviceKeyCommand);
+            if (!deviceKey.HasValue)
+                return false;
+
+            var deleteCommand = new CommandDefinition(DeviceSettingsQuery.DeleteDeviceSettingsByDeviceKey, new
+            {
+                DeviceKey = deviceKey.Value
+            }, cancellationToken: cancellationToken);
+
+            await connection.ExecuteAsync(deleteCommand);
+            return true;
+        }
+        finally
+        {
+            if (connection.State != ConnectionState.Closed)
+                connection.Close();
+        }
+    }
 }

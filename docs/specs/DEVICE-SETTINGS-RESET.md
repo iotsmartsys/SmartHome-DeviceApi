@@ -6,7 +6,7 @@
 
 **Estado normativo:** Approved
 
-**Estado da implementacao:** Not Started
+**Estado da implementacao:** Implemented
 
 **Estado da entrega:** Not Ready
 

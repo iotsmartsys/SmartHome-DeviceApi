@@ -203,12 +203,35 @@ checkpoint acima para implementação.
 ## 6. Engenheiro Implementador
 
 - Responsável: Engenheiro Implementador.
-- Checkpoint de entrada: checkpoint de saída da aprovação humana (`Pending`),
-  nos estados `Approved / Implementable / Not Started / Not Ready`.
-- Reconfirmação do baseline: `Pending` para a atuação do Implementador.
-- Resultado: `Pending`.
-- Requisitos, arquivos, rastreabilidade, decisões e validações: `Pending`.
-- Desvios, operações Git e checkpoint de saída: `Pending`.
+- Checkpoint de entrada: `spec/device-settings-reset@12bde0a5b48046b763ea6a098e8e630a547b3bfe`, worktree limpo.
+- Estados reconfirmados: `Approved / Implementable / Not Started / Not Ready`.
+- Transação: `EKM-CHG-0002`, estado `Open`.
+- Aprovação humana aplicável: Marcelo Miranda, 25/07/2026, registrada na seção 5 para `SHD-SETTINGS-RESET-001@0.1`.
+- Reconfirmação do baseline: concluída. A comparação entre o checkpoint da TRR aprovada `8d7b2fdf5e7e00a10cb30b4e6ad4f5ae0dd603e1` e o checkpoint de entrada confirmou somente a transição documental para `Approved` e o registro da aprovação humana; o contrato DSR-001 a DSR-010 não sofreu mudança material.
+- Resultado: `Implemented`.
+
+| Requisitos | Alteração | Evidência |
+|---|---|---|
+| `DSR-001`, `DSR-002`, `DSR-003` | `DeviceSettingsController` recebeu `ResetDeviceSettingsAsync` com `[HttpPut("reset")]` no controller existente e sem parametro `[FromBody]`. | Rota resultante `PUT /api/v1/devices/{device_id}/settings/reset`; inspecao do diff e diagnosticos sem erros nos arquivos alterados. |
+| `DSR-004` | `IDeviceSettingsRepository.ResetAsync` e `DeviceSettingsRepository.ResetAsync` resolvem a chave interna antes da remocao. | Query `GetDeviceKeyByDeviceId`: `SELECT Id FROM Devices WHERE DeviceId = @DeviceId`; ausencia da chave retorna `false`. |
+| `DSR-005`, `DSR-006` | A remocao usa a query `DeleteDeviceSettingsByDeviceKey`. | A unica escrita adicionada e `DELETE FROM DeviceSettings WHERE DeviceId = @DeviceKey`; `Devices` e somente lida, e nenhuma tabela de settings globais, herdados ou padrao e escrita. |
+| `DSR-007`, `DSR-008` | O repositorio retorna `true` para device resolvido, mesmo com `DELETE` sem linhas afetadas; a action retorna `NoContent()`. | Inspecao do fluxo: nao ha verificacao de quantidade de linhas removidas antes do `204`. |
+| `DSR-009` | A action converte `false` do repositorio em `NotFound()`. | Inspecao do fluxo de ausencia da chave interna. |
+| `DSR-010` | Repeticoes resolvem o mesmo device e executam o mesmo `DELETE` restrito, que permanece sem efeito apos o primeiro reset. | Inspecao da query e do fluxo `true -> NoContent()` sem dependencia de linhas afetadas. |
+
+- Arquivos alterados: `src/Api/Controllers/DeviceSettingsController.cs`; `src/Core/Contracts/Repositories/IDeviceSettingsRepository.cs`; `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs`; `src/Data.Repositories/Repositories/Queries/DeviceSettingsQuery.cs`; `docs/specs/DEVICE-SETTINGS-RESET.md`; este registro.
+- Decisoes mecanicas: `ResetAsync` retorna `bool` para separar device inexistente de device existente sem settings; a chave interna e lida como `long?`; nao foram adicionados body, payload de erro, telemetria ou refatoracao fora do recorte.
+- Inspecao da query e repositorio: `GetDeviceKeyByDeviceId` resolve somente `Devices.Id` pela identificacao publica; `DeleteDeviceSettingsByDeviceKey` altera somente `DeviceSettings` pelo identificador interno; o repositorio fecha a conexao no `finally` como os demais metodos existentes.
+- Validacoes executadas:
+  - `dotnet build src/Api/Api.csproj`: executado; falhou no restore apos `301,0s`, sem erro de compilacao de codigo reportado.
+  - diagnosticos dos quatro arquivos alterados: sem erros.
+  - `git diff --check`: executado; em arquivo legado `CRLF`, o Git padrao classificou o `CR` de novas linhas como whitespace final. A verificacao equivalente `git -c core.whitespace=cr-at-eol diff --check` passou, sem whitespace real.
+  - inspecao do diff, query e repositorio: confirmou que a unica mutacao e o `DELETE` restrito a `DeviceSettings` do device resolvido.
+- Validacoes pendentes: validacao funcional ou integrada de sucesso, device existente sem linhas, `404` e idempotencia. O ambiente nao fornece banco isolado nem fixture autorizada; a configuracao local existente nao autoriza executar `DELETE` contra dados desconhecidos. A tentativa complementar `dotnet build src/Api/Api.csproj --no-restore` foi encerrada sem resultado final pelo controle do terminal e nao e usada como evidencia.
+- Suite retirada: `tests/Api.Tests` nao foi executada, alterada, reparada nem usada como evidencia.
+- Artefatos temporarios: o build criou `Library/Application Support/Microsoft/DeveloperTools/deviceid`; o diretorio nao rastreado `Library/` foi removido antes da reconciliacao. Nenhum artefato temporario permanece no worktree.
+- Operacoes Git e externas: leituras de `git branch --show-current`, `git rev-parse HEAD`, `git status --porcelain`, `git show` e `git diff`; verificacoes de integridade do diff; commit de checkpoint autorizado para formar a saida desta etapa; nenhuma operacao de rede, deploy, push, merge, tag ou alteracao de branch.
+- Reconciliacao: o diff esta limitado aos quatro arquivos de implementacao, ao estado da especificacao e a esta secao 6; a secao 13 da especificacao e o parecer do Engenheiro Analista foram preservados sem alteracao. Checkpoint de saida: a ser formado por commit autorizado; proximo gate: Engenheiro Tech Lead.
 
 ## 7. Engenheiro Tech Lead
 
