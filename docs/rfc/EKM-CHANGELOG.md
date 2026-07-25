@@ -13,6 +13,10 @@ contrato explícito de rota, sem body, mapeamento de `device_id` público para
 chave interna persistida, preservação de settings não específicos, retorno
 `204/404` e idempotência.
 
+Registrar ciclo corretivo de autoria após retorno da Technical Readiness
+Review, incorporando decisões humanas e restaurando a seção 13 da
+especificação ao estado de handoff do Autor.
+
 ### Baseline
 
 - Repositório:
@@ -56,21 +60,36 @@ chave interna persistida, preservação de settings não específicos, retorno
 ### Technical Readiness Review
 
 - Resultado da etapa de autoria: `Pending Review`.
-- Registro integral do Engenheiro Analista: `docs/specs/DEVICE-SETTINGS-RESET.md`, seção 13.
-- Resultado da revisão técnica integral: `Needs Clarification`.
-- Baseline revisado pelo Engenheiro Analista:
-  `spec/device-settings-reset@eb5ed262dfa830f62aa936bb02ce7420780fdd3d`
-  (worktree limpo).
-- Requisitos e dimensões analisados: `DSR-001` a `DSR-010`, compatibilidade,
-  dependências e viabilidade de validações.
-- Lacuna bloqueante identificada:
-  ausência de decisão aprovada para tratar falha de build preexistente em
-  `tests/Api.Tests` diante das validações obrigatórias da seção 10 da
-  especificação.
-- Gate seguinte: retorno à autoria/responsável humano para decisão explícita de
-  saneamento do baseline de testes ou definição de evidência alternativa
-  aprovada.
+- Registro do Engenheiro Analista permanece preservado no histórico Git do
+  checkpoint em que foi emitido.
+- Revisão anterior (`Needs Clarification`) foi invalidada por correção
+  normativa aprovada na autoria, sem execução de nova TRR neste ciclo.
+- Gate seguinte: Engenheiro Analista para nova revisão integral.
 - Aprovação humana para implementar: `Pending`.
+
+### Ciclo corretivo de autoria (2026-07-25)
+
+- Checkpoint de entrada confirmado: branch `spec/device-settings-reset`, commit
+  `a3cbb556d3388d2987da1e87b46c20c97945ff65`, worktree limpo.
+- Decisões humanas aplicadas:
+  - `tests/Api.Tests` classificado como `Retired` para este recorte e ignorado
+    como critério de validação e bloqueio;
+  - validações obrigatórias da especificação substituídas por build de
+    `src/Api/Api.csproj`, inspeção de query/repositório, verificação de
+    alteração exclusiva em `DeviceSettings` do device alvo e validação
+    funcional/integrada para sucesso, ausência de linhas, `404` e
+    idempotência;
+  - formato do body de `404` mantido fora de escopo;
+  - telemetria não solicitada, fora de escopo.
+- Correção normativa aplicada em `SHD-SETTINGS-RESET-001@0.1`:
+  especificação atualizada para `Proposed / Pending Review / Not Started / Not Ready`.
+- Invalidação da revisão anterior:
+  a TRR registrada anteriormente foi tornada não vigente para decisão de gate,
+  exigindo nova execução integral pelo Engenheiro Analista sobre a versão
+  corrigida.
+- Operações executadas neste ciclo: exclusivamente documentais.
+- Checkpoint de saída: `Pending` (SHA será registrado após o commit documental
+  desta atuação).
 
 ### Estado da entrega
 
@@ -85,15 +104,15 @@ chave interna persistida, preservação de settings não específicos, retorno
   `AGENTS.md`;
 - inspeção dos contratos atuais de settings/device e persistência;
 - verificação de branch exclusiva derivada de `main` com worktree limpo;
+- validação documental das decisões humanas aplicadas ao contrato normativo;
 - validação de escopo documental sem alteração de implementação.
 
 ### Pendências e desvios
 
-- Technical Readiness Review executada pelo Engenheiro Analista resultou em
-  `Needs Clarification` e bloqueia implementação até decisão humana do gate;
-- decisão pendente de gate sobre saneamento de falha de build preexistente em
-  `tests/Api.Tests` para viabilizar as validações obrigatórias da
-  especificação;
+- nova Technical Readiness Review integral permanece pendente para a versão
+  normativa corrigida;
+- não há decisão pendente sobre formato de body de `404` nem sobre telemetria,
+  ambos fora de escopo deste recorte;
 - lacuna estrutural de autoridade de schema/view MySQL permanece em
   `EKM-GAP-0002`.
 

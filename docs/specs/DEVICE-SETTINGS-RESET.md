@@ -4,13 +4,13 @@
 
 **Tipo:** Normativo
 
-**Estado normativo:** Draft
+**Estado normativo:** Proposed
 
 **Estado da implementacao:** Not Started
 
 **Estado da entrega:** Not Ready
 
-**Technical readiness:** Needs Clarification
+**Technical readiness:** Pending Review
 
 **Versao:** 0.1
 
@@ -146,9 +146,10 @@ As validacoes abaixo ficam obrigatorias para a fase de implementacao,
 fora do escopo desta atuacao de autoria de especificacao:
 
 - build do projeto API;
-- testes automatizados cobrindo sucesso, ausencia de linhas, inexistencia de
-  device e idempotencia;
+- inspecao da query e do repositorio envolvidos no reset;
 - verificacao de que apenas `DeviceSettings` do device alvo foi alterada.
+- validacao funcional ou de integracao cobrindo sucesso, ausencia de linhas,
+  retorno `404` para device inexistente e idempotencia.
 
 ## 11. Ativos de conhecimento afetados
 
@@ -167,10 +168,12 @@ fora do escopo desta atuacao de autoria de especificacao:
 
 ### Duvidas e decisoes ausentes registradas
 
-- **`EKM-DECISION-PENDING-DSR-001`**: formato exato do corpo de erro para `404`
-  (texto simples, JSON padrao ou outro) nao foi confirmado no contrato.
-- **`EKM-DECISION-PENDING-DSR-002`**: nivel de telemetria/auditoria esperado
-  para o evento de reset nao foi confirmado no contrato.
+- Nao ha decisoes pendentes para o recorte normativo desta especificacao.
+- `tests/Api.Tests` esta classificado como `Retired` para este recorte e nao
+  compoe validacao obrigatoria nem bloqueio.
+- O formato do body de `404` permanece fora de escopo por decisao humana.
+- Telemetria/auditoria do evento de reset nao foi solicitada e permanece fora
+  de escopo.
 
 ## 13. Registro da Technical Readiness Review
 
@@ -184,61 +187,4 @@ No checkpoint de saida da autoria, esta secao deve permanecer exatamente como:
 
 ### 13.2 Registro exclusivo do Engenheiro Analista
 
-**Resultado:** `Needs Clarification`
-
-**Baseline analisado:**
-`branch spec/device-settings-reset`, commit
-`eb5ed262dfa830f62aa936bb02ce7420780fdd3d`, worktree limpo.
-
-**Requisitos analisados:** `DSR-001` a `DSR-010`
-
-**Dependencias e fontes consultadas:**
-
-- `AGENTS.md`;
-- EKM externa: `docs/EKM-CONCEPT.md`, `docs/EKM-METHOD.md`,
-  `docs/GOVERNANCE.md`,
-  `docs/experiments/COORDINATED-ACTOR-MODEL.md`;
-- templates externos aplicaveis:
-  `templates/docs/specs/SPECIFICATION-TEMPLATE.md`,
-  `templates/docs/rfc/EKM-CHANGELOG.md`;
-- fontes locais: `docs/rfc/KNOWLEDGE-MAP.md`,
-  `docs/specs/SYSTEM-DOSSIER.md`, `docs/rfc/EKM-CHANGELOG.md`;
-- baseline tecnico: `src/Api/Controllers/DeviceSettingsController.cs`,
-  `src/Core/Contracts/Repositories/IDeviceSettingsRepository.cs`,
-  `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs`,
-  `src/Data.Repositories/Repositories/Queries/DeviceSettingsQuery.cs`,
-  `src/Core/Contracts/Repositories/IDeviceRepository.cs`,
-  `src/Data.Repositories/Repositories/DeviceRepository.cs`,
-  `src/Api/Middlewares/ExceptionHandler.cs`,
-  `src/Api/Controllers/PropertiesController.cs`,
-  `src/Api/Controllers/DeviceMetricsController.cs`,
-  `tests/Api.Tests/DeviceMetricsTests.cs`.
-
-| Requisito ou dimensao | Resultado | Evidencia | Lacuna ou impacto | Decisao necessaria |
-|---|---|---|---|---|
-| `DSR-001` | Supported | `DeviceSettingsController` ja concentra o contrato de settings por device e usa rota base `api/v1/devices/{device_id}/settings`. | Nenhum. | None |
-| `DSR-002` | Supported | A rota base permite adicionar subrota `reset` via anotacao de metodo sem colisao com `HttpPut()` atual. | Nenhum. | None |
-| `DSR-003` | Supported | O controller atual usa binding explicito por parametro; endpoint de reset pode ser sem `[FromBody]`, preservando requisicao sem payload. | Nenhum. | None |
-| `DSR-004` | Supported | A query `InsertOrUpdateDeviceSettingsByDeviceId` ja resolve `DeviceId` publico para `Devices.Id` interno por subquery. | Nenhum. | None |
-| `DSR-005` | Supported | Repositorio dedicado e tabela `DeviceSettings` ja estao estabelecidos no baseline para operacoes por device. | Nenhum. | None |
-| `DSR-006` | Supported | Leitura efetiva usa `v_DeviceEffectiveSettings`; remocao limitada a `DeviceSettings` nao implica exclusao de fontes globais/padrao. | Nenhum. | None |
-| `DSR-007` | Supported | `IDeviceRepository.GetDeviceAsync` permite distinguir device existente de ausencia de linhas especificas antes de retornar `204`. | Nenhum. | None |
-| `DSR-008` | Supported | Padrao vigente de escrita nos controllers retorna `NoContent()` em sucesso. | Nenhum. | None |
-| `DSR-009` | Supported | Ja existe padrao de `404` para device inexistente em `PropertiesController.RemoveAsync` usando `IDeviceRepository`. | Nenhum. | None |
-| `DSR-010` | Supported | Semantica de reset por remocao total em `DeviceSettings` e repeticao com mesmo estado final e compativel com idempotencia. | Nenhum. | None |
-| Compatibilidade com contratos existentes | Supported | A nova operacao entra em subrota dedicada e preserva os contratos existentes de `GET` e `PUT` de settings do mesmo controller. | Nenhum. | None |
-| Dependencias e DI | Supported | Contratos de repositorio e infraestrutura Dapper/MySQL necessarios ja existem no baseline. | Nenhum. | None |
-| Viabilidade das validacoes obrigatorias | Gap | Execucao de testes falhou por erro de build no projeto `Api.Tests`; no baseline, `DeviceMetricsTests` chama `DeviceMetricsController.Save` sem o parametro de rota `deviceId`, enquanto o metodo exige `[FromRoute] string deviceId` na assinatura atual. | As validacoes obrigatorias da secao 10 nao sao plenamente executaveis sem saneamento preexistente em testes fora do recorte funcional do reset. | Confirmar se o saneamento preexistente em `tests/Api.Tests` esta autorizado no mesmo recorte ou definir evidencia alternativa aprovada para aceite. |
-
-**Lacunas ou decisoes ausentes:**
-Inexistencia de definicao aprovada para tratar falhas de build preexistentes em
-`tests/Api.Tests` frente as validacoes obrigatorias desta especificacao.
-
-**Evidencia do resultado:**
-Inspecao integral dos contratos HTTP, repositorios e queries do dominio;
-checagem do baseline no checkpoint solicitado (`spec/device-settings-reset` @
-`eb5ed262dfa830f62aa936bb02ce7420780fdd3d` com worktree limpo);
-execucao de testes com falha de build no projeto `Api.Tests`.
-
-**Referencia na transacao:**
-`EKM-CHG-0002` (checkpoint documental desta atuacao de Engenheiro Analista).
+Reservado para preenchimento em atuacao futura do Engenheiro Analista.
