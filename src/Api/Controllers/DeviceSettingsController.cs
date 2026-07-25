@@ -47,6 +47,17 @@ public class DeviceSettingsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("reset")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ResetDeviceSettingsAsync([FromRoute] string device_id, [FromServices] IDeviceSettingsRepository repository, CancellationToken cancellationToken)
+    {
+        var deviceFound = await repository.ResetAsync(device_id, cancellationToken);
+        if (!deviceFound)
+            return NotFound();
+
+        return NoContent();
+    }
 
 }
 public record class DeviceSettingsQuery(string? prefix_auto_format_properties_json, string? use_key_value);

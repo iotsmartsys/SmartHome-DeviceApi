@@ -45,6 +45,22 @@ as evidências deste sistema permanecem neste repositório.
 - As branches `qa` e `homolog` são previstas para adoção futura, mas ainda não
   são obrigatórias.
 
+## Suite de testes descontinuada
+
+Por decisão humana de 25/07/2026, `tests/Api.Tests` está classificada como
+`Retired` em todo o repositório.
+
+- Não execute, repare ou evolua essa suíte.
+- Não use seus resultados como evidência, critério de aceite ou bloqueio em
+  nenhuma atuação.
+- Os arquivos permanecem apenas como registro histórico.
+- A referência ainda existente em `src/SmartHome-Api.sln` é uma discrepância
+  legada e não reativa a suíte; sua reconciliação está registrada em
+  `EKM-GAP-0003`.
+- Use `dotnet build src/Api/Api.csproj` como build canônico da API.
+- Obtenha as demais validações obrigatórias da especificação aplicável à
+  mudança.
+
 ## Limites
 
 - Não invente intenção, contrato, compatibilidade ou comportamento ausente.
