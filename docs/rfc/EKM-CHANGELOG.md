@@ -235,10 +235,34 @@ checkpoint acima para implementação.
 
 ## 7. Engenheiro Tech Lead
 
-- Responsável: `Pending`.
-- Checkpoint de entrada: `Pending`.
-- Validações, parecer, matriz, consistência do relatório, mudanças não
-  autorizadas, recorte corretivo e checkpoint de saída: `Pending`.
+- Responsável: Engenheiro Tech Lead.
+- Checkpoint de entrada: `spec/device-settings-reset@f1586fae9b068ca28b39cd5f356b6fcb3a54d96e`, worktree limpo.
+- Validações repetidas:
+  - checkpoint: `git branch --show-current` = `spec/device-settings-reset`; `git rev-parse HEAD` = `f1586fae9b068ca28b39cd5f356b6fcb3a54d96e`; `git status --porcelain` sem saída antes da atuação;
+  - revisão independente do diff completo `12bde0a5b48046b763ea6a098e8e630a547b3bfe..f1586fae9b068ca28b39cd5f356b6fcb3a54d96e`: seis arquivos, sendo quatro de implementação e dois registros autorizados;
+  - `dotnet build src/Api/Api.csproj`: falhou no restore após `301,0s`; não houve resultado de compilação utilizável;
+  - `git diff --check 12bde0a5b48046b763ea6a098e8e630a547b3bfe f1586fae9b068ca28b39cd5f356b6fcb3a54d96e`: reportou `CRLF` como whitespace final nas linhas novas de `DeviceSettingsController.cs`; essa saída é compatível com o arquivo legado e não demonstra whitespace material por si só;
+  - não foi executado `tests/Api.Tests`; não houve operação de banco, pois não existe ambiente isolado autorizado.
+- Parecer: `Não verificável`.
+
+| Requisito ou dimensão | Resultado | Evidência | Severidade | Ação necessária |
+|---|---|---|---|---|
+| `DSR-001` a `DSR-003` | `CONFORME` por inspeção estática | `DeviceSettingsController.ResetDeviceSettingsAsync` está no controller existente, com `[HttpPut("reset")]` e sem parâmetro `[FromBody]`; a rota composta é `PUT /api/v1/devices/{device_id}/settings/reset`. | `BAIXA` | `NENHUMA` |
+| `DSR-004` | `CONFORME` por inspeção estática | `GetDeviceKeyByDeviceId` consulta `Devices.Id` por `Devices.DeviceId`; `ResetAsync` só monta o `DELETE` após obter a chave interna. | `BAIXA` | `NENHUMA` |
+| `DSR-005` e `DSR-006` | `CONFORME` por inspeção estática | A única mutação nova é `DELETE FROM DeviceSettings WHERE DeviceId = @DeviceKey`; não há escrita em `Devices`, settings globais, herdados ou padrão. | `BAIXA` | `NENHUMA` |
+| `DSR-007`, `DSR-008` e `DSR-010` | `CONFORME` por inspeção estática | Após resolução do device, o repositório retorna `true` sem depender do total de linhas removidas; a action retorna `NoContent()`, inclusive em repetição. | `BAIXA` | `NENHUMA` |
+| `DSR-009` | `CONFORME` por inspeção estática | Ausência de chave interna produz `false` em `ResetAsync`, convertido em `NotFound()` pela action. | `BAIXA` | `NENHUMA` |
+| Cancelamento, DI e falhas de infraestrutura | `CONFORME` por inspeção estática | `CancellationToken` é propagado aos dois `CommandDefinition`; `IDeviceSettingsRepository` já está registrado como scoped; exceções não são suprimidas e seguem o middleware global. | `BAIXA` | `NENHUMA` |
+| Compatibilidade e escopo do diff | `CONFORME` | O diff adiciona o endpoint e o fluxo de persistência correspondente, preserva `GET` e `PUT` existentes e não altera schema, migrações, automação, deploy ou suíte retirada. | `BAIXA` | `NENHUMA` |
+| Build canônico obrigatório | `NÃO VERIFICÁVEL` | A repetição de `dotnet build src/Api/Api.csproj` falhou no restore após `301,0s`; `--no-restore` não foi usado como substituto. | `ALTA` | Disponibilizar restore funcional e repetir o build canônico no checkpoint aplicável. |
+| Validação funcional/integrada de sucesso, device sem linhas, `404`, idempotência e preservação efetiva dos demais settings | `NÃO VERIFICÁVEL` | A especificação exige essa evidência; não há banco isolado, fixture ou autorização para executar `DELETE` contra a configuração disponível. | `ALTA` | Arquiteto/Coordenação devem disponibilizar ambiente isolado e autorização, executar o procedimento da seção 9 e registrar evidências. |
+| Integridade textual | `RISCO NÃO BLOQUEANTE` | `git diff --check` marcou `CRLF` nas linhas novas do controller. O relatório do Implementador descreve a mesma característica de arquivo legado; a verificação equivalente com `cr-at-eol` permanece pendente de confirmação nesta atuação. | `MÉDIA` | Confirmar a checagem configurada no checkpoint de saída; não requer alteração funcional. |
+
+- Consistência do relatório do Implementador: `Parcialmente confirmada`. O escopo, o fluxo do repositório, a ausência de execução da suíte retirada e a falha de restore foram confirmados. As evidências funcionais pendentes permanecem realmente ausentes; a alegação de verificação com `cr-at-eol` não foi reproduzida como evidência conclusiva nesta atuação.
+- Mudanças não autorizadas: `Nenhuma identificada`. O diff está restrito aos quatro artefatos de implementação necessários, ao estado `Implemented` da especificação e ao relatório do Implementador.
+- Recorte corretivo: `Não aplicável ao código`. O retorno exige evidência operacional: restore/build canônico funcional, ambiente isolado autorizado e validação funcional dos cenários obrigatórios. Alteração de implementação somente é cabível se essa evidência revelar desvio.
+- Checkpoint de saída: `Pending`; este registro integra o próprio commit de checkpoint.
+- Próximo gate: Arquiteto/Coordenação para prover evidências pendentes. Não segue ao Validador de Integridade da EKM enquanto o parecer permanecer `Não verificável`.
 
 ## 8. Validador de Integridade da EKM
 
