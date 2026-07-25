@@ -10,7 +10,7 @@
 
 **Estado da entrega:** Not Ready
 
-**Technical readiness:** Pending Review
+**Technical readiness:** Needs Clarification
 
 **Versao:** 0.1
 
@@ -174,11 +174,21 @@ fora do escopo desta atuacao de autoria de especificacao:
 
 ## 13. Registro da Technical Readiness Review
 
-**Resultado:** Pending Review
+### 13.1 Estado entregue pelo Autor da Especificacao
+
+No checkpoint de saida da autoria, esta secao deve permanecer exatamente como:
+
+**Resultado:** `Pending Review`
+
+**Revisao executada:** Nao.
+
+### 13.2 Registro exclusivo do Engenheiro Analista
+
+**Resultado:** `Needs Clarification`
 
 **Baseline analisado:**
 `branch spec/device-settings-reset`, commit
-`3fde52003d23b76d4a76be33e6b416beca0f1a7c`, worktree limpo no inicio da atuacao.
+`eb5ed262dfa830f62aa936bb02ce7420780fdd3d`, worktree limpo.
 
 **Requisitos analisados:** `DSR-001` a `DSR-010`
 
@@ -199,24 +209,36 @@ fora do escopo desta atuacao de autoria de especificacao:
   `src/Data.Repositories/Repositories/Queries/DeviceSettingsQuery.cs`,
   `src/Core/Contracts/Repositories/IDeviceRepository.cs`,
   `src/Data.Repositories/Repositories/DeviceRepository.cs`,
-  `src/Api/Middlewares/ExceptionHandler.cs`.
+  `src/Api/Middlewares/ExceptionHandler.cs`,
+  `src/Api/Controllers/PropertiesController.cs`,
+  `src/Api/Controllers/DeviceMetricsController.cs`,
+  `tests/Api.Tests/DeviceMetricsTests.cs`.
 
 | Requisito ou dimensao | Resultado | Evidencia | Lacuna ou impacto | Decisao necessaria |
 |---|---|---|---|---|
-| `DSR-001` a `DSR-010` | Not Applicable | Atuacao atual restrita a autoria de especificacao; revisao tecnica integral nao executada por papel de Engenheiro Analista. | Implementacao nao autorizada por esta atuacao. | Review formal pendente no gate apropriado. |
-| Compatibilidade com contratos existentes | Not Applicable | Revisao de implementabilidade nao executada nesta atuacao. | Risco residual controlado por gate de Technical Readiness Review. | Confirmar na revisao integral. |
-| Dependencias de persistencia | Not Applicable | Lacuna `EKM-GAP-0002` segue aberta. | Autoridade de schema/view ainda parcial. | Confirmacao humana da fonte autoritativa quando exigido pelo review. |
+| `DSR-001` | Supported | `DeviceSettingsController` ja concentra o contrato de settings por device e usa rota base `api/v1/devices/{device_id}/settings`. | Nenhum. | None |
+| `DSR-002` | Supported | A rota base permite adicionar subrota `reset` via anotacao de metodo sem colisao com `HttpPut()` atual. | Nenhum. | None |
+| `DSR-003` | Supported | O controller atual usa binding explicito por parametro; endpoint de reset pode ser sem `[FromBody]`, preservando requisicao sem payload. | Nenhum. | None |
+| `DSR-004` | Supported | A query `InsertOrUpdateDeviceSettingsByDeviceId` ja resolve `DeviceId` publico para `Devices.Id` interno por subquery. | Nenhum. | None |
+| `DSR-005` | Supported | Repositorio dedicado e tabela `DeviceSettings` ja estao estabelecidos no baseline para operacoes por device. | Nenhum. | None |
+| `DSR-006` | Supported | Leitura efetiva usa `v_DeviceEffectiveSettings`; remocao limitada a `DeviceSettings` nao implica exclusao de fontes globais/padrao. | Nenhum. | None |
+| `DSR-007` | Supported | `IDeviceRepository.GetDeviceAsync` permite distinguir device existente de ausencia de linhas especificas antes de retornar `204`. | Nenhum. | None |
+| `DSR-008` | Supported | Padrao vigente de escrita nos controllers retorna `NoContent()` em sucesso. | Nenhum. | None |
+| `DSR-009` | Supported | Ja existe padrao de `404` para device inexistente em `PropertiesController.RemoveAsync` usando `IDeviceRepository`. | Nenhum. | None |
+| `DSR-010` | Supported | Semantica de reset por remocao total em `DeviceSettings` e repeticao com mesmo estado final e compativel com idempotencia. | Nenhum. | None |
+| Compatibilidade com contratos existentes | Supported | A nova operacao entra em subrota dedicada e preserva os contratos existentes de `GET` e `PUT` de settings do mesmo controller. | Nenhum. | None |
+| Dependencias e DI | Supported | Contratos de repositorio e infraestrutura Dapper/MySQL necessarios ja existem no baseline. | Nenhum. | None |
+| Viabilidade das validacoes obrigatorias | Gap | Execucao de testes falhou por erro de build no projeto `Api.Tests`; no baseline, `DeviceMetricsTests` chama `DeviceMetricsController.Save` sem o parametro de rota `deviceId`, enquanto o metodo exige `[FromRoute] string deviceId` na assinatura atual. | As validacoes obrigatorias da secao 10 nao sao plenamente executaveis sem saneamento preexistente em testes fora do recorte funcional do reset. | Confirmar se o saneamento preexistente em `tests/Api.Tests` esta autorizado no mesmo recorte ou definir evidencia alternativa aprovada para aceite. |
 
 **Lacunas ou decisoes ausentes:**
-`EKM-GAP-0002`, `EKM-DECISION-PENDING-DSR-001`,
-`EKM-DECISION-PENDING-DSR-002`.
+Inexistencia de definicao aprovada para tratar falhas de build preexistentes em
+`tests/Api.Tests` frente as validacoes obrigatorias desta especificacao.
 
 **Evidencia do resultado:**
-A atuacao produziu apenas artefatos normativos, sem alteracao de implementacao,
-testes, banco, build ou automacoes.
+Inspecao integral dos contratos HTTP, repositorios e queries do dominio;
+checagem do baseline no checkpoint solicitado (`spec/device-settings-reset` @
+`eb5ed262dfa830f62aa936bb02ce7420780fdd3d` com worktree limpo);
+execucao de testes com falha de build no projeto `Api.Tests`.
 
-**Aprovacao humana para implementar:** Pendente.
-
-**Reconfirmacao do baseline:** Nao aplicavel nesta etapa.
-
-Technical readiness: Pending Review
+**Referencia na transacao:**
+`EKM-CHG-0002` (checkpoint documental desta atuacao de Engenheiro Analista).

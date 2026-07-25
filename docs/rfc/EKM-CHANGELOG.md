@@ -55,21 +55,22 @@ chave interna persistida, preservação de settings não específicos, retorno
 
 ### Technical Readiness Review
 
-- Resultado: `Pending Review`.
-- Baseline e fontes analisadas:
-  `AGENTS.md`, `docs/rfc/KNOWLEDGE-MAP.md`, `docs/specs/SYSTEM-DOSSIER.md`,
-  `docs/rfc/EKM-CHANGELOG.md`, fontes externas EKM e templates aplicáveis,
-  além dos artefatos técnicos de settings/device do baseline.
-- Matriz integral de requisitos e dimensões:
-  `docs/specs/DEVICE-SETTINGS-RESET.md`.
-- Lacunas ou decisões ausentes:
-  `EKM-GAP-0002`, `EKM-DECISION-PENDING-DSR-001`,
-  `EKM-DECISION-PENDING-DSR-002`.
-- Evidência de que a revisão encerrou sem alteração de implementação:
-  esta atuação realizou apenas mudanças em artefatos documentais.
-- Aprovação humana para implementar: pendente.
-- Reconfirmação do baseline antes da primeira alteração: não aplicável nesta
-  etapa.
+- Resultado da etapa de autoria: `Pending Review`.
+- Registro integral do Engenheiro Analista: `docs/specs/DEVICE-SETTINGS-RESET.md`, seção 13.
+- Resultado da revisão técnica integral: `Needs Clarification`.
+- Baseline revisado pelo Engenheiro Analista:
+  `spec/device-settings-reset@eb5ed262dfa830f62aa936bb02ce7420780fdd3d`
+  (worktree limpo).
+- Requisitos e dimensões analisados: `DSR-001` a `DSR-010`, compatibilidade,
+  dependências e viabilidade de validações.
+- Lacuna bloqueante identificada:
+  ausência de decisão aprovada para tratar falha de build preexistente em
+  `tests/Api.Tests` diante das validações obrigatórias da seção 10 da
+  especificação.
+- Gate seguinte: retorno à autoria/responsável humano para decisão explícita de
+  saneamento do baseline de testes ou definição de evidência alternativa
+  aprovada.
+- Aprovação humana para implementar: `Pending`.
 
 ### Estado da entrega
 
@@ -88,9 +89,11 @@ chave interna persistida, preservação de settings não específicos, retorno
 
 ### Pendências e desvios
 
-- Technical Readiness Review permanece pendente por separação de papéis e gate;
-- decisões ausentes registradas na especificação:
-  `EKM-DECISION-PENDING-DSR-001` e `EKM-DECISION-PENDING-DSR-002`;
+- Technical Readiness Review executada pelo Engenheiro Analista resultou em
+  `Needs Clarification` e bloqueia implementação até decisão humana do gate;
+- decisão pendente de gate sobre saneamento de falha de build preexistente em
+  `tests/Api.Tests` para viabilizar as validações obrigatórias da
+  especificação;
 - lacuna estrutural de autoridade de schema/view MySQL permanece em
   `EKM-GAP-0002`.
 
