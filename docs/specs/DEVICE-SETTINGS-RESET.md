@@ -4,7 +4,7 @@
 
 **Tipo:** Normativo
 
-**Estado normativo:** Proposed
+**Estado normativo:** Approved
 
 **Estado da implementacao:** Not Started
 

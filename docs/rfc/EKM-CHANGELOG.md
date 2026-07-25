@@ -42,6 +42,7 @@ deploy e definição de payload de erro além do status `404`.
 | Primeira análise | `spec/device-settings-reset@eb5ed262dfa830f62aa936bb02ce7420780fdd3d` | `Proposed / Pending Review / Not Started / Not Ready` | EKM dinâmica vigente em 24/07/2026, anterior ao gate 0.4 | O contrato da época não separava formalmente admissão e TRR | `Not Applicable` |
 | Autoria corretiva | `spec/device-settings-reset@a3cbb556d3388d2987da1e87b46c20c97945ff65` | Retorno `Needs Clarification` | EKM dinâmica vigente em 25/07/2026 | Decisões humanas incorporadas e revisão anterior invalidada | `Accepted` |
 | Nova análise | `spec/device-settings-reset@535e376e961574c449e9ed4bcb283db1ae66d5ed` | `Proposed / Pending Review / Not Started / Not Ready` | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md`, versão 0.4 | Sem normalização adicional; checkpoint aderente ao gate de admissão | `Accepted` |
+| Implementação | Checkpoint de saída desta aprovação humana (`Pending`) | `Approved / Implementable / Not Started / Not Ready` | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md`, versão 0.4 | Aprovação humana registrada; desvios documentais conhecidos do Analista aceitos como não bloqueantes e preservados para avaliação posterior | `Pending` |
 
 ## 3. Autoria da especificação
 
@@ -173,22 +174,38 @@ após a correção normativa.
 
 ## 5. Aprovação humana para implementação
 
-- Resultado: `Pending`.
+- Resultado: `Approved`.
 - Responsável: Marcelo Miranda.
-- Data: `Pending`.
+- Data: 2026-07-25.
 - Especificação e versão: `SHD-SETTINGS-RESET-001@0.1`.
-- Technical Readiness Review aprovada: `Pending`.
-- Baseline abrangido: `Pending`.
-- Limites ou ressalvas: `Pending`.
-- Checkpoint aprovado para implementação: `Pending`.
+- Technical Readiness Review aprovada: resultado `Implementable` registrado na
+  seção 13 de `docs/specs/DEVICE-SETTINGS-RESET.md` no checkpoint
+  `8d7b2fdf5e7e00a10cb30b4e6ad4f5ae0dd603e1`.
+- Baseline abrangido:
+  `spec/device-settings-reset@8d7b2fdf5e7e00a10cb30b4e6ad4f5ae0dd603e1`,
+  worktree limpo.
+- Limites ou ressalvas:
+  - implementar exclusivamente `DSR-001` a `DSR-010`;
+  - não executar, reparar, evoluir ou usar `tests/Api.Tests` como evidência ou
+    bloqueio;
+  - executar o build canônico `dotnet build src/Api/Api.csproj`;
+  - produzir as demais evidências obrigatórias da seção 10 da especificação;
+  - preservar como desvios aceitos desta execução as inconsistências
+    documentais já identificadas no registro do Analista; elas não bloqueiam
+    esta promoção e serão avaliadas pelo Validador de Integridade da EKM;
+  - o Implementador não está autorizado a reescrever o parecer do Analista.
+- Checkpoint aprovado para implementação: `Pending` (o SHA desta aprovação
+  integra o próprio checkpoint e será informado no handoff).
 
-As decisões humanas sobre a correção normativa e a validação não constituem
-aprovação para implementar.
+Esta seção registra a decisão humana explícita de aprovar a especificação e o
+checkpoint acima para implementação.
 
 ## 6. Engenheiro Implementador
 
-- Responsável: `Pending`.
-- Checkpoint de entrada e reconfirmação do baseline: `Pending`.
+- Responsável: Engenheiro Implementador.
+- Checkpoint de entrada: checkpoint de saída da aprovação humana (`Pending`),
+  nos estados `Approved / Implementable / Not Started / Not Ready`.
+- Reconfirmação do baseline: `Pending` para a atuação do Implementador.
 - Resultado: `Pending`.
 - Requisitos, arquivos, rastreabilidade, decisões e validações: `Pending`.
 - Desvios, operações Git e checkpoint de saída: `Pending`.
@@ -221,7 +238,7 @@ aprovação para implementar.
 - Referência de produção: `main`.
 - Autorização, commit, PR ou merge de integração: `Pending`.
 - Especificação integrada: `Pending`.
-- Estado normativo: `Proposed`.
+- Estado normativo: `Approved`.
 - Estado da implementação: `Not Started`.
 - Estado da entrega: `Not Ready`.
 - Mapa e lacunas reconciliados: `Pending`.
@@ -252,6 +269,12 @@ aprovação para implementar.
 - A falha de restore no build canônico foi registrada como ocorrência
   operacional de `Tooling`, sem lacuna normativa e sem decisão funcional
   pendente.
+- Em 25/07/2026, Marcelo Miranda aprovou explicitamente a atuação do Engenheiro
+  Analista e a implementação de `SHD-SETTINGS-RESET-001@0.1` sobre
+  `spec/device-settings-reset@8d7b2fdf5e7e00a10cb30b4e6ad4f5ae0dd603e1`.
+- As inconsistências documentais identificadas no registro do Analista foram
+  aceitas como desvios não bloqueantes deste experimento, sem correção neste
+  gate. Sua avaliação permanece destinada ao Validador de Integridade da EKM.
 
 ## EKM-CHG-0001 — Fundação EKM por referência externa
 
