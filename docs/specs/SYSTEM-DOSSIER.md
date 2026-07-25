@@ -4,7 +4,7 @@
 
 **Status:** Draft
 
-**Última auditoria:** 24/07/2026
+**Última auditoria:** 25/07/2026
 
 ## 1. Resumo executivo
 
@@ -39,7 +39,8 @@ retrocompatibilidade ainda não possuem fonte normativa local.
   serviço de inclusão de capabilities;
 - `src/Data.Repositories` implementa persistência com Dapper e
   `IDbConnection`;
-- `tests/Api.Tests` contém o projeto xUnit observado;
+- `tests/Api.Tests` contém um projeto xUnit histórico, classificado por decisão
+  humana como `Retired` em todo o repositório;
 - o bootstrap registra os repositórios MySQL por injeção de dependência;
 - existe composição alternativa para SQL Server, mas ela não é selecionada por
   `src/Api/Program.cs`.
@@ -147,18 +148,20 @@ está registrado em `EKM-GAP-0004`.
 ## 9. Build, testes e operação
 
 - Solução: `src/SmartHome-Api.sln`.
-- Build da API: `dotnet build src/Api/Api.csproj`.
-- Testes: `dotnet test tests/Api.Tests/Api.Tests.csproj`.
+- Build canônico da API: `dotnet build src/Api/Api.csproj`.
+- Validações adicionais: definidas pela especificação aplicável.
+- Suite histórica: `tests/Api.Tests`, classificada como `Retired`.
 - Execução local: `Makefile` carrega `.env` e inicia a API.
 - Imagem: `src/Api/Dockerfile`.
 - Publicação automatizada: workflow para pull requests, `main` e tags.
 - Publicação local adicional: `build.sh`.
 
-A evidência automatizada observada está concentrada em
-`tests/Api.Tests/DeviceMetricsTests.cs`. No baseline de 24/07/2026, o projeto de
-testes não compila porque duas chamadas ainda usam a assinatura anterior de
-`DeviceMetricsController.Save` e não fornecem `deviceId`. A reconciliação e a
-suficiência por domínio permanecem abertas em `EKM-GAP-0003`.
+Por decisão humana de 25/07/2026, `tests/Api.Tests` deve ser ignorada em todas
+as situações: não deve ser executada, reparada, evoluída, usada como evidência
+ou tratada como bloqueio. Seus arquivos permanecem apenas como registro
+histórico. A referência ainda presente em `src/SmartHome-Api.sln` é uma
+discrepância legada e não reativa a suíte. Sua remoção futura e a suficiência
+das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 
 ## 10. Domínios e fontes de verdade
 
@@ -169,7 +172,7 @@ suficiência por domínio permanecem abertas em `EKM-GAP-0003`.
 | Settings | Código e queries | Mapped | Abrange settings globais, específicos e efetivos |
 | Properties | Código | Inventoried | Escopo por device |
 | Groups | Código | Inventoried | Mantém relações com capabilities |
-| Métricas | Código, teste e schema parcial | Mapped | Teste presente, mas com falha de compilação no baseline |
+| Métricas | Código e schema parcial | Mapped | A suíte histórica `tests/Api.Tests` está `Retired` e não constitui evidência |
 | OAuth | Código | Inventoried | Contratos e política ainda não especificados |
 | Operação | Docker, workflow e scripts | Mapped | Existem caminhos de publicação distintos |
 

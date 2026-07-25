@@ -145,16 +145,18 @@ device:
 As validacoes abaixo ficam obrigatorias para a fase de implementacao,
 fora do escopo desta atuacao de autoria de especificacao:
 
-- build do projeto API;
+- build exato de `src/Api/Api.csproj`;
 - inspecao da query e do repositorio envolvidos no reset;
-- verificacao de que apenas `DeviceSettings` do device alvo foi alterada.
+- verificacao de que apenas `DeviceSettings` do device alvo foi alterada;
 - validacao funcional ou de integracao cobrindo sucesso, ausencia de linhas,
   retorno `404` para device inexistente e idempotencia.
 
 ## 11. Ativos de conhecimento afetados
 
 - `docs/specs/DEVICE-SETTINGS-RESET.md` (esta especificacao).
+- `AGENTS.md` (politica global da suite de testes descontinuada).
 - `docs/rfc/KNOWLEDGE-MAP.md` (fonte normativa do dominio settings).
+- `docs/specs/SYSTEM-DOSSIER.md` (visao factual de build e validacao).
 - `docs/rfc/EKM-CHANGELOG.md` (transacao EKM da mudanca).
 
 ## 12. Relacoes, desvios e lacunas
@@ -169,8 +171,13 @@ fora do escopo desta atuacao de autoria de especificacao:
 ### Duvidas e decisoes ausentes registradas
 
 - Nao ha decisoes pendentes para o recorte normativo desta especificacao.
-- `tests/Api.Tests` esta classificado como `Retired` para este recorte e nao
-  compoe validacao obrigatoria nem bloqueio.
+- Por decisao humana de 25/07/2026, `tests/Api.Tests` esta classificado como
+  `Retired` em todo o repositorio e deve ser ignorado em todas as situacoes:
+  nao deve ser executado, reparado, usado como evidencia ou tratado como
+  bloqueio. Seus arquivos permanecem apenas como registro historico.
+- A referencia ainda existente em `src/SmartHome-Api.sln` e uma discrepancia
+  legada registrada em `EKM-GAP-0003`; ela nao reativa a suite e sua
+  reconciliacao nao integra esta correcao documental.
 - O formato do body de `404` permanece fora de escopo por decisao humana.
 - Telemetria/auditoria do evento de reset nao foi solicitada e permanece fora
   de escopo.
@@ -187,4 +194,64 @@ No checkpoint de saida da autoria, esta secao deve permanecer exatamente como:
 
 ### 13.2 Registro exclusivo do Engenheiro Analista
 
-Reservado para preenchimento em atuacao futura do Engenheiro Analista.
+Antes de modificar esta especificacao, o Engenheiro Analista executa o gate de
+admissao. Se o resultado for `Checkpoint Blocked`, nao altera este documento e
+entrega um relatorio read-only a Coordenacao, que o registra na transacao.
+
+Somente apos `Accepted`, o Analista preserva a secao 13.1 como evidencia do
+handoff e preenche o registro abaixo.
+
+**Contrato EKM aplicavel:** `<FONTE E VERSAO DO PROTOCOLO>`
+
+**Baseline analisado:** `<BRANCH, COMMIT E WORKTREE>`
+
+| Controle de admissao | Esperado | Observado | Resultado |
+|---|---|---|---|
+| Branch e SHA | `<CHECKPOINT>` | `<EVIDENCIA>` | `Accepted` |
+| Worktree | `Clean` | `<EVIDENCIA>` | `Accepted` |
+| Estados | `Proposed / Pending Review / Not Started / Not Ready` | `<ESTADOS>` | `Accepted` |
+| Transacao | `Open` | `<ESTADO>` | `Accepted` |
+| Contrato e artefatos | `<VERSAO E ARTEFATOS>` | `<EVIDENCIA>` | `Accepted` |
+
+**Resultado do gate de admissao:** `Accepted`
+
+Apos `Accepted`, preencha o restante desta secao e atualize o metadado
+`Technical readiness`.
+
+**Resultado da Technical Readiness Review:** `Implementable | Needs Clarification`
+
+**Requisitos analisados:** `<LISTA OU INTERVALO>`
+
+**Dependencias e fontes consultadas:** `<LISTA>`
+
+| Requisito ou dimensao | Resultado | Natureza da lacuna | Evidencia | Lacuna ou impacto | Decisao necessaria |
+|---|---|---|---|---|---|
+| `<ID OU ASPECTO>` | `Supported`, `Gap`, `Conflict` ou `Not Applicable` | `Normative`, `Baseline`, `Tooling`, `Evidence` ou `None` | `<EVIDENCIA>` | `<IMPACTO OU NONE>` | `<DECISAO OU NONE>` |
+
+**Lacunas ou decisoes ausentes:** `<NENHUMA OU ITENS RASTREAVEIS>`
+
+| Duvida ou decisao ja declarada | Classificacao | Evidencia | Acao |
+|---|---|---|---|
+| `<ITEM OU NONE>` | `Blocking`, `Non-blocking`, `Out of scope` ou `Unrequested option` | `<EVIDENCIA>` | `<RETORNO A AUTORIA OU NONE>` |
+
+**Evidencia do resultado:** `<COMANDOS, INSPECOES E CONCLUSAO>`
+
+**Reconciliacao de saida:** `<METADADOS, SECAO 13, TRANSACAO E GATE SEGUINTE>`
+
+**Referencia na transacao:** `<EKM-CHG-NNNN E CHECKPOINT>`
+
+A revisao deve continuar apos o primeiro bloqueio ate classificar todos os
+itens. Sua execucao encerra sem alterar implementacao, inclusive com
+`Implementable`.
+
+Distinga decisao indispensavel, comportamento fora de escopo e opcao nao
+solicitada. Somente decisao indispensavel ausente produz `Gap`. A natureza da
+lacuna explica sua origem, mas nao cria um terceiro resultado da revisao.
+
+Uma especificacao `Needs Clarification` nao autoriza implementacao parcial nem
+alteracao de artefatos de implementacao. Somente registros EKM e a correcao
+normativa aprovada podem mudar. Apos correcao normativa, a analise deve ser
+repetida integralmente.
+
+`Implementable` e recomendacao tecnica. Aprovacao humana e reconfirmacao do
+baseline sao registradas na transacao antes da implementacao.

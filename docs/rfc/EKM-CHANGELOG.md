@@ -4,123 +4,214 @@
 
 **Estado:** Open
 
-**Data:** 24/07/2026
+**Data de abertura:** 2026-07-24
 
-### Objetivo
+**Especificação:** `SHD-SETTINGS-RESET-001@0.1` em
+`docs/specs/DEVICE-SETTINGS-RESET.md`
 
-Criar especificação EKM para o reset de settings específicos de device com
-contrato explícito de rota, sem body, mapeamento de `device_id` público para
-chave interna persistida, preservação de settings não específicos, retorno
-`204/404` e idempotência.
+## 1. Objetivo e escopo
 
-Registrar ciclo corretivo de autoria após retorno da Technical Readiness
-Review, incorporando decisões humanas e restaurando a seção 13 da
-especificação ao estado de handoff do Autor.
+**Objetivo:** especificar o reset dos settings específicos de um device com
+contrato explícito de rota, persistência, respostas HTTP e idempotência, e
+conduzir a mudança pelos gates da EKM.
 
-### Baseline
+**Incluído:** especificação, transação, mapa, dossiê e bootstrap dos agentes;
+registro da decisão global sobre `tests/Api.Tests`; ciclos de autoria e
+Technical Readiness Review.
+
+**Fora de escopo:** implementação, solução, testes, banco, build, automações,
+deploy e definição de payload de erro além do status `404`.
+
+## 2. Baseline e branch
 
 - Repositório:
   `/Users/marcelocostamiranda/source/IoT/SmartHome/Services/SmartHome-DeviceApi`.
 - Referência de origem: `main`.
-- Commit de origem da branch da mudança:
-  `3fde52003d23b76d4a76be33e6b416beca0f1a7c`.
+- Commit de origem: `3fde52003d23b76d4a76be33e6b416beca0f1a7c`.
 - Worktree de origem: limpo.
-- Branch da mudança: `spec/device-settings-reset`, derivada do commit de
-  origem.
-- Esta atuação é exclusivamente documental e não altera implementação.
+- Branch da mudança: `spec/device-settings-reset`.
+- Fontes normativas: `SHD-SETTINGS-RESET-001@0.1`, `AGENTS.md`, fontes EKM
+  externas apontadas dinamicamente e `docs/rfc/KNOWLEDGE-MAP.md`.
+- Lacunas preexistentes relevantes: `EKM-GAP-0002` e `EKM-GAP-0003`.
 
-### Escopo
+### 2.1 Handoffs e contrato EKM aplicável
 
-- criar especificação `docs/specs/DEVICE-SETTINGS-RESET.md`;
-- registrar a transação `EKM-CHG-0002` neste changelog;
-- atualizar `docs/rfc/KNOWLEDGE-MAP.md` para refletir a nova fonte normativa
-  no domínio de settings;
-- registrar dúvidas e decisões ausentes sem inferência;
-- não alterar código, testes, banco, build, automações ou deploy.
+| Etapa | Checkpoint de entrada | Estados esperados | Fonte e versão do contrato | Compatibilidade ou normalização | Resultado da admissão |
+|---|---|---|---|---|---|
+| Autoria inicial | `main@3fde52003d23b76d4a76be33e6b416beca0f1a7c` | `Draft` até entrega em `Proposed / Pending Review / Not Started / Not Ready` | EKM dinâmica vigente em 24/07/2026 | Branch exclusiva criada a partir de `main` | `Accepted` |
+| Primeira análise | `spec/device-settings-reset@eb5ed262dfa830f62aa936bb02ce7420780fdd3d` | `Proposed / Pending Review / Not Started / Not Ready` | EKM dinâmica vigente em 24/07/2026, anterior ao gate 0.4 | O contrato da época não separava formalmente admissão e TRR | `Not Applicable` |
+| Autoria corretiva | `spec/device-settings-reset@a3cbb556d3388d2987da1e87b46c20c97945ff65` | Retorno `Needs Clarification` | EKM dinâmica vigente em 25/07/2026 | Decisões humanas incorporadas e revisão anterior invalidada | `Accepted` |
+| Nova análise | Checkpoint de saída desta correção documental (`Pending`) | `Proposed / Pending Review / Not Started / Not Ready` | `/Users/marcelocostamiranda/source/EKM-guidelines`, modelo coordenado por atores 0.4 | Transação normalizada e formulário 13.2 restaurado antes do handoff | `Pending` |
 
-### Ativos afetados
+## 3. Autoria da especificação
 
-- `docs/specs/DEVICE-SETTINGS-RESET.md`;
-- `docs/rfc/EKM-CHANGELOG.md`;
-- `docs/rfc/KNOWLEDGE-MAP.md`.
-
-### Decisões e requisitos
-
-- endpoint no controller existente de settings do device;
-- rota `PUT /api/v1/devices/{device_id}/settings/reset`;
-- requisição sem body;
-- remoção de todas as linhas específicas do device em `DeviceSettings`;
-- resolução de `device_id` público para chave interna persistida;
-- preservação de settings globais, herdados ou padrão;
-- retorno `204 No Content` quando o device existe sem linhas específicas;
-- retorno `204 No Content` após reset concluído;
-- retorno `404 Not Found` para `device_id` inexistente;
-- operação idempotente.
-
-### Technical Readiness Review
-
-- Resultado da etapa de autoria: `Pending Review`.
-- Registro do Engenheiro Analista permanece preservado no histórico Git do
-  checkpoint em que foi emitido.
-- Revisão anterior (`Needs Clarification`) foi invalidada por correção
-  normativa aprovada na autoria, sem execução de nova TRR neste ciclo.
-- Gate seguinte: Engenheiro Analista para nova revisão integral.
-- Aprovação humana para implementar: `Pending`.
-
-### Ciclo corretivo de autoria (2026-07-25)
-
-- Checkpoint de entrada confirmado: branch `spec/device-settings-reset`, commit
-  `a3cbb556d3388d2987da1e87b46c20c97945ff65`, worktree limpo.
-- Decisões humanas aplicadas:
-  - `tests/Api.Tests` classificado como `Retired` para este recorte e ignorado
-    como critério de validação e bloqueio;
-  - validações obrigatórias da especificação substituídas por build de
-    `src/Api/Api.csproj`, inspeção de query/repositório, verificação de
-    alteração exclusiva em `DeviceSettings` do device alvo e validação
-    funcional/integrada para sucesso, ausência de linhas, `404` e
+- Autor: Autor da Especificação.
+- Checkpoint de entrada inicial:
+  `main@3fde52003d23b76d4a76be33e6b416beca0f1a7c`.
+- Decisões humanas recebidas: rota `PUT
+  /api/v1/devices/{device_id}/settings/reset`, sem body; remoção de todas as
+  linhas específicas do device em `DeviceSettings`; resolução da identificação
+  pública para chave interna; preservação de settings não específicos;
+  retornos `204/404`; idempotência.
+- Fatos e fontes consultadas: controllers, contratos, repositórios e queries de
+  device settings; mapa, dossiê e EKM externa.
+- Lacunas indispensáveis no primeiro handoff: nenhuma declarada.
+- Opções não solicitadas ou itens fora de escopo: body de `404` e telemetria.
+- Estado produzido: `Proposed / Pending Review / Not Started / Not Ready`.
+- Checkpoint de saída inicial:
+  `eb5ed262dfa830f62aa936bb02ce7420780fdd3d`.
+- Checkpoint de entrada da autoria corretiva:
+  `a3cbb556d3388d2987da1e87b46c20c97945ff65`.
+- Decisões humanas adicionais:
+  - `tests/Api.Tests` está `Retired` em todo o repositório desde 25/07/2026 e
+    deve ser ignorado em todas as situações;
+  - o reset exige build de `src/Api/Api.csproj`, inspeção da
+    query/repositório, verificação de alteração exclusiva no device alvo e
+    validação funcional ou integrada de sucesso, ausência de linhas, `404` e
     idempotência;
-  - formato do body de `404` mantido fora de escopo;
-  - telemetria não solicitada, fora de escopo.
-- Correção normativa aplicada em `SHD-SETTINGS-RESET-001@0.1`:
-  especificação atualizada para `Proposed / Pending Review / Not Started / Not Ready`.
-- Invalidação da revisão anterior:
-  a TRR registrada anteriormente foi tornada não vigente para decisão de gate,
-  exigindo nova execução integral pelo Engenheiro Analista sobre a versão
-  corrigida.
-- Operações executadas neste ciclo: exclusivamente documentais.
-- Checkpoint de saída: `Pending` (SHA será registrado após o commit documental
-  desta atuação).
+  - body de `404` e telemetria permanecem fora de escopo.
+- Checkpoint de saída da autoria corretiva:
+  `b7238c557578fcab1d5ff13e524a16e87cc3ff47`.
 
-### Estado da entrega
+O Autor não alegou implementabilidade. A seção 13 retornou a `Pending Review`
+após a correção normativa.
+
+## 4. Engenheiro Analista
+
+### 4.1 Primeira Technical Readiness Review
+
+- Responsável: Engenheiro Analista.
+- Checkpoint de entrada:
+  `spec/device-settings-reset@eb5ed262dfa830f62aa936bb02ce7420780fdd3d`,
+  worktree limpo.
+- Contrato EKM aplicável: fonte dinâmica vigente em 24/07/2026; a versão exata
+  não foi preservada no registro histórico.
+- Resultado do gate de admissão: `Not Applicable`, pois o contrato anterior
+  não separava formalmente o gate da revisão.
+- Divergências de admissão: nenhuma registrada.
+- Resultado da Technical Readiness Review: `Needs Clarification`.
+- Registro integral: seção 13 da especificação no checkpoint
+  `a3cbb556d3388d2987da1e87b46c20c97945ff65`.
+- Requisitos e dimensões analisados: `DSR-001` a `DSR-010`, compatibilidade,
+  dependências, DI e viabilidade das validações.
+- Natureza da lacuna: `Tooling` e `Evidence`; na data da revisão,
+  `tests/Api.Tests` não compilava e ainda não existia decisão humana de
+  descontinuação nem evidência substituta.
+- Classificação histórica da decisão: `Blocking`.
+- Lacuna necessária à época: sanear a suíte ou declarar evidência alternativa.
+- Comandos e verificações executados: inspeção de contratos HTTP,
+  repositórios, queries e baseline; execução da suíte. O comando exato não foi
+  preservado pelo registro anterior e não é inferido nesta normalização.
+- Resultado relevante: falha de compilação da suíte histórica por chamadas de
+  `DeviceMetricsController.Save` sem `deviceId`.
+- Operações Git e externas: atualização documental e commit do parecer; nenhuma
+  alteração de implementação.
+- Artefatos temporários: nenhum registrado.
+- Reconciliação de saída: `Technical readiness` alterado para
+  `Needs Clarification`, seção 13 preenchida e retorno à autoria.
+- Checkpoint de saída:
+  `a3cbb556d3388d2987da1e87b46c20c97945ff65`.
+- Gate seguinte executado: retorno à autoria e decisão humana.
+
+### 4.2 Nova Technical Readiness Review
+
+- Responsável: Engenheiro Analista.
+- Checkpoint de entrada: checkpoint de saída desta correção documental
+  (`Pending`).
+- Contrato EKM aplicável:
+  `/Users/marcelocostamiranda/source/EKM-guidelines`, modelo coordenado por
+  atores 0.4.
+- Resultado do gate de admissão: `Pending`.
+- Divergências de admissão: `Pending`.
+- Resultado da Technical Readiness Review: `Pending`.
+- Registro integral: seção 13 de `SHD-SETTINGS-RESET-001@0.1`.
+- Requisitos e dimensões a analisar: `DSR-001` a `DSR-010`, compatibilidade,
+  dependências, persistência e viabilidade das validações substitutas.
+- Natureza das lacunas: `Pending`.
+- Classificação de dúvidas e decisões declaradas: `Pending`.
+- Lacunas ou decisões necessárias: `Pending`.
+- Comandos, verificações, resultados e artefatos: `Pending`.
+- Reconciliação e checkpoint de saída: `Pending`.
+- Gate seguinte: `Pending`.
+
+## 5. Aprovação humana para implementação
+
+- Resultado: `Pending`.
+- Responsável: Marcelo Miranda.
+- Data: `Pending`.
+- Especificação e versão: `SHD-SETTINGS-RESET-001@0.1`.
+- Technical Readiness Review aprovada: `Pending`.
+- Baseline abrangido: `Pending`.
+- Limites ou ressalvas: `Pending`.
+- Checkpoint aprovado para implementação: `Pending`.
+
+As decisões humanas sobre a correção normativa e a validação não constituem
+aprovação para implementar.
+
+## 6. Engenheiro Implementador
+
+- Responsável: `Pending`.
+- Checkpoint de entrada e reconfirmação do baseline: `Pending`.
+- Resultado: `Pending`.
+- Requisitos, arquivos, rastreabilidade, decisões e validações: `Pending`.
+- Desvios, operações Git e checkpoint de saída: `Pending`.
+
+## 7. Engenheiro Tech Lead
+
+- Responsável: `Pending`.
+- Checkpoint de entrada: `Pending`.
+- Validações, parecer, matriz, consistência do relatório, mudanças não
+  autorizadas, recorte corretivo e checkpoint de saída: `Pending`.
+
+## 8. Validador de Integridade da EKM
+
+- Responsável: `Pending`.
+- Checkpoint de entrada: `Pending`.
+- Controles, conclusão, não conformidades, evidências ausentes e checkpoint de
+  saída: `Pending`.
+
+## 9. Validação funcional e operacional
+
+- Responsável humano: Marcelo Miranda.
+- Ambiente e checkpoint: `Pending`.
+- Procedimento requerido: sucesso do reset, device existente sem linhas,
+  device inexistente com `404`, repetição idempotente e comprovação de que
+  somente `DeviceSettings` do device alvo foi alterada.
+- Resultado, evidências, desvios e estado recomendado: `Pending`.
+
+## 10. Integração e encerramento
 
 - Referência de produção: `main`.
-- Estado: `Not Ready`.
-- Relações normativas criadas: `SHD-SETTINGS-RESET-001@0.1`.
-- Evidência de integração, quando `Done`: pendente.
+- Autorização, commit, PR ou merge de integração: `Pending`.
+- Especificação integrada: `Pending`.
+- Estado normativo: `Proposed`.
+- Estado da implementação: `Not Started`.
+- Estado da entrega: `Not Ready`.
+- Mapa e lacunas reconciliados: `Pending`.
+- Operações externas e deploy: nenhum autorizado.
+- Estado final da transação: `Open`.
+- Critério de encerramento: integração comprovada em `main`, estados
+  reconciliados e gates concluídos.
 
-### Validações
+## 11. Pendências, desvios e histórico corretivo
 
-- leitura obrigatória das fontes EKM externas e locais na ordem definida em
-  `AGENTS.md`;
-- inspeção dos contratos atuais de settings/device e persistência;
-- verificação de branch exclusiva derivada de `main` com worktree limpo;
-- validação documental das decisões humanas aplicadas ao contrato normativo;
-- validação de escopo documental sem alteração de implementação.
-
-### Pendências e desvios
-
-- nova Technical Readiness Review integral permanece pendente para a versão
-  normativa corrigida;
-- não há decisão pendente sobre formato de body de `404` nem sobre telemetria,
-  ambos fora de escopo deste recorte;
-- lacuna estrutural de autoridade de schema/view MySQL permanece em
-  `EKM-GAP-0002`.
-
-### Encerramento
-
-A transação permanece `Open` até aprovação humana da especificação, execução da
-Technical Readiness Review por papel apropriado e avanço autorizado do ciclo
-EKM.
+- A primeira TRR resultou em `Needs Clarification` no checkpoint
+  `a3cbb556d3388d2987da1e87b46c20c97945ff65`.
+- A decisão humana de 25/07/2026 classificou `tests/Api.Tests` como `Retired`
+  globalmente. A suíte não deve ser executada, reparada, evoluída, usada como
+  evidência ou tratada como bloqueio; seus arquivos permanecem históricos.
+- A autoria corretiva incorporou as evidências substitutas e produziu
+  `b7238c557578fcab1d5ff13e524a16e87cc3ff47`.
+- Esta correção documental, iniciada em
+  `b7238c557578fcab1d5ff13e524a16e87cc3ff47`, normalizou a transação, restaurou
+  o formulário 0.4 e propagou a decisão global para `AGENTS.md`,
+  `docs/rfc/KNOWLEDGE-MAP.md` e `docs/specs/SYSTEM-DOSSIER.md`.
+- Checkpoint de saída desta correção: `Pending`; será completado pela
+  Coordenação no próximo handoff, sem reescrever o próprio commit.
+- A referência de `src/SmartHome-Api.sln` à suíte descontinuada é discrepância
+  legada em `EKM-GAP-0003`, não reativa a suíte e não bloqueia a nova TRR.
+- A autoridade do schema/view MySQL permanece aberta em `EKM-GAP-0002`.
+- Nova Technical Readiness Review integral permanece pendente.
 
 ## EKM-CHG-0001 — Fundação EKM por referência externa
 
