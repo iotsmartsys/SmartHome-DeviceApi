@@ -41,7 +41,7 @@ deploy e definição de payload de erro além do status `404`.
 | Autoria inicial | `main@3fde52003d23b76d4a76be33e6b416beca0f1a7c` | `Draft` até entrega em `Proposed / Pending Review / Not Started / Not Ready` | EKM dinâmica vigente em 24/07/2026 | Branch exclusiva criada a partir de `main` | `Accepted` |
 | Primeira análise | `spec/device-settings-reset@eb5ed262dfa830f62aa936bb02ce7420780fdd3d` | `Proposed / Pending Review / Not Started / Not Ready` | EKM dinâmica vigente em 24/07/2026, anterior ao gate 0.4 | O contrato da época não separava formalmente admissão e TRR | `Not Applicable` |
 | Autoria corretiva | `spec/device-settings-reset@a3cbb556d3388d2987da1e87b46c20c97945ff65` | Retorno `Needs Clarification` | EKM dinâmica vigente em 25/07/2026 | Decisões humanas incorporadas e revisão anterior invalidada | `Accepted` |
-| Nova análise | Checkpoint de saída desta correção documental (`Pending`) | `Proposed / Pending Review / Not Started / Not Ready` | `/Users/marcelocostamiranda/source/EKM-guidelines`, modelo coordenado por atores 0.4 | Transação normalizada e formulário 13.2 restaurado antes do handoff | `Pending` |
+| Nova análise | `spec/device-settings-reset@535e376e961574c449e9ed4bcb283db1ae66d5ed` | `Proposed / Pending Review / Not Started / Not Ready` | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md`, versão 0.4 | Sem normalização adicional; checkpoint aderente ao gate de admissão | `Accepted` |
 
 ## 3. Autoria da especificação
 
@@ -89,7 +89,7 @@ após a correção normativa.
 - Resultado do gate de admissão: `Not Applicable`, pois o contrato anterior
   não separava formalmente o gate da revisão.
 - Divergências de admissão: nenhuma registrada.
-- Resultado da Technical Readiness Review: `Needs Clarification`.
+- Resultado da Technical Readiness Review: `Implementable`.
 - Registro integral: seção 13 da especificação no checkpoint
   `a3cbb556d3388d2987da1e87b46c20c97945ff65`.
 - Requisitos e dimensões analisados: `DSR-001` a `DSR-010`, compatibilidade,
@@ -116,23 +116,60 @@ após a correção normativa.
 ### 4.2 Nova Technical Readiness Review
 
 - Responsável: Engenheiro Analista.
-- Checkpoint de entrada: checkpoint de saída desta correção documental
-  (`Pending`).
+- Checkpoint de entrada:
+  `spec/device-settings-reset@535e376e961574c449e9ed4bcb283db1ae66d5ed`,
+  worktree limpo.
 - Contrato EKM aplicável:
-  `/Users/marcelocostamiranda/source/EKM-guidelines`, modelo coordenado por
-  atores 0.4.
-- Resultado do gate de admissão: `Pending`.
-- Divergências de admissão: `Pending`.
-- Resultado da Technical Readiness Review: `Pending`.
+  `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md`,
+  versão 0.4.
+- Resultado do gate de admissão: `Accepted`.
+- Divergências de admissão: nenhuma.
+- Resultado da Technical Readiness Review: `Needs Clarification`.
 - Registro integral: seção 13 de `SHD-SETTINGS-RESET-001@0.1`.
-- Requisitos e dimensões a analisar: `DSR-001` a `DSR-010`, compatibilidade,
-  dependências, persistência e viabilidade das validações substitutas.
-- Natureza das lacunas: `Pending`.
-- Classificação de dúvidas e decisões declaradas: `Pending`.
-- Lacunas ou decisões necessárias: `Pending`.
-- Comandos, verificações, resultados e artefatos: `Pending`.
-- Reconciliação e checkpoint de saída: `Pending`.
-- Gate seguinte: `Pending`.
+- Requisitos e dimensões analisados: `DSR-001` a `DSR-010`, contratos HTTP,
+  persistência, dependências/DI, compatibilidade e viabilidade das validações
+  obrigatórias.
+- Natureza das lacunas: `None` (sem lacuna normativa indispensável).
+- Ocorrência operacional observada: `Tooling` (falha de restore no build
+  canônico durante a análise).
+- Classificação de dúvidas e decisões declaradas:
+  `Non-blocking`, `Out of scope` e `Unrequested option`, sem lacuna normativa
+  indispensável.
+- Lacunas ou decisões necessárias:
+  - decisão necessária: `NONE`;
+  - repetição de `dotnet build src/Api/Api.csproj` registrada como validação
+    obrigatória pendente da etapa do Engenheiro Implementador.
+- Comandos e verificações executados:
+  - `git branch --show-current`;
+  - `git rev-parse HEAD`;
+  - `git status --porcelain`;
+  - leituras integrais de `AGENTS.md`, fontes EKM externas obrigatórias,
+    templates aplicáveis e fontes locais do mapa;
+  - inspeções de controllers, contratos, DI, repositórios e queries do domínio
+    de device settings;
+  - `dotnet build src/Api/Api.csproj`.
+- Resultados e saídas relevantes:
+  - admissão `Accepted`;
+  - matriz DSR completa preenchida na seção 13.2 com requisitos classificados;
+  - build canônico executado com ocorrência operacional de restore
+    (`exit_code=1`, `Restaurar falhou em 300,9s`), sem erros de compilação de
+    código reportados;
+  - resultado binário da TRR mantido como `Implementable`, pois não houve
+    ambiguidade normativa nem decisão funcional ausente.
+- Operações Git e externas: atualização documental e commit de checkpoint desta
+  etapa; nenhuma alteração de implementação e nenhuma operação externa.
+- Artefatos temporários criados, alterados ou removidos: criação transitória de
+  `Library/Application Support/Microsoft/DeveloperTools/deviceid` pelo ambiente
+  de build; diretório não rastreado `Library/` removido antes do checkpoint,
+  sem persistência no repositório.
+- Reconciliação de saída:
+  - metadado `Technical readiness` ajustado para `Implementable`;
+  - seção 13.2 preenchida integralmente;
+  - transação reconciliada com gate `Accepted`, TRR concluída, ocorrência
+    operacional de tooling registrada e decisão necessária `NONE`;
+  - worktree contendo apenas artefatos documentais autorizados desta etapa.
+- Checkpoint de saída: `Pending`.
+- Gate seguinte: aprovação humana para implementação.
 
 ## 5. Aprovação humana para implementação
 
@@ -211,7 +248,10 @@ aprovação para implementar.
 - A referência de `src/SmartHome-Api.sln` à suíte descontinuada é discrepância
   legada em `EKM-GAP-0003`, não reativa a suíte e não bloqueia a nova TRR.
 - A autoridade do schema/view MySQL permanece aberta em `EKM-GAP-0002`.
-- Nova Technical Readiness Review integral permanece pendente.
+- Nova Technical Readiness Review integral concluída com `Implementable`.
+- A falha de restore no build canônico foi registrada como ocorrência
+  operacional de `Tooling`, sem lacuna normativa e sem decisão funcional
+  pendente.
 
 ## EKM-CHG-0001 — Fundação EKM por referência externa
 

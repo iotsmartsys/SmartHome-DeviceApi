@@ -10,7 +10,7 @@
 
 **Estado da entrega:** Not Ready
 
-**Technical readiness:** Pending Review
+**Technical readiness:** Implementable
 
 **Versao:** 0.1
 
@@ -201,44 +201,62 @@ entrega um relatorio read-only a Coordenacao, que o registra na transacao.
 Somente apos `Accepted`, o Analista preserva a secao 13.1 como evidencia do
 handoff e preenche o registro abaixo.
 
-**Contrato EKM aplicavel:** `<FONTE E VERSAO DO PROTOCOLO>`
+**Contrato EKM aplicavel:** `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md` (versao 0.4)
 
-**Baseline analisado:** `<BRANCH, COMMIT E WORKTREE>`
+**Baseline analisado:** `spec/device-settings-reset@535e376e961574c449e9ed4bcb283db1ae66d5ed`, worktree limpo
 
 | Controle de admissao | Esperado | Observado | Resultado |
 |---|---|---|---|
-| Branch e SHA | `<CHECKPOINT>` | `<EVIDENCIA>` | `Accepted` |
-| Worktree | `Clean` | `<EVIDENCIA>` | `Accepted` |
-| Estados | `Proposed / Pending Review / Not Started / Not Ready` | `<ESTADOS>` | `Accepted` |
-| Transacao | `Open` | `<ESTADO>` | `Accepted` |
-| Contrato e artefatos | `<VERSAO E ARTEFATOS>` | `<EVIDENCIA>` | `Accepted` |
+| Branch e SHA | `spec/device-settings-reset@535e376e961574c449e9ed4bcb283db1ae66d5ed` | `git branch --show-current` = `spec/device-settings-reset`; `git rev-parse HEAD` = `535e376e961574c449e9ed4bcb283db1ae66d5ed` | `Accepted` |
+| Worktree | `Clean` | `git status --porcelain` sem saida (`worktree=clean`) | `Accepted` |
+| Estados | `Proposed / Pending Review / Not Started / Not Ready` | Metadados observados: `Estado normativo=Proposed`, `Technical readiness=Pending Review`, `Estado da implementacao=Not Started`, `Estado da entrega=Not Ready` | `Accepted` |
+| Transacao | `Open` | `docs/rfc/EKM-CHANGELOG.md`, secao `EKM-CHG-0002`, estado `Open` | `Accepted` |
+| Contrato e artefatos | Protocolo 0.4 e artefatos de autoria obrigatorios presentes | Leituras integrais de `AGENTS.md`, fontes externas obrigatorias, `docs/rfc/KNOWLEDGE-MAP.md`, `docs/specs/SYSTEM-DOSSIER.md`, especificacao e transacao | `Accepted` |
 
 **Resultado do gate de admissao:** `Accepted`
 
 Apos `Accepted`, preencha o restante desta secao e atualize o metadado
 `Technical readiness`.
 
-**Resultado da Technical Readiness Review:** `Implementable | Needs Clarification`
+**Resultado da Technical Readiness Review:** `Implementable`
 
-**Requisitos analisados:** `<LISTA OU INTERVALO>`
+**Requisitos analisados:** `DSR-001` a `DSR-010`, mais contratos HTTP, persistencia, dependencias/DI, compatibilidade e viabilidade das validacoes obrigatorias
 
-**Dependencias e fontes consultadas:** `<LISTA>`
+**Dependencias e fontes consultadas:** `AGENTS.md`; `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md`; `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-METHOD.md`; `/Users/marcelocostamiranda/source/EKM-guidelines/docs/GOVERNANCE.md`; `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md`; `/Users/marcelocostamiranda/source/EKM-guidelines/templates/docs/specs/SPECIFICATION-TEMPLATE.md`; `/Users/marcelocostamiranda/source/EKM-guidelines/templates/docs/rfc/EKM-CHANGELOG.md`; `docs/rfc/KNOWLEDGE-MAP.md`; `docs/specs/SYSTEM-DOSSIER.md`; `docs/rfc/EKM-CHANGELOG.md`; `src/Api/Controllers/DeviceSettingsController.cs`; `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs`; `src/Data.Repositories/Repositories/Queries/DeviceSettingsQuery.cs`; `src/Core/Contracts/Repositories/IDeviceSettingsRepository.cs`; `src/Data.Repositories/DI/MySqlDependencyInjection.cs`; `src/Api/Middlewares/ExceptionHandler.cs`; `src/Api/Program.cs`; `src/Api/Controllers/DeviceMetricsController.cs`; `src/Core/Contracts/Repositories/IDeviceMetricsRepository.cs`; `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs`
 
 | Requisito ou dimensao | Resultado | Natureza da lacuna | Evidencia | Lacuna ou impacto | Decisao necessaria |
 |---|---|---|---|---|---|
-| `<ID OU ASPECTO>` | `Supported`, `Gap`, `Conflict` ou `Not Applicable` | `Normative`, `Baseline`, `Tooling`, `Evidence` ou `None` | `<EVIDENCIA>` | `<IMPACTO OU NONE>` | `<DECISAO OU NONE>` |
+| `DSR-001` | `Supported` | `None` | Controller existente em `src/Api/Controllers/DeviceSettingsController.cs` no escopo de settings por device | `NONE` | `NONE` |
+| `DSR-002` | `Supported` | `None` | A combinacao `[Route("api/v1/devices/{device_id}/settings")]` + `[HttpPut("reset")]` e tecnicamente viavel no mesmo controller, sem quebra dos endpoints atuais | `NONE` | `NONE` |
+| `DSR-003` | `Supported` | `None` | ASP.NET Core aceita `PUT` sem body quando a action nao declara parametro `[FromBody]` | `NONE` | `NONE` |
+| `DSR-004` | `Supported` | `None` | Padrao consolidado de resolucao publico->interno em queries/repositorios (`SELECT Id FROM Devices WHERE DeviceId = @...`) em `DeviceSettingsQuery` e `DeviceMetricsRepository` | `NONE` | `NONE` |
+| `DSR-005` | `Supported` | `None` | Persistencia explicita em `DeviceSettings`; recorte permite `DELETE` por chave interna resolvida | `NONE` | `NONE` |
+| `DSR-006` | `Supported` | `None` | Settings globais e efetivos sao separados de `DeviceSettings` (consulta efetiva via `v_DeviceEffectiveSettings`); delete restrito em `DeviceSettings` preserva demais camadas | `NONE` | `NONE` |
+| `DSR-007` | `Supported` | `None` | Distincao entre "device existe sem linhas" e "device inexistente" e viavel via checagem de existencia previa + delete idempotente | `NONE` | `NONE` |
+| `DSR-008` | `Supported` | `None` | Fluxo HTTP do controller permite `NoContent()` apos remocao concluida | `NONE` | `NONE` |
+| `DSR-009` | `Supported` | `None` | O baseline possui padrao de `404` por ausencia (`NotFound()`) e middleware para excecoes de dominio | `NONE` | `NONE` |
+| `DSR-010` | `Supported` | `None` | `DELETE` repetido sobre o mesmo conjunto (apos esvaziamento) preserva efeito observavel e retorno `204` quando device existe | `NONE` | `NONE` |
+| `Contrato HTTP` | `Supported` | `None` | Rota/metodo nao conflitam com `GET/PUT /api/v1/devices/{device_id}/settings` existentes; subrota `reset` e compativel | `NONE` | `NONE` |
+| `Persistencia e recorte de dados` | `Supported` | `None` | `DeviceSettingsQuery` ja referencia `DeviceSettings` e resolve `Devices.Id` por `DeviceId`; recorte de delecao e aderente ao modelo observado | `NONE` | `NONE` |
+| `Dependencias e DI` | `Supported` | `None` | `IDeviceSettingsRepository` e `DeviceSettingsRepository` estao registrados em `AddMySqlData` | `NONE` | `NONE` |
+| `Compatibilidade` | `Supported` | `None` | Inclusao de novo endpoint dedicado nao exige alteracao dos contratos existentes de leitura/upsert | `NONE` | `NONE` |
+| `Viabilidade das validacoes obrigatorias` | `Supported` | `Tooling` | Execucao obrigatoria `dotnet build src/Api/Api.csproj` no checkpoint analisado retornou `exit_code=1` com `Restaurar falhou em 300,9s`, sem erros de compilacao de codigo reportados | Ocorrencia operacional de restore no ambiente de execucao da analise; a repeticao do build permanece como validacao obrigatoria pendente da etapa do Engenheiro Implementador | `NONE` |
 
-**Lacunas ou decisoes ausentes:** `<NENHUMA OU ITENS RASTREAVEIS>`
+**Lacunas ou decisoes ausentes:** `NENHUMA lacuna normativa indispensavel; nao ha decisao funcional ausente para os requisitos DSR-001..DSR-010.`
 
 | Duvida ou decisao ja declarada | Classificacao | Evidencia | Acao |
 |---|---|---|---|
-| `<ITEM OU NONE>` | `Blocking`, `Non-blocking`, `Out of scope` ou `Unrequested option` | `<EVIDENCIA>` | `<RETORNO A AUTORIA OU NONE>` |
+| `Nao ha decisoes pendentes para o recorte normativo desta especificacao` | `Non-blocking` | Secao 12 e matriz TRR: requisitos e contratos classificados sem ambiguidade normativa indispensavel | `NONE` |
+| `tests/Api.Tests` classificado como `Retired` e ignorado globalmente | `Out of scope` | `AGENTS.md`, `docs/rfc/KNOWLEDGE-MAP.md`, `docs/specs/SYSTEM-DOSSIER.md` e secao 12 desta especificacao | `NONE` |
+| `Referencia legada da suite em src/SmartHome-Api.sln (EKM-GAP-0003)` | `Out of scope` | Secao 12 desta especificacao + `docs/rfc/KNOWLEDGE-MAP.md` (`EKM-GAP-0003`) | `NONE` |
+| `Formato do body de 404 permanece fora de escopo` | `Out of scope` | Secoes 8 e 12 desta especificacao | `NONE` |
+| `Telemetria/auditoria do reset nao solicitada` | `Unrequested option` | Secoes 8 e 12 desta especificacao | `NONE` |
 
-**Evidencia do resultado:** `<COMANDOS, INSPECOES E CONCLUSAO>`
+**Evidencia do resultado:** Gate de admissao executado com `git branch --show-current`, `git rev-parse HEAD` e `git status --porcelain` (Accepted). Leituras integrais das fontes EKM obrigatorias externas e fontes locais do mapa (AGENTS, mapa, dossie, especificacao e transacao). Inspecao tecnica dos contratos HTTP, DI, repositorios e queries: `src/Api/Controllers/DeviceSettingsController.cs`, `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs`, `src/Data.Repositories/Repositories/Queries/DeviceSettingsQuery.cs`, `src/Core/Contracts/Repositories/IDeviceSettingsRepository.cs`, `src/Data.Repositories/DI/MySqlDependencyInjection.cs`, `src/Api/Program.cs`, `src/Api/Middlewares/ExceptionHandler.cs`, alem de repositorio/padrao de resolucao de device em metricas para consistencia (`src/Data.Repositories/Repositories/DeviceMetricsRepository.cs`). Validacao obrigatoria executada com `dotnet build src/Api/Api.csproj` e resultado observado `exit_code=1` (`Restaurar falhou em 300,9s`), sem erro de compilacao de codigo reportado. Conclusao: todos os requisitos DSR-001..DSR-010 permanecem `Supported`; a falha de restore foi classificada como ocorrencia operacional de `Tooling` sem decisao funcional pendente, mantendo TRR `Implementable` e registrando repeticao do build como validacao pendente da etapa de implementacao.
 
-**Reconciliacao de saida:** `<METADADOS, SECAO 13, TRANSACAO E GATE SEGUINTE>`
+**Reconciliacao de saida:** Metadado `Technical readiness` atualizado para `Implementable`; secao 13.1 preservada sem alteracao; secao 13.2 preenchida integralmente pelo Engenheiro Analista; transacao `EKM-CHG-0002` reconciliada com gate de admissao `Accepted`, TRR concluida e ocorrencia operacional de tooling registrada sem decisao pendente; gate seguinte: aprovacao humana para implementacao.
 
-**Referencia na transacao:** `<EKM-CHG-NNNN E CHECKPOINT>`
+**Referencia na transacao:** `EKM-CHG-0002`, checkpoint de entrada `spec/device-settings-reset@535e376e961574c449e9ed4bcb283db1ae66d5ed`.
 
 A revisao deve continuar apos o primeiro bloqueio ate classificar todos os
 itens. Sua execucao encerra sem alterar implementacao, inclusive com
