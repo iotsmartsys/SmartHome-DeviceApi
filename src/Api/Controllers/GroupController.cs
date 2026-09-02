@@ -3,19 +3,46 @@ using Api.Models;
 using Core.Contracts.Repositories;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 [Route("api/v1/groups")]
 [ApiController]
 public class GroupController(ILogger<GroupController> logger) : ControllerBase
 {
     [HttpPost()]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> AddGroupAsync([FromBody] Group group, [FromServices] IGroupRepository repository, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(Group), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> AddGroupAsync(
+        [FromBody] GroupCreateRequest? request,
+        [FromServices] IGroupRepository repository,
+        CancellationToken cancellationToken)
     {
-        logger.LogInformation("Request de adição de grupo {group}", group);
-        var entity = (Core.Entities.Group)group;
+        if (request is null)
+        {
+            ModelState.AddModelError("request", "O payload de criação é obrigatório.");
+            return ValidationProblem(ModelState);
+        }
+
+        if (string.IsNullOrWhiteSpace(request.name))
+            ModelState.AddModelError(nameof(request.name), "name é obrigatório.");
+
+        if (request.icon is not null && string.IsNullOrWhiteSpace(request.icon.name))
+            ModelState.AddModelError("icon.name", "icon.name deve ser preenchido quando icon for informado.");
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var normalizedRequest = request with
+        {
+            name = request.name!.Trim(),
+            icon = request.icon is null ? null : new GroupIconRequest(request.icon.name!.Trim())
+        };
+
+        logger.LogInformation("Request de adição de grupo {Group}", normalizedRequest);
+        var entity = normalizedRequest.ToEntity();
         await repository.AddAsync(entity, cancellationToken);
         logger.LogInformation("Grupo adicionado com sucesso");
 
@@ -24,16 +51,13 @@ public class GroupController(ILogger<GroupController> logger) : ControllerBase
 
     [HttpGet()]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Group>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status503ServiceUnavailable)]
     public async Task<IActionResult> GetAllGroupsAsync([FromServices] IGroupRepository repository, CancellationToken cancellationToken)
     {
         logger.LogInformation("Request de busca de todos os grupos");
         var groups = await repository.GetAllAsync(cancellationToken);
-        if (groups.Any())
-            return Ok(groups.Select(g => (Group)g));
-
-        return NoContent();
+        return Ok(groups.Select(g => (Group)g).ToArray());
     }
 
     [HttpPut("{id}")]
@@ -57,34 +81,90 @@ public class GroupController(ILogger<GroupController> logger) : ControllerBase
     }
 
     [HttpPatch("{id}")]
+    [Consumes("application/json-patch+json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UpdatePatchGroupAsync(int id, [FromBody] JsonPatchDocument<Group> group, [FromServices] IGroupRepository repository, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> UpdatePatchGroupAsync(
+        int id,
+        [FromBody] JsonPatchDocument<GroupPatchRequest>? patch,
+        [FromServices] IGroupRepository repository,
+        CancellationToken cancellationToken)
     {
         logger.LogInformation("Request de patch do grupo {id}", id);
-        if (group == null)
+
+        if (id <= 0)
+            return BadRequestProblem("O id do Group deve ser positivo.");
+
+        if (patch is null || patch.Operations.Count == 0)
         {
             logger.LogWarning("JsonPatchDocument inválido fornecido para o grupo {id}", id);
-            return BadRequest("JsonPatchDocument inválido.");
+            return BadRequestProblem("O documento JSON Patch deve conter ao menos uma operação.");
         }
+
+        foreach (var operation in patch.Operations)
+        {
+            if (!string.Equals(operation.op, "replace", StringComparison.OrdinalIgnoreCase))
+                ModelState.AddModelError("patch.op", "Somente operações replace são aceitas.");
+
+            if (!AllowedPatchPaths.Contains(operation.path))
+                ModelState.AddModelError("patch.path", $"O caminho '{operation.path}' não é permitido.");
+            else if (!HasExpectedValue(operation.path, operation.value))
+                ModelState.AddModelError("patch.value", $"O valor informado para '{operation.path}' é inválido.");
+        }
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
 
         var existingGroup = await repository.GetByIdAsync(id, cancellationToken);
         if (existingGroup == null)
         {
             logger.LogWarning("Grupo com ID {id} não encontrado", id);
-            return NotFound($"Grupo com ID {id} não encontrado.");
+            return NotFoundProblem(id);
         }
 
-        var model = (Group)existingGroup;
-        group.ApplyTo(model);
-        existingGroup = (Core.Entities.Group)model;
-        existingGroup.Id = id;
+        var model = GroupPatchRequest.FromEntity(existingGroup);
+        patch.ApplyTo(model, ModelState);
 
-        logger.LogInformation(JsonSerializer.Serialize(existingGroup, new JsonSerializerOptions { WriteIndented = true }));
+        var changedPaths = patch.Operations
+            .Select(operation => operation.path)
+            .ToHashSet(StringComparer.Ordinal);
 
-        await repository.UpdateOnlyGroupAsync(existingGroup, cancellationToken);
+        if (changedPaths.Contains("/name"))
+        {
+            if (string.IsNullOrWhiteSpace(model.name))
+                ModelState.AddModelError(nameof(model.name), "name é obrigatório.");
+            else
+                model.name = model.name.Trim();
+        }
+
+        if (changedPaths.Contains("/icon") && model.icon is not null)
+        {
+            if (string.IsNullOrWhiteSpace(model.icon.name))
+                ModelState.AddModelError("icon.name", "icon.name deve ser preenchido quando icon for informado.");
+            else
+                model.icon = new GroupIconRequest(model.icon.name.Trim());
+        }
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        logger.LogInformation(JsonSerializer.Serialize(model, new JsonSerializerOptions { WriteIndented = true }));
+
+        var updated = await repository.UpdateAdministrativeAsync(
+            id,
+            changedPaths.Contains("/name") ? model.name : null,
+            changedPaths.Contains("/active") ? model.active : null,
+            model.icon?.name,
+            changedPaths.Contains("/icon"),
+            cancellationToken);
+
+        if (!updated)
+            return NotFoundProblem(id);
+
         logger.LogInformation("Grupo {id} atualizado com sucesso", id);
         return NoContent();
     }
@@ -93,11 +173,19 @@ public class GroupController(ILogger<GroupController> logger) : ControllerBase
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status503ServiceUnavailable)]
     public async Task<IActionResult> DeleteGroupAsync(int id, [FromServices] IGroupRepository repository, CancellationToken cancellationToken)
     {
-        await repository.DeleteAsync(id, cancellationToken);
+        if (id <= 0)
+            return BadRequestProblem("O id do Group deve ser positivo.");
+
+        var deleted = await repository.DeleteAsync(id, cancellationToken);
+        if (!deleted)
+            return NotFoundProblem(id);
+
         logger.LogInformation("Grupo com ID {id} excluído com sucesso", id);
         return NoContent();
     }
@@ -157,4 +245,29 @@ public class GroupController(ILogger<GroupController> logger) : ControllerBase
         logger.LogInformation("Capability {capabilityId} excluída do grupo {groupId} com sucesso", capabilityId, groupId);
         return NoContent();
     }
+
+    private static readonly HashSet<string> AllowedPatchPaths =
+    [
+        "/name",
+        "/active",
+        "/icon"
+    ];
+
+    private static bool HasExpectedValue(string path, object? value) => path switch
+    {
+        "/name" => value is string || value is JValue { Type: JTokenType.String },
+        "/active" => value is bool || value is JValue { Type: JTokenType.Boolean },
+        "/icon" => value is null || value is JObject || value is GroupIconRequest,
+        _ => false
+    };
+
+    private ObjectResult BadRequestProblem(string detail) => Problem(
+        statusCode: StatusCodes.Status400BadRequest,
+        title: "Requisição inválida",
+        detail: detail);
+
+    private ObjectResult NotFoundProblem(int id) => Problem(
+        statusCode: StatusCodes.Status404NotFound,
+        title: "Group não encontrado",
+        detail: $"Grupo com ID {id} não encontrado.");
 }

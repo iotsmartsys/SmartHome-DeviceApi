@@ -11,7 +11,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
     public async Task AddAsync(Group group, CancellationToken cancellationToken)
     {
         connection.Open();
-        var transaction = connection.BeginTransaction();
+        using var transaction = connection.BeginTransaction();
         try
         {
             var command = new CommandDefinition(GroupQuery.Insert, new
@@ -24,7 +24,7 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
 
             foreach (var capability in group.Capabilities)
             {
-                capability.Id = await connection.ExecuteAsync(new CommandDefinition(GroupQuery.InsertCapabilityForGroup, new
+                await connection.ExecuteAsync(new CommandDefinition(GroupQuery.InsertCapabilityForGroup, new
                 {
                     groupId = group.Id,
                     capabilityId = capability.Id
@@ -40,7 +40,6 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
         }
         finally
         {
-            transaction.Dispose();
             connection.Close();
         }
         logger.LogInformation($"Grupo {group.Name} adicionado com sucesso com ID {group.Id}");
@@ -66,16 +65,49 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
         return groups.FirstOrDefault();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var command = new CommandDefinition(GroupQuery.Delete, new { id }, cancellationToken: cancellationToken);
-        await connection.ExecuteAsync(command);
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            await connection.ExecuteAsync(new CommandDefinition(
+                GroupQuery.DeleteAllCapabilityForGroup,
+                new { groupId = id },
+                transaction: transaction,
+                cancellationToken: cancellationToken));
+
+            var affectedRows = await connection.ExecuteAsync(new CommandDefinition(
+                GroupQuery.Delete,
+                new { id },
+                transaction: transaction,
+                cancellationToken: cancellationToken));
+
+            if (affectedRows == 0)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            logger.LogError(ex, "Erro ao excluir grupo {GroupId}", id);
+            throw;
+        }
+        finally
+        {
+            connection.Close();
+        }
     }
 
     public async Task UpdateAsync(Group group, CancellationToken cancellationToken)
     {
         connection.Open();
-        var transaction = connection.BeginTransaction();
+        using var transaction = connection.BeginTransaction();
         try
         {
             var command = new CommandDefinition(GroupQuery.Update, new
@@ -106,20 +138,74 @@ internal class GroupRepository(ILogger<GroupRepository> logger, IDbConnection co
         }
         finally
         {
-            transaction.Dispose();
             connection.Close();
         }
     }
-    public async Task UpdateOnlyGroupAsync(Group group, CancellationToken cancellationToken)
+
+    public async Task<bool> UpdateAdministrativeAsync(
+        int id,
+        string? name,
+        bool? active,
+        string? iconName,
+        bool updateIcon,
+        CancellationToken cancellationToken)
     {
-        var command = new CommandDefinition(GroupQuery.Update, new
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        try
         {
-            id = group.Id,
-            name = group.Name,
-            activated = group.IsActive,
-            IconName = group.Icon?.Name
-        }, cancellationToken: cancellationToken);
-        await connection.ExecuteAsync(command);
+            var existingId = await connection.QueryFirstOrDefaultAsync<int?>(new CommandDefinition(
+                GroupQuery.GetIdForUpdate,
+                new { id },
+                transaction: transaction,
+                cancellationToken: cancellationToken));
+
+            if (!existingId.HasValue)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            if (name is not null)
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    GroupQuery.UpdateName,
+                    new { id, name },
+                    transaction: transaction,
+                    cancellationToken: cancellationToken));
+            }
+
+            if (active.HasValue)
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    GroupQuery.UpdateActive,
+                    new { id, active = active.Value },
+                    transaction: transaction,
+                    cancellationToken: cancellationToken));
+            }
+
+            if (updateIcon)
+            {
+                await connection.ExecuteAsync(new CommandDefinition(
+                    GroupQuery.UpdateIcon,
+                    new { id, iconName },
+                    transaction: transaction,
+                    cancellationToken: cancellationToken));
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            logger.LogError(ex, "Erro ao atualizar campos administrativos do grupo {GroupId}", id);
+            throw;
+        }
+        finally
+        {
+            connection.Close();
+        }
     }
 
     public async Task AddCapabilityToGroupAsync(int groupId, CapabilityGroup capability, CancellationToken cancellationToken)

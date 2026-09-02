@@ -30,9 +30,13 @@ superfície de manutenção do aplicativo AIoTSmartHome.
 
 ### Estado
 
-A versão 0.1 está em `Draft`, com Análise de Implementabilidade pendente.
-Código, testes, banco, build, deploy e aplicativo consumidor não foram
-alterados nesta autoria.
+A versão 0.1 possui Implementação concluída [`Implemented`] e segue para
+Revisão. DTOs de criação e patch foram separados, guards e `ProblemDetails`
+foram aplicados, INSERT passou a persistir `IconName`, PATCH atualiza somente
+os campos solicitados e DELETE remove relações em transação explícita. O build
+`dotnet build src/Api/Api.csproj --configuration Release` terminou com código
+zero. Testes, OpenAPI gerado, MySQL, deploy e aplicativo consumidor permanecem
+`Not Executed`.
 
 ## EKM-CHG-0001 — Fundação EKM por referência externa
 
