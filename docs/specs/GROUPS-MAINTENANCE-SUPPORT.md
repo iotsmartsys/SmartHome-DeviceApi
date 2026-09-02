@@ -247,13 +247,18 @@ Invariantes de persistência:
 
 **Cobre:** `GRP-API-004`, `005`, `007` a `009`
 
-- **Dado que** o payload contenha nome, active e ícone opcional, sem id nem
-  capabilities;
+- **Dado que** um payload válido contenha nome, active e ícone opcional, sem id
+  nem capabilities;
 - **Quando** o POST for processado;
 - **Então** a API retorna `200` após persistir exatamente um Group, seu ícone
   opcional e nenhuma relação;
+- **E dado que** `name` ou `icon.name` seja inválido;
+- **Quando** o POST for processado;
+- **Então** a API retorna `400` com `ProblemDetails` ou
+  `ValidationProblemDetails` consumível e não executa INSERT;
 - **Evidência:** inspeção de DTO, fluxo transacional e query, seguida de
-  validação integrada autorizada.
+  validação integrada autorizada e comparação do estado antes e depois dos
+  cenários válido e inválido.
 
 ### `GRP-API-AC-003` — Compatibilidade de criação anterior
 
@@ -276,26 +281,38 @@ Invariantes de persistência:
 - **Evidência:** inspeção da allowlist, modelo de patch e UPDATE, seguida de
   validação integrada autorizada.
 
-### `GRP-API-AC-005` — Rejeição de patch inválido
+### `GRP-API-AC-005` — Rejeição e ausência no patch
 
 **Cobre:** `GRP-API-010` a `012`, `015`, `020`
 
-- **Dado que** o patch use `id`, operação, caminho ou valor inválido;
+- **Dado que** o `id` não seja positivo ou o patch esteja vazio, use operação
+  diferente de `replace`, caminho fora da allowlist ou valor inválido;
 - **Quando** a requisição for processada;
-- **Então** a API retorna `400` com detalhes consumíveis e não altera o Group;
+- **Então** a API retorna `400` com `ProblemDetails` ou
+  `ValidationProblemDetails` consumível e não executa UPDATE;
+- **E dado que** o `id` seja positivo, o patch seja válido e o Group não
+  exista;
+- **Quando** a requisição for processada;
+- **Então** a API retorna `404` com `ProblemDetails` consumível e não executa
+  UPDATE;
 - **Evidência:** inspeção e validação integrada autorizada, comparando o estado
-  antes e depois.
+  antes e depois de cada ramo.
 
-### `GRP-API-AC-006` — Exclusão existente e inexistente
+### `GRP-API-AC-006` — Exclusão válida, inválida e repetida
 
 **Cobre:** `GRP-API-016` a `018`
 
-- **Dado que** um Group possua relações com capabilities;
+- **Dado que** o `id` não seja positivo;
+- **Quando** o DELETE for processado;
+- **Então** a API retorna `400` com `ProblemDetails` consumível e não executa
+  DELETE;
+- **E dado que** um Group existente possua relações com capabilities;
 - **Quando** ele for excluído e a exclusão for repetida;
 - **Então** a primeira chamada retorna `204`, remove Group e relações sem
-  remover capabilities, e a repetição retorna `404`;
+  remover capabilities, e a repetição retorna `404` com `ProblemDetails`
+  consumível sem nova mutação;
 - **Evidência:** validação integrada autorizada com MySQL descartável e inspeção
-  das linhas relacionadas.
+  das linhas relacionadas antes e depois de cada chamada.
 
 ### `GRP-API-AC-007` — OpenAPI coerente
 
@@ -303,19 +320,39 @@ Invariantes de persistência:
 
 - **Dado que** a API seja construída com os contratos desta versão;
 - **Quando** o documento OpenAPI for gerado;
-- **Então** schemas, nulabilidade, payloads e status correspondem ao contrato;
+- **Então** schemas, nulabilidade, payloads, respostas de `ProblemDetails` e
+  status correspondem ao contrato e aos status efetivos do middleware vigente,
+  somente nas operações em que possam ocorrer;
 - **Evidência:** inspeção do OpenAPI gerado, sem publicação.
+
+### `GRP-API-AC-008` — Conflito, falha e atomicidade da persistência
+
+**Cobre:** `GRP-API-006`, `008`, `014`, `016` a `020`
+
+- **Dado que** a persistência imponha um conflito conhecido pelo middleware ou
+  falhe durante POST, PATCH ou DELETE;
+- **Quando** a mutação for processada, inclusive com falha posterior a uma
+  escrita em fluxo transacional;
+- **Então** a API retorna o status de falha correspondente, incluindo `409`
+  para conflito de unicidade existente, e nunca retorna resposta terminal de
+  sucesso;
+- **E** POST e DELETE preservam atomicamente o estado anterior, sem criação ou
+  remoção parcial de Group ou relação e sem alterar ou excluir capabilities;
+- **Evidência:** inspeção dos limites transacionais e validação integrada
+  autorizada com falha controlada em MySQL descartável, comparando Group,
+  relações e capabilities antes e depois.
 
 ### 7.1 Evidências planejadas
 
 - **Artefatos de teste no recorte:** Nenhum. Esta versão não autoriza criar,
   reparar ou alterar projeto de testes.
 - Inspeção do delta, dos DTOs, guards, queries, transações e OpenAPI gerado.
-- Validação integrada em MySQL descartável dos sete critérios, mediante
+- Validação integrada em MySQL descartável dos oito critérios, mediante
   autorização operacional própria; sem execução autorizada, o resultado deve
   permanecer `Not Executed`.
 - A implementação deve preservar registros comparativos antes e depois para os
-  cenários de PATCH inválido e DELETE com relações.
+  cenários de criação inválida, PATCH inválido ou ausente, DELETE inválido ou
+  repetido e falha de persistência.
 
 ## 8. Conhecimento afetado
 
