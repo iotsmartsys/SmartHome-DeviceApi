@@ -26,4 +26,15 @@ internal class DeviceSettingsQuery
         WHERE DeviceKey = @DeviceId
         ORDER BY Name;
         ";
+
+    public const string GetDeviceKeyByDeviceId = @"
+        SELECT Id
+        FROM Devices
+        WHERE DeviceId = @DeviceId;
+        ";
+
+    public const string DeleteDeviceSettingsByDeviceKey = @"
+        DELETE FROM DeviceSettings
+        WHERE DeviceId = @DeviceKey;
+        ";
 }
