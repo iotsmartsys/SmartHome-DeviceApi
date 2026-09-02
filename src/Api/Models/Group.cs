@@ -29,6 +29,49 @@ public record class Group(int id, string name, bool active, IconGroup? icon, IEn
         return entity;
     }
 }
+
+public sealed record class GroupCreateRequest(
+    string? name,
+    bool active,
+    GroupIconRequest? icon = null,
+    IEnumerable<Capability>? capabilities = null)
+{
+    public Core.Entities.Group ToEntity()
+    {
+        Core.Entities.Group entity = new()
+        {
+            Name = name!,
+            IsActive = active,
+            Icon = icon is null
+                ? null
+                : new Core.Entities.IconGroup { Name = icon.name! }
+        };
+
+        foreach (var capability in capabilities ?? [])
+        {
+            entity.AddCapability(capability);
+        }
+
+        return entity;
+    }
+}
+
+public sealed class GroupPatchRequest
+{
+    public string? name { get; set; }
+    public bool active { get; set; }
+    public GroupIconRequest? icon { get; set; }
+
+    public static GroupPatchRequest FromEntity(Core.Entities.Group group) => new()
+    {
+        name = group.Name,
+        active = group.IsActive,
+        icon = group.Icon is null ? null : new GroupIconRequest(group.Icon.Name)
+    };
+}
+
+public sealed record class GroupIconRequest(string? name);
+
 public record class IconGroup(string name)
 {
     public static implicit operator IconGroup(Core.Entities.IconGroup icon)

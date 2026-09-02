@@ -171,7 +171,7 @@ das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 | Capabilities | Código | Inventoried | Inclui tipos, histórico e relações |
 | Settings | Código e queries | Mapped | Abrange settings globais, específicos e efetivos |
 | Properties | Código | Inventoried | Escopo por device |
-| Groups | Código | Inventoried | Mantém relações com capabilities |
+| Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e código | Mapped | Contrato administrativo concluído e validado por decisão do Arquiteto; mantém relações com capabilities |
 | Métricas | Código e schema parcial | Mapped | A suíte histórica `tests/Api.Tests` está `Retired` e não constitui evidência |
 | OAuth | Código | Inventoried | Contratos e política ainda não especificados |
 | Operação | Docker, workflow e scripts | Mapped | Existem caminhos de publicação distintos |

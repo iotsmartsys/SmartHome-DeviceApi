@@ -1,7 +1,10 @@
 using Api.Models;
 using Core.DI;
 using Data.Repositories.MySql.DI;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 
 var cts = new CancellationTokenSource();
 
@@ -12,6 +15,54 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.CustomSchemaIds(type => type.FullName?.Replace('+', '.') ?? type.Name);
+    options.MapType<JsonPatchDocument<GroupPatchRequest>>(() => new OpenApiSchema
+    {
+        Type = "array",
+        Description = "Operações JSON Patch replace para /name, /active ou /icon.",
+        Items = new OpenApiSchema
+        {
+            Type = "object",
+            AdditionalPropertiesAllowed = false,
+            Required = new HashSet<string> { "op", "path", "value" },
+            Properties = new Dictionary<string, OpenApiSchema>
+            {
+                ["op"] = new()
+                {
+                    Type = "string",
+                    Enum = new List<IOpenApiAny> { new OpenApiString("replace") }
+                },
+                ["path"] = new()
+                {
+                    Type = "string",
+                    Enum = new List<IOpenApiAny>
+                    {
+                        new OpenApiString("/name"),
+                        new OpenApiString("/active"),
+                        new OpenApiString("/icon")
+                    }
+                },
+                ["value"] = new()
+                {
+                    Nullable = true,
+                    OneOf = new List<OpenApiSchema>
+                    {
+                        new() { Type = "string" },
+                        new() { Type = "boolean" },
+                        new()
+                        {
+                            Type = "object",
+                            AdditionalPropertiesAllowed = false,
+                            Required = new HashSet<string> { "name" },
+                            Properties = new Dictionary<string, OpenApiSchema>
+                            {
+                                ["name"] = new() { Type = "string" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
 });
 
 builder.Services.AddHostedService<DatabaseWatchdogService>();

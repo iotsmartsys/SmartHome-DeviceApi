@@ -1,5 +1,46 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
+
+**Estado:** Closed
+
+**Data de abertura:** 02/09/2026
+
+**Especificação:** `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` em
+`docs/specs/GROUPS-MAINTENANCE-SUPPORT.md`
+
+### Objetivo
+
+Adequar leitura, criação, patch e exclusão de Groups para habilitar a nova
+superfície de manutenção do aplicativo AIoTSmartHome.
+
+### Decisões
+
+- coleção vazia será representada por `200 []`;
+- POST aceitará ausência de `id` e `capabilities`, persistirá o ícone opcional
+  e manterá compatibilidade com capabilities opcionais de consumidores
+  anteriores;
+- PATCH aceitará somente `replace` de `name`, `active` e `icon`, preservando
+  associações;
+- DELETE distinguirá Group inexistente e removerá relações atomicamente sem
+  excluir capabilities;
+- contratos HTTP de leitura, criação e patch serão separados localmente;
+- nenhum artefato de teste integra a versão; validação integrada depende de
+  autorização e MySQL descartável.
+
+### Estado
+
+A versão 0.1 está Concluída [`Done`] por decisão do Arquiteto em 02/09/2026.
+DTOs de criação e patch foram separados, guards e `ProblemDetails` foram
+aplicados, INSERT passou a persistir `IconName`, PATCH atualiza somente os
+campos solicitados e DELETE remove relações em transação explícita. O build
+`dotnet build src/Api/Api.csproj --configuration Release` terminou com código
+zero. O Arquiteto informou a conclusão da validação, julgou as evidências
+suficientes e autorizou a promoção para `main`; detalhes técnicos adicionais da
+validação não foram registrados neste repositório. Testes automatizados,
+publicação, deploy e alteração do aplicativo consumidor não integraram esta
+execução. A integração é comprovada pelo histórico Git.
+
 ## EKM-CHG-0002 — Especificação de reset de settings específicos de device
 
 **Estado:** Open

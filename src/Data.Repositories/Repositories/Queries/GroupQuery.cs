@@ -37,8 +37,8 @@ internal static class GroupQuery
     ";
 
     public const string Insert = @"
-    INSERT INTO `Groups` (Name, Activated, CreatedAt, UpdatedAt)
-    VALUES (@name, @activated, NOW(), NOW());
+    INSERT INTO `Groups` (Name, Activated, IconName, CreatedAt, UpdatedAt)
+    VALUES (@name, @activated, @IconName, NOW(), NOW());
     SELECT LAST_INSERT_ID() AS NewId;
     ";
 
@@ -54,6 +54,31 @@ internal static class GroupQuery
     public const string Delete = @"
     DELETE FROM `Groups`
     WHERE Id = @id;
+    ";
+
+    public const string UpdateName = @"
+    UPDATE `Groups`
+    SET Name = @name, UpdatedAt = NOW()
+    WHERE Id = @id;
+    ";
+
+    public const string UpdateActive = @"
+    UPDATE `Groups`
+    SET Activated = @active, UpdatedAt = NOW()
+    WHERE Id = @id;
+    ";
+
+    public const string UpdateIcon = @"
+    UPDATE `Groups`
+    SET IconName = @iconName, UpdatedAt = NOW()
+    WHERE Id = @id;
+    ";
+
+    public const string GetIdForUpdate = @"
+    SELECT Id
+    FROM `Groups`
+    WHERE Id = @id
+    FOR UPDATE;
     ";
 
     public const string InsertCapabilityForGroup = @"
