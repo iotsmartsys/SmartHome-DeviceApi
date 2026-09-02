@@ -1,55 +1,65 @@
-# Instruções para agentes
+# Instruções permanentes e roteamento EKOM
 
-Este repositório adota a Engineering Knowledge Management (EKM) por referência
-externa. As definições compartilhadas da EKM não devem ser copiadas para este
-repositório.
+**Modelo EKOM:** 4.6
 
-## Fonte EKM
+**Modalidade:** capacidades referenciadas e governança proporcional
 
-A fonte atual deve ser lida diretamente em:
+**Estado:** vigente
 
-`/Users/marcelocostamiranda/source/EKM-guidelines`
+## Autoridade
 
-Antes de iniciar cada etapa ou operação, leia na fonte externa:
+O Arquiteto humano tem autoridade final sobre intenção, prioridade, escopo,
+arquitetura, risco aceitável, relevância das críticas, suficiência das
+evidências, aprovação, conclusão ou reabertura e integração. A especificação é
+a fonte da verdade para comportamento e governa a execução dos agentes.
 
-1. `docs/EKM-CONCEPT.md`;
-2. `docs/EKM-METHOD.md`;
-3. `docs/GOVERNANCE.md`;
-4. `docs/experiments/COORDINATED-ACTOR-MODEL.md`;
-5. os templates aplicáveis à tarefa.
+## Fonte dos perfis
 
-O apontamento é dinâmico nesta fase experimental. Não fixe nem valide o commit da
-EKM. Se o caminho não estiver acessível, interrompa a atuação; não use uma cópia
-ou cache como fallback.
+**Raiz do EKOM:** `/Users/marcelocostamiranda/source/EKM-guidelines`
 
-## Fontes específicas deste projeto
+Antes de qualquer atuação EKOM:
 
-Depois da leitura externa, leia nesta ordem:
+1. leia integralmente `roles/REGRAS-COMUNS.md` na raiz do EKOM;
+2. leia o perfil correspondente à capacidade recebida;
+3. leia a especificação indicada, quando aplicável;
+4. leia somente as fontes técnicas pertinentes.
 
-1. `docs/rfc/KNOWLEDGE-MAP.md`;
-2. `docs/specs/SYSTEM-DOSSIER.md`;
-3. as especificações relacionadas em `docs/specs/`;
-4. `docs/rfc/EKM-CHANGELOG.md` e a transação aplicável.
+| Capacidade recebida | Perfil |
+|---|---|
+| Autor da Especificação | `roles/AUTOR-DA-ESPECIFICACAO.md` |
+| Engenheiro Analista | `roles/ENGENHEIRO-ANALISTA.md` |
+| Engenheiro Implementador | `roles/ENGENHEIRO-IMPLEMENTADOR.md` |
+| Crítico ou Engenheiro Revisor | `roles/ENGENHEIRO-REVISOR.md` |
+| Consultor de Arquitetura | `roles/CONSULTOR-DE-ARQUITETURA.md` |
 
-As especificações, o mapa, o dossiê, as transações, as lacunas, os relatórios e
-as evidências deste sistema permanecem neste repositório.
+Análise de implementabilidade é obrigatória antes da implementação, mas pode
+ser executada na mesma atuação quando autorizada. Challenge é consultivo e
+proporcional ao risco, não um gate universal.
 
-## Decisões de processo confirmadas
+Implementação exige análise `Ready`, promoção registrada e autorização da mesma
+versão. Com esses gates satisfeitos, o build canônico dos entregáveis
+construíveis afetados integra a implementação e não exige cláusula na
+especificação. Coleta ou execução de testes, flash, monitor e hardware exigem
+autorização própria.
 
-- `main` é a referência de produção.
-- Toda especificação funcional deve nascer em branch exclusiva derivada de
-  `main`.
-- Especificação e desenvolvimento percorrem a mesma branch da mudança.
-- Cada atuação de agente começa em commit explícito, com worktree limpo e
-  estados da especificação registrados.
-- As branches `qa` e `homolog` são previstas para adoção futura, mas ainda não
-  são obrigatórias.
+## Fontes locais do projeto
 
-## Limites
+- especificações: `docs/specs/`;
+- ADRs: `docs/adr/`;
+- relatórios: `docs/reports/`;
+- transações e lacunas: `docs/rfc/EKOM-CHANGELOG.md`;
+- débitos técnicos aceitos: `docs/rfc/KNOWLEDGE-MAP.md`, namespace
+  `EKOM-DEBT-NNNN`;
+- mapa de conhecimento: `docs/rfc/KNOWLEDGE-MAP.md`;
+- visão e navegação: `docs/specs/SYSTEM-DOSSIER.md`;
+- diretriz local de adoção: `docs/rfc/EKOM-GUIDELINES.md`;
+- arquitetura e contratos: `docs/specs/ISSP-Architecture.md`,
+  `docs/specs/ISSP-Commissioning.md` e `components/README.md`;
+- targets e execução de testes:
+  `docs/specs/Repository-Test-Execution-Policy.md`;
+- guarda documental: `python3 tools/validate_ekom_documents.py .`.
 
-- Não invente intenção, contrato, compatibilidade ou comportamento ausente.
-- Preserve alterações preexistentes e fora do escopo.
-- Não trate relatório como fonte de novos requisitos.
-- Não execute operação Git ou externa sem autorização aplicável.
-- Mudanças funcionais exigem especificação, Technical Readiness Review integral,
-  aprovação humana e reconfirmação do checkpoint.
+## Invariantes locais
+
+
+> **Specifications orchestrate. Code implements.**
