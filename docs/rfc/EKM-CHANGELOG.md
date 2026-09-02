@@ -1,5 +1,39 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
+
+**Estado:** Open
+
+**Data de abertura:** 02/09/2026
+
+**Especificação:** `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` em
+`docs/specs/GROUPS-MAINTENANCE-SUPPORT.md`
+
+### Objetivo
+
+Adequar leitura, criação, patch e exclusão de Groups para habilitar a nova
+superfície de manutenção do aplicativo AIoTSmartHome.
+
+### Decisões
+
+- coleção vazia será representada por `200 []`;
+- POST aceitará ausência de `id` e `capabilities`, persistirá o ícone opcional
+  e manterá compatibilidade com capabilities opcionais de consumidores
+  anteriores;
+- PATCH aceitará somente `replace` de `name`, `active` e `icon`, preservando
+  associações;
+- DELETE distinguirá Group inexistente e removerá relações atomicamente sem
+  excluir capabilities;
+- contratos HTTP de leitura, criação e patch serão separados localmente;
+- nenhum artefato de teste integra a versão; validação integrada depende de
+  autorização e MySQL descartável.
+
+### Estado
+
+A versão 0.1 está em `Draft`, com Análise de Implementabilidade pendente.
+Código, testes, banco, build, deploy e aplicativo consumidor não foram
+alterados nesta autoria.
+
 ## EKM-CHG-0001 — Fundação EKM por referência externa
 
 **Estado:** Open
