@@ -6,7 +6,7 @@
 
 **Versão:** 0.1
 
-**Estado do workflow:** Implementação concluída [`Implemented`]
+**Estado do workflow:** Concluída [`Done`]
 
 **Análise de implementabilidade:** Pronta [`Ready`] para a revisão `ff67c991`,
 conforme relatório
@@ -18,9 +18,9 @@ conforme relatório
 
 - Nova [`New`] — primeiro contrato normativo local da manutenção administrativa
   de Groups na Device API;
-- Habilita [`Enables`]
-  `AIOTSMARTHOME-GROUPS-MAINTENANCE-001@0.1`, após implementação e validação
-  deste contrato e reconciliação da especificação consumidora.
+- Habilita [`Enables`] `AIOTSMARTHOME-GROUPS-MAINTENANCE-001@0.1`; a
+  implementação e a validação deste contrato foram consideradas suficientes
+  pelo Arquiteto, restando à especificação consumidora sua reconciliação local.
 
 ## 1. Objetivo e contexto
 
@@ -406,7 +406,9 @@ validação integrada, quando autorizada.
 
 ## 10. Encaminhamento
 
-Esta versão possui Implementação concluída [`Implemented`] e segue para
-Revisão. O build canônico foi concluído; testes, validação integrada em MySQL e
-alteração do aplicativo consumidor permanecem `Not Executed`. Somente o
-Arquiteto determina conclusão e integração.
+Esta versão está Concluída [`Done`] por decisão do Arquiteto em 02/09/2026. O
+build canônico foi concluído e a validação realizada pelo Arquiteto foi julgada
+suficiente para o encerramento. Testes automatizados, publicação, deploy e
+alteração do aplicativo consumidor não integraram esta execução. A promoção da
+implementação para `main` foi autorizada na mesma decisão; o histórico Git
+constitui a evidência da integração.

@@ -2,7 +2,7 @@
 
 ## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
 
-**Estado:** Open
+**Estado:** Closed
 
 **Data de abertura:** 02/09/2026
 
@@ -30,13 +30,16 @@ superfície de manutenção do aplicativo AIoTSmartHome.
 
 ### Estado
 
-A versão 0.1 possui Implementação concluída [`Implemented`] e segue para
-Revisão. DTOs de criação e patch foram separados, guards e `ProblemDetails`
-foram aplicados, INSERT passou a persistir `IconName`, PATCH atualiza somente
-os campos solicitados e DELETE remove relações em transação explícita. O build
+A versão 0.1 está Concluída [`Done`] por decisão do Arquiteto em 02/09/2026.
+DTOs de criação e patch foram separados, guards e `ProblemDetails` foram
+aplicados, INSERT passou a persistir `IconName`, PATCH atualiza somente os
+campos solicitados e DELETE remove relações em transação explícita. O build
 `dotnet build src/Api/Api.csproj --configuration Release` terminou com código
-zero. Testes, OpenAPI gerado, MySQL, deploy e aplicativo consumidor permanecem
-`Not Executed`.
+zero. O Arquiteto informou a conclusão da validação, julgou as evidências
+suficientes e autorizou a promoção para `main`; detalhes técnicos adicionais da
+validação não foram registrados neste repositório. Testes automatizados,
+publicação, deploy e alteração do aplicativo consumidor não integraram esta
+execução. A integração é comprovada pelo histórico Git.
 
 ## EKM-CHG-0002 — Especificação de reset de settings específicos de device
 
