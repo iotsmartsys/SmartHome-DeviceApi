@@ -6,9 +6,12 @@
 
 **Versão:** 0.3
 
-**Estado do workflow:** Rascunho [`Draft`]
+**Estado do workflow:** Em andamento [`In Progress`]
 
-**Implementação:** Não iniciada; esta atuação autoriza somente documentação.
+**Implementação:** Implementação técnica concluída e encaminhada à Revisão;
+build canônico aprovado. Aceite operacional pendente. Ordem explícita do
+Arquiteto para implementar integralmente 0.3 após análise Ready do snapshot
+`3a8c4ca27c3812a8a20452c456504f5512aadb87fdc7c17444646591f3af7139`.
 
 **Relação normativa:** Nova [`New`], aditiva às APIs existentes. Esta revisão
 substitui o conteúdo da revisão documental 0.2 desta mesma especificação.
@@ -33,8 +36,10 @@ Na revisão 0.3, o Arquiteto determinou que a precedência da seção 11.2
 governa também a listagem de capabilities, inclusive para tipo não suportado.
 
 Escopo funcional: CRUD de dashboards/widgets, catálogo, compatibilidade e
-renderização de valor atual. Esta ordem não autoriza implementação, build,
-testes, HTTP, banco, migração, deploy nem desenvolvimento do app Swift.
+renderização de valor atual. A ordem original de autoria não autorizava
+implementação, build, testes, HTTP, banco, migração, deploy ou app Swift.
+A ordem posterior de implementação integral autoriza código e build canônico;
+as demais operações permanecem sujeitas à autorização própria.
 Histórico, comandos de devices, multiusuário e mudança transversal de
 identidade/autenticação ficam fora do recorte funcional.
 
@@ -537,5 +542,7 @@ não altera relógio, sessões MySQL ou contratos de escrita de capabilities.
   roles/AUTOR-DA-ESPECIFICACAO.md na raiz EKM-guidelines. Bootstrap local 4.6
   e perfis externos 4.7 permanecem sem alteração.
 
-Revisão 0.3 registrada em Draft para nova Análise de Implementabilidade.
-Sem Ready, implementação, integração em main ou encerramento Done nesta entrega.
+Revisão 0.3 analisada como Ready; implementação técnica entregue para Revisão.
+[Relatório de implementação](../reports/DASHBOARD-API-V1/implementation/2026-09-05T025714Z-0.3-50c7654c-c78e-4d19-aa77-10fc5f53b503-implementation.md)
+registra build e limitações. Workflow permanece In Progress até decisão humana;
+sem execução de aceite operacional, integração em main ou encerramento Done.

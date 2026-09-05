@@ -81,6 +81,7 @@ falhas consecutivas, permitindo reinício pelo orquestrador.
 
 - devices;
 - capabilities e histórico;
+- dashboards globais, widgets, catálogo e dados atuais (implementação 0.3; validação operacional pendente);
 - settings globais;
 - settings específicos por device;
 - properties por device;
@@ -170,6 +171,7 @@ das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 | Devices | Código e `Readme.md` | Inventoried | Sem especificação normativa EKM |
 | Capabilities | Código | Inventoried | Inclui tipos, histórico e relações |
 | Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` | Mapped | Versão 0.2 Done por decisão humana; build aprovado, validação e testes aceitos pelo Arquiteto |
+| Dashboard API v1 | `SHD-DASHBOARD-API-V1-001@0.3` | Mapped | Implementação técnica e build concluídos; schema não aplicado e aceite operacional pendente |
 | Settings | Código e queries | Mapped | Abrange settings globais, específicos e efetivos |
 | Properties | Código | Inventoried | Escopo por device |
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e código | Mapped | Contrato administrativo concluído e validado por decisão do Arquiteto; mantém relações com capabilities |

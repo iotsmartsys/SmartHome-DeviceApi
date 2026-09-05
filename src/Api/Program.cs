@@ -65,6 +65,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddScoped<Core.Services.DashboardDataResolver>(_ =>
+    new Core.Services.DashboardDataResolver(builder.Configuration["Dashboard:SourceTimeZone"]));
+
 builder.Services.AddHostedService<DatabaseWatchdogService>();
 
 builder.Services
@@ -99,6 +102,7 @@ app.UseCors("AllowAll");
 app.UseOutputCache();
 app.MapControllers();
 app.UseMiddleware<ExceptionHandler>();
+app.UseMiddleware<DashboardExceptionHandler>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

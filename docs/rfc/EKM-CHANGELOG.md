@@ -8,7 +8,8 @@
 
 **Especificação:** [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md).
 
-**Workflow:** Draft. Análise da revisão 0.3: Ready. Implementação não iniciada nem autorizada.
+**Workflow:** In Progress. Implementação técnica integral 0.3 e build canônico
+concluídos, encaminhados à Revisão; aceite operacional pendente.
 
 **Autorização atual:** decisão expressa do Arquiteto pela precedência da
 seção 11.2. Revisão 0.3 incorpora essa decisão na listagem, nas regras de
@@ -46,8 +47,15 @@ confrontados; B-04 descartado pela precedência única, demais disposições
 preservadas. Challenge sem bloqueadores; limitações operacionais mantidas.
 Especificação e relatórios históricos permanecem inalterados nesta análise.
 
-**Estado resultante:** análise técnica concluída para 0.3; implementação depende
-de ordem explícita do Arquiteto. Sem integração em main ou conclusão Done.
+**Implementação:** ordem explícita do Arquiteto para implementar integralmente
+0.3. [Relatório](../reports/DASHBOARD-API-V1/implementation/2026-09-05T025714Z-0.3-50c7654c-c78e-4d19-aa77-10fc5f53b503-implementation.md)
+registra CRUD, catálogo, resolução de dados, validação e DDL aditivo preparado.
+Build canônico exit 0; nenhum teste/HTTP/banco executado. SQL não aplicado,
+SourceTimeZone não presumido, P-07 preservada. Sem mudanças de pacotes,
+contratos antigos ou suíte Retired.
+
+**Estado resultante:** implementação técnica entregue para Revisão; In Progress.
+Sem aprovação de aceite operacional, integração em main ou conclusão Done.
 
 ## EKM-CHG-0004 — CapabilityType por id
 
