@@ -1,5 +1,40 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0005 — Especificação Dashboard API v1
+
+**Estado:** Open
+
+**Data de abertura:** 04/09/2026
+
+**Especificação:** [SHD-DASHBOARD-API-V1-001@0.1](../specs/DASHBOARD-API-V1.md).
+
+**Workflow:** Draft. Implementação não iniciada; análise formal não executada.
+
+**Autorização:** ordem explícita do Arquiteto para registrar a proposta da
+conversa “Design de Dashboard IoT” seguindo EKOM, sem implementar código.
+
+**Escopo:** autoria da especificação, requisitos rastreáveis, contratos,
+critérios de aceite futuros e reconciliação do mapa. Relação normativa New;
+contratos existentes preservados.
+
+**Baseline:** main@648b4ce5c935b4343a3cca682b8f526fcf59249b, árvore limpa;
+branch documental spec/dashboard-api-v1.
+
+**Pendências:** ownership, identificação e metadados das capabilities,
+catálogo inicial versus histórico, conversão e ausência de dados, erros,
+validações e autoridade de schema/migração, descritos na seção 16. A leitura
+da conversa foi truncada em 13.4; somente o trecho recuperado foi atribuído
+à proposta original. Nenhuma pendência constitui débito aceito.
+
+**Validação documental:** integridade textual, exemplos JSON, links locais e
+escopo do delta verificados antes da entrega. A guarda documental indicada
+pelo AGENTS.md não está presente no repositório. Build e testes não se aplicam
+a esta autoria; nenhuma chamada à API ou operação de banco foi executada.
+
+**Encaminhamento:** reconciliar pendências e realizar análise de
+implementabilidade da versão resultante antes de qualquer implementação.
+Não há aprovação de implementação, integração em main ou encerramento Done.
+
 ## EKM-CHG-0004 — CapabilityType por id
 
 **Estado:** Closed

@@ -41,6 +41,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1`, `EKM-GAP-0001`, `EKM-GAP-0002` | `src/Api/Controllers/GroupController.cs`, modelos HTTP de Groups, `src/Core/Entities/Group.cs`, `src/Data.Repositories/Repositories/GroupRepository.cs` e queries relacionadas | Especificação v0.1 concluída; implementação, build Release e validação aceita pelo Arquiteto | Mapped |
 | Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
 | Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Versão 0.2 Done; build aprovado, validação e testes aceitos pelo Arquiteto | Mapped |
+| Dashboard API v1 | [SHD-DASHBOARD-API-V1-001@0.1](../specs/DASHBOARD-API-V1.md) | Não implementada | Proposta registrada em Draft; análise de implementabilidade não executada; pendências na seção 16 | Draft |
 | Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
 | OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
 | Persistência | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Queries Dapper e scripts parciais | Inventoried |
@@ -51,6 +52,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 ```text
 SmartHome-DeviceApi
 ├── Contratos normativos
+│   ├── Dashboard API v1 (Draft; não implementada)
 │   ├── Capability Types por id (Done)
 │   ├── Suporte à manutenção de Groups
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
@@ -65,6 +67,8 @@ SmartHome-DeviceApi
 
 ```mermaid
 flowchart LR
+    DASHSPEC[SHD-DASHBOARD-API-V1-001 Draft] -.->|propõe leitura de capabilities| DASHCAP[Capabilities existentes]
+    DASHSPEC -.->|propõe contrato HTTP| DASHAPP[Editor e renderização Swift futuros]
     CTSPEC[SHD-CAPABILITY-TYPE-ID-001] -->|contrato| CTAPI[CapabilityTypeController]
     CTAPI --> CTCORE[CapabilityType / ICapabilityTypeRepository]
     CTCORE --> CTDB[CapabilityTypeRepository / MySQL]
