@@ -8,7 +8,7 @@
 
 **Especificação:** [SHD-DASHBOARD-API-V1-001@0.2](../specs/DASHBOARD-API-V1.md).
 
-**Workflow:** Draft. Implementação não iniciada; análise da revisão 0.2 pendente.
+**Workflow:** Draft. Implementação não iniciada; análise 0.2: Not Ready — Specification Defect.
 
 **Autorização atual:** ordem do Arquiteto para atualizar a especificação para
 0.2, com decisões explícitas sobre contexto global, IDs reais, mapeamento,
@@ -33,8 +33,13 @@ de migração. Nenhum débito aceito, implementação ou validação operacional
 A guarda tools/validate_ekom_documents.py continua ausente. Build, testes,
 HTTP e banco não executados; suíte Api.Tests permanece Retired.
 
-**Encaminhamento:** Análise de Implementabilidade da revisão 0.2. Nenhuma
-aprovação Ready, integração em main ou conclusão Done nesta autoria.
+**Análise atual:** [relatório 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md),
+atuação exclusiva de Engenheiro Analista por ordem do Arquiteto. Dez requisitos,
+onze critérios e seis bloqueadores anteriores confrontados. B-01/02/03/05/06
+descartados; B-04 mantido, restrito à precedência contraditória de status para
+tipo não suportado na listagem. Especificação e relatório anterior preservados.
+
+**Estado resultante:** sem Ready, integração em main ou conclusão Done.
 
 ## EKM-CHG-0004 — CapabilityType por id
 
