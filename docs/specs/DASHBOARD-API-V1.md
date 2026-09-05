@@ -4,19 +4,19 @@
 
 **Classe da fonte:** Normativa (proposta em rascunho)
 
-**Versão:** 0.2
+**Versão:** 0.3
 
 **Estado do workflow:** Rascunho [`Draft`]
 
 **Implementação:** Não iniciada; esta atuação autoriza somente documentação.
 
 **Relação normativa:** Nova [`New`], aditiva às APIs existentes. Esta revisão
-substitui o conteúdo da revisão documental 0.1 desta mesma especificação.
+substitui o conteúdo da revisão documental 0.2 desta mesma especificação.
 
 ## Contexto de registro e autoridade
 
 Origem: conversa “Design de Dashboard IoT”, de 04/09/2026,
-`6a373c18-d4a4-83e9-b423-30e62d60571a`. API v1 identifica a API; 0.2 identifica
+`6a373c18-d4a4-83e9-b423-30e62d60571a`. API v1 identifica a API; 0.3 identifica
 esta revisão documental EKOM. A recuperação original terminou em 13.3;
 esta revisão é autoria local e não atribui conteúdo adicional à conversa.
 
@@ -28,6 +28,9 @@ mantém, null reseta e objeto config mescla com defaults; x/y não negativos
 e dimensões entre 1 e 4. As demais regras abaixo são detalhamento autoral
 proposto para tornar essas decisões verificáveis, sem alegar confirmação
 humana individual de cada default. A revisão permanece Draft para análise.
+
+Na revisão 0.3, o Arquiteto determinou que a precedência da seção 11.2
+governa também a listagem de capabilities, inclusive para tipo não suportado.
 
 Escopo funcional: CRUD de dashboards/widgets, catálogo, compatibilidade e
 renderização de valor atual. Esta ordem não autoriza implementação, build,
@@ -108,7 +111,8 @@ os tipos encontrados na baseline; não mudam o contrato dessas capabilities.
 Tipo ausente ou não listado não é inferido pelo valor/nome: dataType=null,
 sem compatibleWidgets e rejeição de criação/atualização por
 UNSUPPORTED_CAPABILITY_DATA_TYPE. A mudança posterior para tipo não suportado
-produz invalid_value na renderização de widget já salvo.
+produz invalid_value na renderização de widget já salvo somente quando
+nenhuma condição de maior precedência da seção 11.2 for aplicável.
 
 unit vem de CapabilityType.ValueSymbol: null ou vazio significa null. config.unit,
 quando não null, prevalece apenas na renderização. capabilityName é Capability.Name;
@@ -286,7 +290,15 @@ não excluir silenciosamente fontes sem leitura. Cada item contém deviceId,
 deviceName, capabilityId, capabilityCode, capabilityName, dataType, unit,
 semanticType, currentValue, lastUpdatedAt, status e compatibleWidgets (códigos).
 Valor/status usam as mesmas regras da seção 11, sem configuração de widget.
-Tipo não suportado retorna dataType=null, status=invalid_value e lista vazia.
+Tipo não suportado retorna dataType=null e compatibleWidgets=[]; o status
+segue estritamente a precedência da seção 11.2. Não há exceção de precedência
+para essa listagem. invalid_value só é retornado quando nenhuma condição
+anterior for aplicável. Assim, sem erro de maior precedência, tipo não
+suportado com fonte offline retorna offline; com fonte online e sem valor,
+retorna no_data.
+Com fonte online, valor e instante presentes, sem condição de maior
+precedência, retorna invalid_value. dataType e compatibleWidgets mantêm os
+valores acima em todos esses casos.
 
 Cada widget renderizado contém widgetId, title, deviceId, capabilityId,
 capabilityCode, widgetType, dataType, dataMode, value, unit, label, icon,
@@ -370,11 +382,15 @@ Exceto text, remover espaços externos; tokens lógicos/de estado são comparado
 sem distinção de caixa e retornam em minúsculas. Valor fora da regra é
 invalid_value com value=null. Tipo/compatibilidade alterado depois da criação
 que torne o widget inválido também resulta em invalid_value, assim como tipo
-de widget posteriormente desabilitado. Não adaptar silenciosamente o widget.
+de widget posteriormente desabilitado. Essas condições de invalid_value
+respeitam a precedência da seção 11.2; não se sobrepõem a error, offline ou
+no_data. Não adaptar silenciosamente o widget.
 
 ### 11.2 Status e precedência
 
-Avaliar na ordem abaixo; primeiro caso aplicável vence:
+Avaliar na ordem abaixo; primeiro caso aplicável vence, tanto na renderização
+de widgets quanto na listagem de capabilities. Tipo não suportado não altera
+essa ordem:
 
 | status | Condição | value e apresentação |
 |---|---|---|
@@ -473,30 +489,31 @@ própria. Nenhuma dessas execuções é autorizada por esta autoria documental.
 | AC-06 / 007 | Fixtures de conversão válida, aliases, metadados, unit e inversão: value preserva fonte; label/icon seguem config. Nulls são emitidos e config completa permanece. Número 0 e booleano false reais continuam valores válidos. | Fixtures e respostas HTTP. |
 | AC-07 / 008 | IDs inválidos, JSON malformado, erros de config, recurso ausente e widget de outro dashboard retornam status/envelope da seção 9, sem mutação; APIs antigas conservam seus contratos. | HTTP e banco isolado. |
 | AC-08 / 009 | Excluir widget/dashboard remove somente widgets pertinentes; devices/capabilities permanecem. Excluir capability preserva widget com capabilityId original e status capability_missing. | Banco isolado antes/depois e HTTP. |
-| AC-09 / 007 | Cobrir os sete status e precedência: ausência não vira valor; offline prevalece sobre no_data; erro isolado não elimina os demais widgets. Idade 300s é ok, maior é stale; futuro é invalid_value; fuso ausente é error. Falha global do banco é 503. | Fixtures controladas e HTTP. |
+| AC-09 / 007 | Cobrir os sete status e precedência: ausência não vira valor; offline prevalece sobre no_data; na listagem, tipo não suportado com fonte offline resulta em offline, com fonte online sem valor resulta em no_data, e com fonte online, valor presente e instante válido resulta em invalid_value, sempre sem erro de maior precedência, com dataType=null e compatibleWidgets=[]. Erro isolado não elimina os demais widgets. Idade 300s é ok, maior é stale; futuro é invalid_value; fuso ausente é error. Falha global do banco é 503. | Fixtures controladas e HTTP. |
 | AC-10 / 005,008 | x/y=-1, dimensão 0/5, refresh 0/86401 e decimals 7 rejeitados; limites válidos aceitos, colisão permitida. Config desconhecida, thresholds fora da escala e min>=max rejeitados atomicamente. | HTTP e banco isolado. |
 | AC-11 / 005 | Troca de tipo com config omitida inválida é rejeitada; config=null usa novos defaults. PUTs concorrentes em campos distintos preservam ambos; {} é no-op. | HTTP concorrente e banco isolado. |
 
 Critério sem execução é evidência ausente, não aprovação. Não existe
-classificação Ready para 0.2 nesta atuação de autoria.
+classificação Ready para 0.3 nesta atuação de autoria.
 
 ## 16. Reconciliação da análise e dependências
 
-Baseline desta revisão: `ab3d671`, branch `spec/dashboard-api-v1`, árvore limpa
-antes da autoria. A análise da 0.1 é histórica e imutável; não classifica a 0.2.
+Baseline desta revisão: `d32b419`, branch `spec/dashboard-api-v1`, árvore limpa
+antes da correção. As análises 0.1 e 0.2 são históricas e imutáveis; não
+classificam a revisão 0.3.
 
-| Achado 0.1 | Disposição autoral na 0.2 |
+| Achado 0.1 | Disposição autoral vigente |
 |---|---|
 | B-01 / P-01 | Contexto global, acesso e unicidade definidos na seção 2; atomicidade em 6.4. |
 | B-02 / P-02 | IDs, origem dos metadados, mapeamento e tipos desconhecidos em 2/3. |
 | B-03 / P-03 | Catálogo planejado/desabilitado e rejeição de layouts/modos em 3. |
-| B-04 / P-04 | Conversão, ausência, precedência dos sete status e fuso em 11. |
+| B-04 / P-04 | Contrato de dados em 11; conflito residual da análise 0.2 corrigido em 3.2, 7.3 e 11 pela precedência única de 11.2, com cenário de aceite em AC-09. |
 | B-05 / P-05 | Envelope, status e recursos aninhados em 8/9. |
 | B-06 / P-06 | PUT, reset, defaults, limites, concorrência e apresentação em 6/12/13. |
 | P-07 / EKM-GAP-0002 | Limitação de integração preservada em 5; não encerrada nem convertida em débito aceito. |
 
 “Disposição autoral” registra onde o contrato foi detalhado, sem declarar os
-bloqueadores tecnicamente encerrados. Isso depende de análise da revisão 0.2.
+bloqueadores tecnicamente encerrados. Isso depende de análise da revisão 0.3.
 Nenhuma capacidade transversal foi incorporada para resolver ownership.
 Dashboard:SourceTimeZone é configuração de leitura desta funcionalidade;
 não altera relógio, sessões MySQL ou contratos de escrita de capabilities.
@@ -511,6 +528,7 @@ não altera relógio, sessões MySQL ou contratos de escrita de capabilities.
 - [Reset de settings](DEVICE-SETTINGS-RESET.md).
 - [Instruções locais](../../AGENTS.md).
 - [Análise histórica 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md).
+- [Análise histórica 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md).
 - Fontes factuais: src/Core/Entities/Capability.cs, Device.cs, CapabilityType.cs,
   DataTypes/CapabilityDataType.cs e conversores; src/Api/Models/Capability.cs;
   src/Data.Repositories/Repositories/Queries/CapabilityQuery.cs e DeviceQuery.cs;
@@ -519,5 +537,5 @@ não altera relógio, sessões MySQL ou contratos de escrita de capabilities.
   roles/AUTOR-DA-ESPECIFICACAO.md na raiz EKM-guidelines. Bootstrap local 4.6
   e perfis externos 4.7 permanecem sem alteração.
 
-Revisão 0.2 registrada em Draft para nova Análise de Implementabilidade.
+Revisão 0.3 registrada em Draft para nova Análise de Implementabilidade.
 Sem Ready, implementação, integração em main ou encerramento Done nesta entrega.

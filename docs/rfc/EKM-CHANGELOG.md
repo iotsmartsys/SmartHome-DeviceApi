@@ -6,20 +6,19 @@
 
 **Data de abertura:** 04/09/2026
 
-**Especificação:** [SHD-DASHBOARD-API-V1-001@0.2](../specs/DASHBOARD-API-V1.md).
+**Especificação:** [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md).
 
-**Workflow:** Draft. Implementação não iniciada; análise 0.2: Not Ready — Specification Defect.
+**Workflow:** Draft. Implementação não iniciada; análise da revisão 0.3 pendente.
 
-**Autorização atual:** ordem do Arquiteto para atualizar a especificação para
-0.2, com decisões explícitas sobre contexto global, IDs reais, mapeamento,
-catálogo, grid, sete status, ausência sem valor fabricado, erros HTTP,
-PUT parcial e limites de layout. Atuação de Autor da Especificação.
+**Autorização atual:** decisão expressa do Arquiteto pela precedência da
+seção 11.2. Revisão 0.3 incorpora essa decisão na listagem, nas regras de
+tipo/conversão e no AC-09; demais contratos da 0.2 preservados.
 
 **Escopo:** contrato e critérios reconciliados, mapa e registro resumido.
 Relação New às APIs existentes; sem alteração de código ou autenticação
 transversal. Detalhes autorais complementares estão identificados na revisão.
 
-**Baseline da revisão:** ab3d671, branch spec/dashboard-api-v1, árvore limpa.
+**Baseline da revisão:** d32b419, branch spec/dashboard-api-v1, árvore limpa.
 A autoria inicial partiu de main@648b4ce5c935b4343a3cca682b8f526fcf59249b.
 
 **Histórico de análise:** [relatório imutável 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md),
@@ -33,11 +32,12 @@ de migração. Nenhum débito aceito, implementação ou validação operacional
 A guarda tools/validate_ekom_documents.py continua ausente. Build, testes,
 HTTP e banco não executados; suíte Api.Tests permanece Retired.
 
-**Análise atual:** [relatório 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md),
+**Análise histórica 0.2:** [relatório 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md),
 atuação exclusiva de Engenheiro Analista por ordem do Arquiteto. Dez requisitos,
 onze critérios e seis bloqueadores anteriores confrontados. B-01/02/03/05/06
 descartados; B-04 mantido, restrito à precedência contraditória de status para
-tipo não suportado na listagem. Especificação e relatório anterior preservados.
+tipo não suportado na listagem. A decisão posterior foi incorporada na 0.3;
+relatórios históricos permanecem imutáveis e não classificam a nova revisão.
 
 **Estado resultante:** sem Ready, integração em main ou conclusão Done.
 
