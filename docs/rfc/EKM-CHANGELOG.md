@@ -8,7 +8,7 @@
 
 **Especificação:** [SHD-DASHBOARD-API-V1-001@0.1](../specs/DASHBOARD-API-V1.md).
 
-**Workflow:** Draft. Implementação não iniciada; análise formal não executada.
+**Workflow:** Draft. Implementação não iniciada; análise 0.1: `Not Ready — Specification Defect`.
 
 **Autorização:** ordem explícita do Arquiteto para registrar a proposta da
 conversa “Design de Dashboard IoT” seguindo EKOM, sem implementar código.
@@ -34,6 +34,12 @@ a esta autoria; nenhuma chamada à API ou operação de banco foi executada.
 **Encaminhamento:** reconciliar pendências e realizar análise de
 implementabilidade da versão resultante antes de qualquer implementação.
 Não há aprovação de implementação, integração em main ou encerramento Done.
+
+**Análise de implementabilidade:** atuação exclusiva como Engenheiro Analista,
+por ordem do Arquiteto. [Relatório 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md)
+registra seis bloqueadores normativos, cobertura dos dez requisitos e nove
+critérios, e P-07 como limitação não bloqueante. Especificação preservada;
+nenhum build, teste, chamada HTTP ou operação de banco executado.
 
 ## EKM-CHG-0004 — CapabilityType por id
 
