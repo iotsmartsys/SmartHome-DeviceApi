@@ -1,0 +1,14 @@
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+  Core -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/bin/Debug/net9.0/Core.dll
+  Data.Repositories -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Data.Repositories/bin/Debug/net9.0/Data.Repositories.dll
+  Api -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/bin/Debug/net9.0/Api.dll
+
+Compilação com êxito.
+
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+    1 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:02.53
