@@ -40,7 +40,8 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Properties | `EKM-GAP-0001` | `src/Api/Controllers/PropertiesController.cs`, `src/Data.Repositories/Repositories/PropertyRepository.cs` | Código e build | Inventoried |
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1`, `EKM-GAP-0001`, `EKM-GAP-0002` | `src/Api/Controllers/GroupController.cs`, modelos HTTP de Groups, `src/Core/Entities/Group.cs`, `src/Data.Repositories/Repositories/GroupRepository.cs` e queries relacionadas | Especificação v0.1 concluída; implementação, build Release e validação aceita pelo Arquiteto | Mapped |
 | Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
-| Tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
+| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.1` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Especificação Draft e análise Ready; implementação não iniciada | Mapped |
+| Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
 | OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
 | Persistência | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Queries Dapper e scripts parciais | Inventoried |
 | Build, validação, imagem e operação | `AGENTS.md` + `docs/specs/SYSTEM-DOSSIER.md` + especificação aplicável | `src/Api/Api.csproj`, `src/Api/Dockerfile`, `.github/workflows/docker-api.yml`, `build.sh`, `docker-compose.swarm.yaml` | Build canônico da API e validações declaradas por especificação; `tests/Api.Tests` é ignorado globalmente | Mapped |
@@ -50,6 +51,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 ```text
 SmartHome-DeviceApi
 ├── Contratos normativos
+│   ├── Capability Types por id (Draft, análise Ready)
 │   ├── Suporte à manutenção de Groups
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
 ├── API e modelos HTTP
@@ -63,6 +65,9 @@ SmartHome-DeviceApi
 
 ```mermaid
 flowchart LR
+    CTSPEC[SHD-CAPABILITY-TYPE-ID-001 Draft] -->|contrato proposto| CTAPI[CapabilityTypeController]
+    CTAPI --> CTCORE[CapabilityType / ICapabilityTypeRepository]
+    CTCORE --> CTDB[CapabilityTypeRepository / MySQL]
     APP[AIoTSmartHome Groups] -->|HTTP /api/v1/groups| API[GroupController]
     SPEC[SHD-GROUPS-MAINTENANCE-SUPPORT-001] --> API
     API --> CORE[Group / IGroupRepository]
@@ -85,7 +90,13 @@ flowchart LR
 Nenhum débito técnico foi aceito pelo Arquiteto neste mapa. Lacunas e riscos
 observados permanecem na seção 5 até decisão humana de disposição.
 
-## 7. Manutenção
+## 7. Análise de Capability Types por id
+
+Relatório: `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T005112Z-3f300ef9-80a95854-7035-487a-8ef9-af14afd40318-implementability-analysis.md`.
+Classificação `Ready` para a versão 0.1, SHA-256 `3f300ef99c15dca9c638e9342f1679126f5fb0d14c850bd1eb3883bf5069cbc5`.
+Implementação não iniciada; esta entrada não promove o estado normativo.
+
+## 8. Manutenção
 
 Atualize este mapa quando uma fonte, autoridade, responsabilidade, evidência,
 estado ou lacuna mudar. Não remova uma entrada sem indicar o destino do

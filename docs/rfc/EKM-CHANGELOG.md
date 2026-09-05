@@ -1,5 +1,33 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0004 — CapabilityType por id
+
+**Estado:** Open
+
+**Especificação:** `SHD-CAPABILITY-TYPE-ID-001@0.1`, `Draft`.
+
+**Autorização humana:** confirmação do rascunho e ordem de registro e análise
+na mesma atuação, em 04/09/2026. Implementação não iniciada.
+
+**Recorte:** PATCH e DELETE por id, novo GET `/id/{id:int}`, id do banco nas
+respostas, preservação do GET por nome e renomeação pelo PATCH com id estável.
+
+**Branch:** `spec/capability-type-id`, derivada da `main` com árvore limpa.
+
+**Análise:** `Ready`, relatório `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T005112Z-3f300ef9-80a95854-7035-487a-8ef9-af14afd40318-implementability-analysis.md`.
+Revisão normativa SHA-256 `3f300ef99c15dca9c638e9342f1679126f5fb0d14c850bd1eb3883bf5069cbc5`.
+
+**Autoridades:** primeiro contrato deste recorte (`New`); preserva Groups e
+cobre parte de `EKM-GAP-0001`, sem encerrar lacunas ou aceitar débitos.
+
+**Validação documental:** inspeção do contrato e referências locais;
+`git diff --check` registrado na entrega. Guarda
+`tools/validate_ekom_documents.py` ausente na baseline (`Not Executed`).
+Build e validação HTTP/banco não executados nesta atuação documental.
+
+**Entrega:** somente documentos; commit e push da branch conforme regras comuns
+EKOM. Promoção, implementação e integração não realizadas nesta atuação.
+
 ## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
 
 **Estado:** Closed

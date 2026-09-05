@@ -169,6 +169,7 @@ das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 |---|---|---|---|
 | Devices | Código e `Readme.md` | Inventoried | Sem especificação normativa EKM |
 | Capabilities | Código | Inventoried | Inclui tipos, histórico e relações |
+| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.1` | Mapped | Contrato Draft com análise Ready; implementação não iniciada |
 | Settings | Código e queries | Mapped | Abrange settings globais, específicos e efetivos |
 | Properties | Código | Inventoried | Escopo por device |
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e código | Mapped | Contrato administrativo concluído e validado por decisão do Arquiteto; mantém relações com capabilities |
