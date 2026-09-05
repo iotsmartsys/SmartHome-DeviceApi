@@ -6,40 +6,35 @@
 
 **Data de abertura:** 04/09/2026
 
-**Especificação:** [SHD-DASHBOARD-API-V1-001@0.1](../specs/DASHBOARD-API-V1.md).
+**Especificação:** [SHD-DASHBOARD-API-V1-001@0.2](../specs/DASHBOARD-API-V1.md).
 
-**Workflow:** Draft. Implementação não iniciada; análise 0.1: `Not Ready — Specification Defect`.
+**Workflow:** Draft. Implementação não iniciada; análise da revisão 0.2 pendente.
 
-**Autorização:** ordem explícita do Arquiteto para registrar a proposta da
-conversa “Design de Dashboard IoT” seguindo EKOM, sem implementar código.
+**Autorização atual:** ordem do Arquiteto para atualizar a especificação para
+0.2, com decisões explícitas sobre contexto global, IDs reais, mapeamento,
+catálogo, grid, sete status, ausência sem valor fabricado, erros HTTP,
+PUT parcial e limites de layout. Atuação de Autor da Especificação.
 
-**Escopo:** autoria da especificação, requisitos rastreáveis, contratos,
-critérios de aceite futuros e reconciliação do mapa. Relação normativa New;
-contratos existentes preservados.
+**Escopo:** contrato e critérios reconciliados, mapa e registro resumido.
+Relação New às APIs existentes; sem alteração de código ou autenticação
+transversal. Detalhes autorais complementares estão identificados na revisão.
 
-**Baseline:** main@648b4ce5c935b4343a3cca682b8f526fcf59249b, árvore limpa;
-branch documental spec/dashboard-api-v1.
+**Baseline da revisão:** ab3d671, branch spec/dashboard-api-v1, árvore limpa.
+A autoria inicial partiu de main@648b4ce5c935b4343a3cca682b8f526fcf59249b.
 
-**Pendências:** ownership, identificação e metadados das capabilities,
-catálogo inicial versus histórico, conversão e ausência de dados, erros,
-validações e autoridade de schema/migração, descritos na seção 16. A leitura
-da conversa foi truncada em 13.4; somente o trecho recuperado foi atribuído
-à proposta original. Nenhuma pendência constitui débito aceito.
+**Histórico de análise:** [relatório imutável 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md),
+Not Ready — Specification Defect, seis bloqueadores. A seção 16 da 0.2
+localiza sua disposição autoral; não declara nova classificação técnica.
 
-**Validação documental:** integridade textual, exemplos JSON, links locais e
-escopo do delta verificados antes da entrega. A guarda documental indicada
-pelo AGENTS.md não está presente no repositório. Build e testes não se aplicam
-a esta autoria; nenhuma chamada à API ou operação de banco foi executada.
+**Limitação preservada:** P-07/EKM-GAP-0002, integração com schema e autoridade
+de migração. Nenhum débito aceito, implementação ou validação operacional.
 
-**Encaminhamento:** reconciliar pendências e realizar análise de
-implementabilidade da versão resultante antes de qualquer implementação.
-Não há aprovação de implementação, integração em main ou encerramento Done.
+**Validação documental:** JSON, links locais, rastreabilidade e diff verificados.
+A guarda tools/validate_ekom_documents.py continua ausente. Build, testes,
+HTTP e banco não executados; suíte Api.Tests permanece Retired.
 
-**Análise de implementabilidade:** atuação exclusiva como Engenheiro Analista,
-por ordem do Arquiteto. [Relatório 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md)
-registra seis bloqueadores normativos, cobertura dos dez requisitos e nove
-critérios, e P-07 como limitação não bloqueante. Especificação preservada;
-nenhum build, teste, chamada HTTP ou operação de banco executado.
+**Encaminhamento:** Análise de Implementabilidade da revisão 0.2. Nenhuma
+aprovação Ready, integração em main ou conclusão Done nesta autoria.
 
 ## EKM-CHG-0004 — CapabilityType por id
 

@@ -4,1230 +4,502 @@
 
 **Classe da fonte:** Normativa (proposta em rascunho)
 
-**Versão:** 0.1
+**Versão:** 0.2
 
 **Estado do workflow:** Rascunho [`Draft`]
 
-**Implementação:** Não iniciada; fora da autorização desta atuação
+**Implementação:** Não iniciada; esta atuação autoriza somente documentação.
 
-**Relação normativa:** Nova [`New`], aditiva aos contratos existentes.
-
-**Origem:** conversa “Design de Dashboard IoT”, de 04/09/2026,
-identificador `6a373c18-d4a4-83e9-b423-30e62d60571a`, e ordem explícita
-de registro no repositório. “API v1” identifica a API; 0.1 identifica a
-revisão documental EKOM.
+**Relação normativa:** Nova [`New`], aditiva às APIs existentes. Esta revisão
+substitui o conteúdo da revisão documental 0.1 desta mesma especificação.
 
 ## Contexto de registro e autoridade
 
-Este documento registra a proposta solicitada, sem aprovar implementação.
-As seções 1 a 13 preservam o conteúdo recuperado da proposta; os exemplos
-SQL e JSON são desenho proposto, não descrição do banco ou dos endpoints
-existentes. As ressalvas de integração e decisões pendentes da seção 16
-delimitam sua autoridade. Contradições ainda abertas não devem ser resolvidas
-por implementação silenciosa.
+Origem: conversa “Design de Dashboard IoT”, de 04/09/2026,
+`6a373c18-d4a4-83e9-b423-30e62d60571a`. API v1 identifica a API; 0.2 identifica
+esta revisão documental EKOM. A recuperação original terminou em 13.3;
+esta revisão é autoria local e não atribui conteúdo adicional à conversa.
 
-A leitura disponibilizada da conversa foi truncada durante a seção 13.4.
-O conteúdo recuperado até 13.3 foi preservado; nenhum trecho posterior é
-atribuído à conversa sem evidência. As seções 14 a 17 organizam o registro
-local conforme EKOM.
+O Arquiteto ordenou a revisão 0.2 e definiu: dashboards globais; IDs reais;
+float/integer → numeric, boolean → logical, open_closed/on_off → state;
+line_chart planned/disabled; somente grid; os sete status da seção 11;
+ausência nunca convertida em valor; erros HTTP padronizados; PUT com omitido
+mantém, null reseta e objeto config mescla com defaults; x/y não negativos
+e dimensões entre 1 e 4. As demais regras abaixo são detalhamento autoral
+proposto para tornar essas decisões verificáveis, sem alegar confirmação
+humana individual de cada default. A revisão permanece Draft para análise.
 
-O escopo confirmado é dashboard dinâmico por capability, catálogo e
-compatibilidade de widgets, CRUD e dados para renderização, com prioridade
-para valor atual. Não inclui app Swift, controle/comando de dispositivos,
-implementação, migrações executáveis, alteração do banco, testes, deploy
-ou mudança transversal de autenticação.
+Escopo funcional: CRUD de dashboards/widgets, catálogo, compatibilidade e
+renderização de valor atual. Esta ordem não autoriza implementação, build,
+testes, HTTP, banco, migração, deploy nem desenvolvimento do app Swift.
+Histórico, comandos de devices, multiusuário e mudança transversal de
+identidade/autenticação ficam fora do recorte funcional.
 
-A arquitetura observada permanece controller/modelo HTTP → Core →
-repositórios Dapper → MySQL. Os componentes sugeridos nas seções 10 a 12
-pertencem ao domínio Dashboard; não autorizam uma camada transversal nova.
-
-As especificações `SHD-CAPABILITY-TYPE-ID-001@0.2`,
-`SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e
-`SHD-SETTINGS-RESET-001@0.1` permanecem preservadas. Este contrato não altera
-suas rotas, identificadores ou comportamentos.
+Preservar controller/modelo HTTP → Core → repositórios Dapper → MySQL.
+DashboardService, DashboardDataResolver e DashboardWidgetCompatibilityResolver
+pertencem ao domínio Dashboard; não introduzem camada transversal.
+`SHD-CAPABILITY-TYPE-ID-001@0.2`, `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e
+`SHD-SETTINGS-RESET-001@0.1` conservam rotas, identificadores e comportamento.
 
 ## 1. Objetivo
 
-Criar uma API para permitir que o usuário crie dashboards personalizados no IoTSmartSys.
+Permitir dashboards globais configuráveis, cujos widgets representam uma
+capability e cuja compatibilidade depende do tipo de dado, sem inferência
+pelo nome do sensor. A API fornece configuração e dados para o cliente renderizar.
 
-Cada dashboard será composto por widgets. Cada widget representa visualmente uma capability de um dispositivo, usando uma forma de visualização compatível com o tipo de dado daquela capability.
+## 2. Ownership, acesso e identidade
 
-A API deve permitir:
+Existe um único contexto Dashboard por instalação da DeviceApi. Dashboards
+não pertencem a usuário, residência ou cliente. Todas as chamadas admitidas
+pela instalação operam sobre o mesmo conjunto; nenhum filtro owner/user/tenant
+é aceito. No máximo um dashboard global pode ter isDefault=true. Zero padrões
+é válido, inclusive após desmarcar ou excluir o padrão; não há eleição automática.
 
-- criar dashboards;
-- listar dashboards;
-- editar dashboards;
-- excluir dashboards;
-- adicionar widgets;
-- editar widgets;
-- remover widgets;
-- retornar os dados prontos para renderização no app;
-- informar quais widgets são compatíveis com cada tipo de capability.
+As novas rotas usam as condições de acesso já aplicadas à DeviceApi na
+instalação, sem nova autenticação ou autorização por usuário. Isso não cria
+isolamento entre clientes: quem tem acesso às rotas pode listar e alterar o
+conjunto global. Não se altera a exposição de rede ou configuração do ingresso.
+O bootstrap observado não configura autorização global; esta revisão não
+promete proteção autenticada nem solicita publicação pública da API.
 
----
+Identificadores JSON:
 
-## 2. Conceitos principais
-
-### 2.1 Dashboard
-
-Um dashboard é uma coleção de widgets configuráveis.
-
-Exemplo:
-
-```text
-Dashboard: Casa - Visão Geral
-
-Widgets:
-- Temperatura da sala como gauge
-- Umidade como card de valor
-- Porta da frente como ícone de estado
-- Luz da garagem como card de status
-```
-
----
-
-### 2.2 Widget
-
-Um widget é uma representação visual de uma capability.
-
-Um widget contém:
-
-```text
-- dashboard vinculado
-- capability vinculada
-- tipo de visualização
-- posição no layout
-- tamanho no layout
-- configurações específicas
-```
-
----
-
-### 2.3 Capability
-
-A capability continua sendo a fonte lógica de dados.
-
-A API de dashboard não deve depender diretamente de nomes como `temperature`, `humidity`, `door`, `relay` etc.
-
-A decisão de quais widgets são permitidos deve ser baseada principalmente no tipo visual de dado da capability.
-
----
-
-## 3. Enums e contratos compartilhados
-
-### 3.1 DashboardLayoutType
-
-```text
-grid
-free_grid
-list
-```
-
-Na v1, usar principalmente:
-
-```text
-grid
-```
-
----
-
-### 3.2 CapabilityVisualDataType
-
-```text
-numeric
-logical
-state
-text
-event
-```
-
-Descrição:
-
-| Tipo | Uso |
+| Campo | Contrato |
 |---|---|
-| `numeric` | Temperatura, umidade, tensão, corrente, potência, nível, luminosidade |
-| `logical` | Verdadeiro/falso, presença detectada/não detectada |
-| `state` | Estados nomeados: `on/off`, `open/closed`, `online/offline` |
-| `text` | Informação textual simples |
-| `event` | Último evento, histórico de evento ou timestamp relevante |
+| dashboardId, widgetId, id de dashboard/widget | Inteiro positivo Int64; gerado pelo banco, imutável. |
+| capabilityId | Core.Entities.Capability.Id: inteiro positivo Int32. |
+| deviceId | Core.Entities.Device.DeviceId/Capability.DeviceId: string pública, nunca Devices.Id numérico. |
+| capabilityCode | Capability.Type, obtido de CapabilityTypes.Name; não é chave para consulta nem necessariamente único. |
 
----
+O vínculo persistido do widget é capabilityId. deviceId é derivado da capability
+nas respostas. No POST/PUT é opcional como verificação de consistência:
+omitido ou null significa derivar; string deve identificar device existente e
+coincidir exatamente com a capability, senão DEVICE_NOT_FOUND ou
+DEVICE_CAPABILITY_MISMATCH. Não é permitido redirecionar a capability a outro device.
+Quando a capability desaparece, deviceId e metadados derivados retornam null;
+o capabilityId original e a configuração do widget são preservados.
 
-### 3.3 DashboardWidgetType
+## 3. Tipos e catálogo inicial
 
-Tipos iniciais da v1:
+### 3.1 Layout e modo
 
-```text
-value_card
-gauge
-line_chart
-state_icon
-status_card
-```
+Somente layoutType=grid e dataMode=current_value são aceitos. Omitidos na
+criação assumem esses defaults. free_grid/list e history/aggregated_history
+são reservados, rejeitados com INVALID_LAYOUT_TYPE/INVALID_DATA_MODE.
 
-Descrição:
+### 3.2 Mapeamento oficial do Dashboard
 
-| Widget | Uso |
+A fonte é Capability.DataType, lida de CapabilityTypes.DataType. Normalizar
+somente espaços externos e caixa para comparação; não alterar a fonte persistida.
+
+| Tipo da fonte | Tipo visual | semanticType |
+|---|---|---|
+| float, integer | numeric | null |
+| boolean | logical | null |
+| open_closed | state | open_closed |
+| on_off, power | state | on_off |
+| detection | logical | detection |
+| press | state | press |
+| text | text | null |
+| time | event | time |
+
+power, detection, press, text e time são extensões autorais explícitas para
+os tipos encontrados na baseline; não mudam o contrato dessas capabilities.
+Tipo ausente ou não listado não é inferido pelo valor/nome: dataType=null,
+sem compatibleWidgets e rejeição de criação/atualização por
+UNSUPPORTED_CAPABILITY_DATA_TYPE. A mudança posterior para tipo não suportado
+produz invalid_value na renderização de widget já salvo.
+
+unit vem de CapabilityType.ValueSymbol: null ou vazio significa null. config.unit,
+quando não null, prevalece apenas na renderização. capabilityName é Capability.Name;
+deviceName é Device.Name. semanticType segue exclusivamente a tabela acima.
+
+### 3.3 Catálogo e compatibilidade
+
+| code | name | compatibleDataTypes | defaultDataMode | enabled | lifecycle |
+|---|---|---|---|---|---|
+| value_card | Card de valor | numeric, text | current_value | true | available |
+| gauge | Gauge | numeric | current_value | true | available |
+| state_icon | Ícone de estado | logical, state | current_value | true | available |
+| status_card | Card de status | logical, state, text, event | current_value | true | available |
+| line_chart | Gráfico de linha | numeric | history | false | planned |
+
+O catálogo lista as cinco entradas, incluindo line_chart como planned/disabled.
+Listas compatibleWidgets retornam somente entradas enabled=true com modo
+suportado e tipo visual compatível. line_chart nunca aparece como utilizável;
+sua criação/atualização retorna WIDGET_TYPE_DISABLED. O contrato de gráficos,
+períodos e agregação permanece fora desta revisão.
+
+## 4. Contrato JSON e ordenação
+
+Payloads usam camelCase. Campos derivados ou de identidade não são graváveis,
+exceto referências capabilityId/deviceId declaradas. Propriedade desconhecida
+no request retorna INVALID_REQUEST; em config, INVALID_WIDGET_CONFIG.
+Nulls declarados nas respostas são emitidos, independentemente do default de
+serialização das APIs existentes. Não modificar a configuração global para isso.
+
+Listas não são paginadas nesta v1. Dashboards e widgets são ordenados por
+(displayOrder, id) ascendente; capabilities por capabilityId; catálogo e
+compatíveis por code ordinal ascendente. displayOrder repetido é permitido.
+
+## 5. Persistência e limites de integração
+
+Persistir dashboards (id, name, description, layoutType, isDefault,
+displayOrder, createdAt, updatedAt), widgets (id, dashboardId, capabilityId,
+title, widgetType, dataMode, position, config, refreshIntervalSeconds,
+displayOrder, createdAt, updatedAt) e catálogo com os campos da seção 3.3,
+description e defaultConfig. Não há user_id funcional na v1.
+
+Dashboard/widget id pode usar BIGINT; capabilityId deve preservar o domínio
+Int32 da API existente. Não armazenar DeviceId público em coluna numérica.
+Config é objeto JSON. Exclusão de dashboard remove seus widgets por
+ON DELETE CASCADE; excluir widget não afeta capability/device.
+Não criar FK de widget que impeça exclusão de capability/device nem cascade
+que elimine o widget quando sua fonte desaparece: capability_missing exige
+preservar o vínculo lógico original. Criação e atualização validam existência.
+
+DDL e criação do catálogo são entregáveis futuros, não migrações executáveis
+nesta autoria. EKM-GAP-0002 permanece aberta: tipos físicos, collation e
+procedimento de aplicação devem ser confrontados com o schema autoritativo
+na etapa apropriada. Esta funcionalidade não remedia o schema inteiro.
+
+## 6. Criação, PUT, defaults e validações
+
+### 6.1 Campos comuns e defaults
+
+| Campo | Validação e default de criação/reset |
 |---|---|
-| `value_card` | Exibe um valor simples |
-| `gauge` | Exibe valor numérico em escala |
-| `line_chart` | Exibe histórico numérico |
-| `state_icon` | Exibe estado como ícone |
-| `status_card` | Exibe estado textual/visual |
-
----
-
-### 3.4 WidgetDataMode
-
-```text
-current_value
-history
-aggregated_history
-```
-
-Na v1 inicial, priorizar:
-
-```text
-current_value
-```
-
-O modo `history` pode ser preparado no contrato, mas implementado depois.
-
----
-
-## 4. Compatibilidade entre tipo de dado e widget
-
-Regra inicial:
-
-```json
-{
-  "numeric": [
-    "value_card",
-    "gauge",
-    "line_chart"
-  ],
-  "logical": [
-    "state_icon",
-    "status_card"
-  ],
-  "state": [
-    "state_icon",
-    "status_card"
-  ],
-  "text": [
-    "value_card",
-    "status_card"
-  ],
-  "event": [
-    "status_card"
-  ]
-}
-```
-
-A API deve impedir a criação de widgets incompatíveis.
-
-Exemplo inválido:
-
-```text
-capability state/open_closed + widget gauge
-```
-
-Exemplo válido:
-
-```text
-capability numeric/temperature + widget gauge
-```
-
----
-
-## 5. Modelo de banco de dados
-
-### 5.1 Tabela `dashboards`
-
-```sql
-CREATE TABLE dashboards (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
-    user_id BIGINT NULL,
-
-    name VARCHAR(120) NOT NULL,
-    description VARCHAR(255) NULL,
-
-    layout_type VARCHAR(50) NOT NULL DEFAULT 'grid',
-
-    is_default BOOLEAN NOT NULL DEFAULT FALSE,
-    display_order INT NOT NULL DEFAULT 0,
-
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NULL,
-
-    INDEX idx_dashboards_user_id (user_id),
-    INDEX idx_dashboards_display_order (display_order)
-);
-```
-
-Observações:
-
-- `user_id` fica `NULL` na v1 se ainda não houver multiusuário plenamente resolvido.
-- `is_default` permite definir o dashboard principal.
-- `display_order` permite ordenação no app.
-
----
-
-### 5.2 Tabela `dashboard_widgets`
-
-```sql
-CREATE TABLE dashboard_widgets (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
-    dashboard_id BIGINT NOT NULL,
-
-    title VARCHAR(120) NULL,
-
-    device_id BIGINT NULL,
-    capability_id BIGINT NOT NULL,
-
-    widget_type VARCHAR(80) NOT NULL,
-    data_mode VARCHAR(80) NOT NULL DEFAULT 'current_value',
-
-    position_x INT NOT NULL DEFAULT 0,
-    position_y INT NOT NULL DEFAULT 0,
-    width INT NOT NULL DEFAULT 1,
-    height INT NOT NULL DEFAULT 1,
-
-    config_json JSON NULL,
-
-    refresh_interval_seconds INT NULL,
-
-    display_order INT NOT NULL DEFAULT 0,
-
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NULL,
-
-    CONSTRAINT fk_dashboard_widgets_dashboard
-        FOREIGN KEY (dashboard_id)
-        REFERENCES dashboards(id)
-        ON DELETE CASCADE,
-
-    INDEX idx_dashboard_widgets_dashboard_id (dashboard_id),
-    INDEX idx_dashboard_widgets_capability_id (capability_id),
-    INDEX idx_dashboard_widgets_device_id (device_id),
-    INDEX idx_dashboard_widgets_display_order (display_order)
-);
-```
-
-Observações:
-
-- `device_id` pode ser redundante se a capability já aponta para o device, mas ajuda performance e simplifica payload.
-- `config_json` guarda configurações específicas por tipo de widget.
-- `data_mode` indica se o widget usa valor atual, histórico ou agregado.
-
----
-
-### 5.3 Tabela `dashboard_widget_types`
-
-```sql
-CREATE TABLE dashboard_widget_types (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
-    code VARCHAR(80) NOT NULL UNIQUE,
-    name VARCHAR(120) NOT NULL,
-    description VARCHAR(255) NULL,
-
-    compatible_data_types JSON NOT NULL,
-    default_data_mode VARCHAR(80) NOT NULL DEFAULT 'current_value',
-    default_config_json JSON NULL,
-
-    enabled BOOLEAN NOT NULL DEFAULT TRUE,
-
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NULL
-);
-```
-
-Registros iniciais sugeridos:
-
-```sql
-INSERT INTO dashboard_widget_types
-(code, name, description, compatible_data_types, default_data_mode, default_config_json)
-VALUES
-(
-    'value_card',
-    'Card de valor',
-    'Exibe o valor atual de uma capability.',
-    JSON_ARRAY('numeric', 'text'),
-    'current_value',
-    JSON_OBJECT('decimals', 1)
-),
-(
-    'gauge',
-    'Gauge',
-    'Exibe um valor numérico dentro de uma escala.',
-    JSON_ARRAY('numeric'),
-    'current_value',
-    JSON_OBJECT('min', 0, 'max', 100, 'decimals', 1)
-),
-(
-    'line_chart',
-    'Gráfico de linha',
-    'Exibe o histórico de uma capability numérica.',
-    JSON_ARRAY('numeric'),
-    'history',
-    JSON_OBJECT('period', '24h', 'aggregation', 'avg', 'decimals', 1)
-),
-(
-    'state_icon',
-    'Ícone de estado',
-    'Exibe um estado lógico ou textual usando ícone.',
-    JSON_ARRAY('logical', 'state'),
-    'current_value',
-    JSON_OBJECT()
-),
-(
-    'status_card',
-    'Card de status',
-    'Exibe o estado atual de uma capability.',
-    JSON_ARRAY('logical', 'state', 'text', 'event'),
-    'current_value',
-    JSON_OBJECT()
-);
-```
-
----
-
-## 6. Regras de negócio
-
-### 6.1 Criação de dashboard
-
-Ao criar um dashboard:
-
-- `name` é obrigatório;
-- `layout_type` deve assumir `grid` se não informado;
-- `display_order` pode ser calculado automaticamente;
-- `is_default` deve ser `false` por padrão.
-
-Se o dashboard for criado como padrão, a API deve remover o padrão dos demais dashboards do mesmo usuário/contexto.
-
----
-
-### 6.2 Criação de widget
-
-Ao criar um widget:
-
-- `dashboard_id` deve existir;
-- `capability_id` deve existir;
-- `widget_type` deve existir e estar habilitado;
-- o tipo visual da capability deve ser compatível com o widget;
-- `data_mode` pode ser omitido e herdado do widget type;
-- `config_json` deve ser mesclado com `default_config_json`.
-
-Exemplo:
-
-```text
-default_config_json + config_json informado pelo usuário = config final
-```
-
----
-
-### 6.3 Atualização de widget
-
-Ao atualizar um widget:
-
-- validar novamente compatibilidade se `capability_id` ou `widget_type` forem alterados;
-- permitir alteração de título, posição, tamanho, config e intervalo de atualização;
-- não permitir que widget fique vinculado a uma capability inexistente.
-
----
-
-### 6.4 Exclusão de dashboard
-
-Ao excluir dashboard:
-
-- todos os widgets devem ser removidos automaticamente por `ON DELETE CASCADE`.
-
----
-
-### 6.5 Exclusão de widget
-
-Ao excluir widget:
-
-- apenas o widget deve ser removido;
-- a capability e o device não são afetados.
-
----
+| name de dashboard | String aparada, 1–120 caracteres; obrigatória, sem default. |
+| description | null ou string até 255 caracteres; default null. |
+| title de widget | null ou string aparada de 1–120 caracteres; default null. |
+| layoutType | grid. |
+| isDefault | Booleano; false. |
+| displayOrder | Inteiro 0–2147483647; 0. |
+| capabilityId | Referência obrigatória, positiva; sem default. |
+| widgetType | Código obrigatório existente e habilitado; sem default. |
+| dataMode | current_value. |
+| position | Objeto; default {x:0,y:0,width:1,height:1}. |
+| position.x/y | Inteiros 0–2147483647. |
+| position.width/height | Inteiros entre 1 e 4, inclusive. |
+| refreshIntervalSeconds | null ou inteiro entre 1 e 86400; default null. |
+| config | Objeto conforme seção 13; default do tipo. |
+
+Colisões/sobreposição de posição são permitidas; não há deslocamento automático
+nem limite global de colunas. refreshIntervalSeconds é sugestão ao cliente:
+null não define polling; a API não agenda coleta nem altera a fonte.
+
+### 6.2 POST
+
+Dashboard exige name. Widget exige capabilityId e widgetType; demais campos
+omitidos assumem defaults. Null aplica reset conforme tabela, rejeitado nos
+campos obrigatórios sem default. position parcial completa com defaults.
+Config objeto produz defaultConfig do tipo + propriedades informadas.
+
+### 6.3 PUT de dashboard e widget
+
+PUT é atualização parcial por decisão expressa desta API:
+
+- campo omitido mantém o valor persistido;
+- campo null reseta para o default da seção 6.1; campo obrigatório sem default
+  retorna erro de validação, nunca remove nome, capabilityId ou widgetType;
+- position omitido mantém, null reseta todo o objeto; objeto mescla seus
+  membros sobre position atual; membro null reseta apenas aquele membro;
+- config omitida mantém a configuração persistida; null substitui pelo
+  defaultConfig do tipo efetivo; objeto substitui a configuração por
+  defaultConfig do tipo efetivo + propriedades desse objeto. Não mescla com
+  a configuração anterior. Merge é raso; chave null reseta ao default da chave;
+- deviceId é apenas verificação da capability efetiva, conforme seção 2.
+
+Exemplo para gauge salvo com max=50 e decimals=2: config omitida mantém ambos;
+config=null restaura max=100 e decimals=1; config={"max":60} resulta em max=60,
+decimals=1. Não reter decimals=2 nesse último caso.
+
+Troca de widgetType com config omitida conserva o objeto anterior e o valida
+contra o novo tipo; se incompatível, rejeita atomicamente. Para resetar na
+mesma chamada, enviar config=null. Validar sempre o estado efetivo completo,
+inclusive compatibilidade, existência da capability e habilitação do tipo.
+Corpo {} válido não altera campos nem updatedAt; JSON null não é corpo válido.
+
+### 6.4 Atomicidade e concorrência
+
+POST/PUT inválido não persiste parcialmente. Atualizar o padrão para true
+remove os demais padrões globalmente na mesma operação atômica. Chamadas
+concorrentes não podem resultar em dois padrões. PUTs concorrentes são
+serializados logicamente: o último a aplicar cada campo vence; campos omitidos
+preservam o estado vigente no momento da aplicação. Não há ETag nesta v1.
+DELETE de recurso ausente retorna 404. Excluir fonte não exclui widgets;
+excluir dashboard é atômico com a remoção dos widgets.
 
 ## 7. Endpoints da API
 
-Base path:
+### 7.1 Rotas e sucesso
 
-```http
-/api/v1
-```
+| Método e rota | Resposta |
+|---|---|
+| GET /api/v1/dashboards | 200, {items:[resumoDashboard]} |
+| GET /api/v1/dashboards/{dashboardId} | 200, dashboard com widgets |
+| POST /api/v1/dashboards | 201, dashboard; Location para GET individual |
+| PUT /api/v1/dashboards/{dashboardId} | 200, dashboard atualizado |
+| DELETE /api/v1/dashboards/{dashboardId} | 204, sem corpo |
+| POST /api/v1/dashboards/{dashboardId}/widgets | 201, widget; Location para GET do dashboard proprietário |
+| PUT /api/v1/dashboards/{dashboardId}/widgets/{widgetId} | 200, widget atualizado |
+| DELETE /api/v1/dashboards/{dashboardId}/widgets/{widgetId} | 204, sem corpo |
+| GET /api/v1/dashboard-widget-types | 200, {items:[tipoWidget]} |
+| GET /api/v1/dashboard-capabilities | 200, {items:[capabilityDisponivel]} |
+| GET /api/v1/dashboard-capabilities/{capabilityId}/compatible-widgets | 200, capabilityId, capabilityCode, dataType e compatibleWidgets com entradas de catálogo |
+| GET /api/v1/dashboards/{dashboardId}/data | 200, dashboardId, name, layoutType, generatedAt e widgets renderizados |
 
----
+Todos os IDs de rota devem estar no domínio da seção 2; texto, zero, negativo
+ou overflow retorna 400 INVALID_REQUEST, sem depender de constraint de rota
+que os converteria em 404. Não há endpoint de controle de device.
 
-# 7.1 Listar dashboards
+### 7.2 Formatos de configuração
 
-```http
-GET /api/v1/dashboards
-```
+Dashboard nas respostas POST/PUT/GET individual contém id, name, description,
+layoutType, isDefault, displayOrder, createdAt, updatedAt e widgets (lista vazia
+na criação). Resumo de listagem contém os mesmos campos escalares e widgetCount,
+sem widgets. Widget contém todos os campos persistidos da seção 5 e os derivados
+deviceId, capabilityCode e dataType. Posição é um objeto com x/y/width/height.
+createdAt é imutável; updatedAt=null até alteração efetiva.
 
-Resposta:
-
-```json
-{
-  "items": [
-    {
-      "id": 1,
-      "name": "Casa - Visão Geral",
-      "description": "Resumo dos principais dispositivos",
-      "layoutType": "grid",
-      "isDefault": true,
-      "displayOrder": 0,
-      "widgetCount": 5,
-      "createdAt": "2026-09-04T22:26:00-03:00",
-      "updatedAt": null
-    }
-  ]
-}
-```
-
----
-
-# 7.2 Obter dashboard
-
-```http
-GET /api/v1/dashboards/{dashboardId}
-```
-
-Resposta:
-
-```json
-{
-  "id": 1,
-  "name": "Casa - Visão Geral",
-  "description": "Resumo dos principais dispositivos",
-  "layoutType": "grid",
-  "isDefault": true,
-  "displayOrder": 0,
-  "widgets": [
-    {
-      "id": 10,
-      "title": "Temperatura da sala",
-      "deviceId": 5,
-      "capabilityId": 22,
-      "capabilityCode": "temperature",
-      "widgetType": "gauge",
-      "dataType": "numeric",
-      "dataMode": "current_value",
-      "position": {
-        "x": 0,
-        "y": 0,
-        "width": 1,
-        "height": 1
-      },
-      "config": {
-        "unit": "°C",
-        "min": 0,
-        "max": 50,
-        "decimals": 1
-      },
-      "refreshIntervalSeconds": null,
-      "displayOrder": 0
-    }
-  ]
-}
-```
-
----
-
-# 7.3 Criar dashboard
-
-```http
-POST /api/v1/dashboards
-```
-
-Request:
-
-```json
-{
-  "name": "Casa - Visão Geral",
-  "description": "Resumo dos principais dispositivos",
-  "layoutType": "grid",
-  "isDefault": true
-}
-```
-
-Resposta:
-
-```json
-{
-  "id": 1,
-  "name": "Casa - Visão Geral",
-  "description": "Resumo dos principais dispositivos",
-  "layoutType": "grid",
-  "isDefault": true,
-  "displayOrder": 0,
-  "createdAt": "2026-09-04T22:26:00-03:00"
-}
-```
-
----
-
-# 7.4 Atualizar dashboard
-
-```http
-PUT /api/v1/dashboards/{dashboardId}
-```
-
-Request:
-
-```json
-{
-  "name": "Casa - Visão Geral",
-  "description": "Resumo atualizado",
-  "layoutType": "grid",
-  "isDefault": true,
-  "displayOrder": 0
-}
-```
-
-Resposta:
-
-```json
-{
-  "id": 1,
-  "name": "Casa - Visão Geral",
-  "description": "Resumo atualizado",
-  "layoutType": "grid",
-  "isDefault": true,
-  "displayOrder": 0,
-  "updatedAt": "2026-09-04T22:35:00-03:00"
-}
-```
-
----
-
-# 7.5 Excluir dashboard
-
-```http
-DELETE /api/v1/dashboards/{dashboardId}
-```
-
-Resposta:
-
-```http
-204 No Content
-```
-
----
-
-# 7.6 Criar widget
-
-```http
-POST /api/v1/dashboards/{dashboardId}/widgets
-```
-
-Request:
+Exemplo de request para criar widget:
 
 ```json
 {
   "title": "Temperatura da sala",
-  "deviceId": 5,
+  "deviceId": "sensor-sala",
   "capabilityId": 22,
   "widgetType": "gauge",
-  "position": {
-    "x": 0,
-    "y": 0,
-    "width": 1,
-    "height": 1
-  },
-  "config": {
-    "unit": "°C",
-    "min": 0,
-    "max": 50,
-    "warningFrom": 32,
-    "dangerFrom": 38,
-    "decimals": 1
-  },
+  "position": {"x": 0, "y": 0, "width": 1, "height": 1},
+  "config": {"unit": "°C", "min": 0, "max": 50, "decimals": 1},
   "refreshIntervalSeconds": null
 }
 ```
 
-Resposta:
+TipoWidget contém code, name, description, compatibleDataTypes, defaultDataMode,
+defaultConfig, enabled e lifecycle. Os textos não determinam compatibilidade.
 
-```json
-{
-  "id": 10,
-  "dashboardId": 1,
-  "title": "Temperatura da sala",
-  "deviceId": 5,
-  "capabilityId": 22,
-  "capabilityCode": "temperature",
-  "widgetType": "gauge",
-  "dataType": "numeric",
-  "dataMode": "current_value",
-  "position": {
-    "x": 0,
-    "y": 0,
-    "width": 1,
-    "height": 1
-  },
-  "config": {
-    "unit": "°C",
-    "min": 0,
-    "max": 50,
-    "warningFrom": 32,
-    "dangerFrom": 38,
-    "decimals": 1
-  },
-  "refreshIntervalSeconds": null,
-  "displayOrder": 0
-}
-```
+### 7.3 Capabilities disponíveis e renderização
 
----
+Listar capabilities existentes, inclusive inativas ou de tipo não suportado;
+não excluir silenciosamente fontes sem leitura. Cada item contém deviceId,
+deviceName, capabilityId, capabilityCode, capabilityName, dataType, unit,
+semanticType, currentValue, lastUpdatedAt, status e compatibleWidgets (códigos).
+Valor/status usam as mesmas regras da seção 11, sem configuração de widget.
+Tipo não suportado retorna dataType=null, status=invalid_value e lista vazia.
 
-# 7.7 Atualizar widget
+Cada widget renderizado contém widgetId, title, deviceId, capabilityId,
+capabilityCode, widgetType, dataType, dataMode, value, unit, label, icon,
+status, lastUpdatedAt, position, config, displayOrder e refreshIntervalSeconds.
+Não omitir widgets problemáticos. title/config/layout mantêm os dados salvos;
+campos derivados indisponíveis são null. Config não perde unit na renderização.
 
-```http
-PUT /api/v1/dashboards/{dashboardId}/widgets/{widgetId}
-```
+## 8. Envelope de erro e isolamento
 
-Request:
-
-```json
-{
-  "title": "Temperatura ambiente",
-  "deviceId": 5,
-  "capabilityId": 22,
-  "widgetType": "gauge",
-  "position": {
-    "x": 0,
-    "y": 0,
-    "width": 2,
-    "height": 1
-  },
-  "config": {
-    "unit": "°C",
-    "min": 0,
-    "max": 60,
-    "warningFrom": 32,
-    "dangerFrom": 40,
-    "decimals": 1
-  },
-  "refreshIntervalSeconds": 30,
-  "displayOrder": 0
-}
-```
-
-Resposta:
-
-```json
-{
-  "id": 10,
-  "dashboardId": 1,
-  "title": "Temperatura ambiente",
-  "deviceId": 5,
-  "capabilityId": 22,
-  "capabilityCode": "temperature",
-  "widgetType": "gauge",
-  "dataType": "numeric",
-  "dataMode": "current_value",
-  "position": {
-    "x": 0,
-    "y": 0,
-    "width": 2,
-    "height": 1
-  },
-  "config": {
-    "unit": "°C",
-    "min": 0,
-    "max": 60,
-    "warningFrom": 32,
-    "dangerFrom": 40,
-    "decimals": 1
-  },
-  "refreshIntervalSeconds": 30,
-  "displayOrder": 0
-}
-```
-
----
-
-# 7.8 Excluir widget
-
-```http
-DELETE /api/v1/dashboards/{dashboardId}/widgets/{widgetId}
-```
-
-Resposta:
-
-```http
-204 No Content
-```
-
----
-
-# 7.9 Listar tipos de widgets
-
-```http
-GET /api/v1/dashboard-widget-types
-```
-
-Resposta:
-
-```json
-{
-  "items": [
-    {
-      "code": "value_card",
-      "name": "Card de valor",
-      "description": "Exibe o valor atual de uma capability.",
-      "compatibleDataTypes": [
-        "numeric",
-        "text"
-      ],
-      "defaultDataMode": "current_value",
-      "defaultConfig": {
-        "decimals": 1
-      },
-      "enabled": true
-    },
-    {
-      "code": "gauge",
-      "name": "Gauge",
-      "description": "Exibe um valor numérico dentro de uma escala.",
-      "compatibleDataTypes": [
-        "numeric"
-      ],
-      "defaultDataMode": "current_value",
-      "defaultConfig": {
-        "min": 0,
-        "max": 100,
-        "decimals": 1
-      },
-      "enabled": true
-    }
-  ]
-}
-```
-
----
-
-# 7.10 Listar capabilities disponíveis para dashboard
-
-```http
-GET /api/v1/dashboard-capabilities
-```
-
-Resposta:
-
-```json
-{
-  "items": [
-    {
-      "deviceId": 5,
-      "deviceName": "Sensor da sala",
-      "capabilityId": 22,
-      "capabilityCode": "temperature",
-      "capabilityName": "Temperatura",
-      "dataType": "numeric",
-      "unit": "°C",
-      "semanticType": "temperature",
-      "currentValue": 28.4,
-      "lastUpdatedAt": "2026-09-04T22:25:40-03:00",
-      "compatibleWidgets": [
-        "value_card",
-        "gauge",
-        "line_chart"
-      ]
-    },
-    {
-      "deviceId": 8,
-      "deviceName": "Porta da frente",
-      "capabilityId": 31,
-      "capabilityCode": "contact",
-      "capabilityName": "Contato",
-      "dataType": "state",
-      "semanticType": "door_contact",
-      "currentValue": "closed",
-      "lastUpdatedAt": "2026-09-04T22:24:10-03:00",
-      "compatibleWidgets": [
-        "state_icon",
-        "status_card"
-      ]
-    }
-  ]
-}
-```
-
-Este endpoint é usado pelo editor do app Swift.
-
----
-
-# 7.11 Obter widgets compatíveis com uma capability
-
-```http
-GET /api/v1/dashboard-capabilities/{capabilityId}/compatible-widgets
-```
-
-Resposta:
-
-```json
-{
-  "capabilityId": 22,
-  "capabilityCode": "temperature",
-  "dataType": "numeric",
-  "compatibleWidgets": [
-    {
-      "code": "value_card",
-      "name": "Card de valor",
-      "defaultDataMode": "current_value",
-      "defaultConfig": {
-        "decimals": 1
-      }
-    },
-    {
-      "code": "gauge",
-      "name": "Gauge",
-      "defaultDataMode": "current_value",
-      "defaultConfig": {
-        "min": 0,
-        "max": 100,
-        "decimals": 1
-      }
-    },
-    {
-      "code": "line_chart",
-      "name": "Gráfico de linha",
-      "defaultDataMode": "history",
-      "defaultConfig": {
-        "period": "24h",
-        "aggregation": "avg",
-        "decimals": 1
-      }
-    }
-  ]
-}
-```
-
----
-
-# 7.12 Obter dados de renderização do dashboard
-
-```http
-GET /api/v1/dashboards/{dashboardId}/data
-```
-
-Resposta:
-
-```json
-{
-  "dashboardId": 1,
-  "name": "Casa - Visão Geral",
-  "layoutType": "grid",
-  "generatedAt": "2026-09-04T22:26:00-03:00",
-  "widgets": [
-    {
-      "widgetId": 10,
-      "title": "Temperatura da sala",
-      "deviceId": 5,
-      "capabilityId": 22,
-      "capabilityCode": "temperature",
-      "widgetType": "gauge",
-      "dataType": "numeric",
-      "dataMode": "current_value",
-      "value": 28.4,
-      "unit": "°C",
-      "label": "28.4 °C",
-      "status": "ok",
-      "lastUpdatedAt": "2026-09-04T22:25:40-03:00",
-      "position": {
-        "x": 0,
-        "y": 0,
-        "width": 1,
-        "height": 1
-      },
-      "config": {
-        "min": 0,
-        "max": 50,
-        "warningFrom": 32,
-        "dangerFrom": 38,
-        "decimals": 1
-      }
-    },
-    {
-      "widgetId": 11,
-      "title": "Porta da frente",
-      "deviceId": 8,
-      "capabilityId": 31,
-      "capabilityCode": "contact",
-      "widgetType": "state_icon",
-      "dataType": "state",
-      "dataMode": "current_value",
-      "value": "closed",
-      "unit": null,
-      "label": "Fechada",
-      "icon": "door-closed",
-      "status": "ok",
-      "lastUpdatedAt": "2026-09-04T22:24:10-03:00",
-      "position": {
-        "x": 1,
-        "y": 0,
-        "width": 1,
-        "height": 1
-      },
-      "config": {
-        "openLabel": "Aberta",
-        "closedLabel": "Fechada",
-        "openIcon": "door-open",
-        "closedIcon": "door-closed"
-      }
-    }
-  ]
-}
-```
-
----
-
-## 8. Estrutura padrão de erro
-
-Todas as respostas de erro devem seguir um padrão simples.
-
-Exemplo:
+Nas rotas desta especificação, erros retornam application/json:
 
 ```json
 {
   "error": {
     "code": "INVALID_WIDGET_FOR_CAPABILITY",
-    "message": "O widget gauge não é compatível com capabilities do tipo state.",
-    "details": {
-      "widgetType": "gauge",
-      "capabilityId": 31,
-      "capabilityDataType": "state"
-    }
+    "message": "O widget gauge não é compatível com o tipo state.",
+    "details": {"widgetType": "gauge", "capabilityId": 31, "capabilityDataType": "state"}
   }
 }
 ```
 
----
+code é estável; message é texto legível não contratualmente fixo; details é
+objeto, vazio quando não aplicável. Validação identifica campo em details.field.
+Erros não expõem SQL, stack trace ou credenciais. Falhas de parsing/model binding
+nas novas rotas também usam o envelope. APIs existentes conservam seus formatos.
+Não exigir formato para rejeições anteriores à aplicação, como proxy ou TLS.
 
-## 9. Códigos de erro previstos
+Após validação sintática, verificar dashboard da rota antes de widget. Se não
+existir, DASHBOARD_NOT_FOUND. Widget ausente ou pertencente a outro dashboard
+retorna WIDGET_NOT_FOUND, sem revelar o proprietário e sem mutação. Depois,
+validar referências e configuração. Havendo múltiplos erros de campo, qualquer
+um dos códigos aplicáveis pode ser retornado; estado persistido permanece intacto.
 
-```text
-DASHBOARD_NOT_FOUND
-WIDGET_NOT_FOUND
-CAPABILITY_NOT_FOUND
-DEVICE_NOT_FOUND
-WIDGET_TYPE_NOT_FOUND
-WIDGET_TYPE_DISABLED
-INVALID_WIDGET_FOR_CAPABILITY
-INVALID_DASHBOARD_NAME
-INVALID_WIDGET_POSITION
-INVALID_WIDGET_CONFIG
-INVALID_DATA_MODE
-```
+## 9. Status HTTP e códigos
 
----
-
-## 10. Serviço principal da API
-
-Criar um serviço de domínio para concentrar as regras:
-
-```text
-DashboardService
-```
-
-Responsabilidades:
-
-```text
-- criar dashboard
-- atualizar dashboard
-- excluir dashboard
-- criar widget
-- atualizar widget
-- excluir widget
-- validar compatibilidade
-- montar dados para renderização
-```
-
----
-
-## 11. Resolver de dados do dashboard
-
-Criar um componente separado:
-
-```text
-DashboardDataResolver
-```
-
-Responsabilidade:
-
-```text
-Receber um dashboard + widgets e retornar os dados atuais/históricos necessários para renderização.
-```
-
-Na v1 inicial, resolver apenas:
-
-```text
-current_value
-```
-
-Posteriormente:
-
-```text
-history
-aggregated_history
-```
-
----
-
-## 12. Compatibilidade de widgets
-
-Criar um componente:
-
-```text
-DashboardWidgetCompatibilityResolver
-```
-
-Responsabilidade:
-
-```text
-Validar se uma capability pode ser exibida usando determinado widgetType.
-```
-
-Regra:
-
-```text
-capability.dataType precisa estar presente em dashboard_widget_types.compatible_data_types
-```
-
----
-
-## 13. Configuração JSON por widget
-
-### 13.1 Gauge
-
-```json
-{
-  "unit": "°C",
-  "min": 0,
-  "max": 50,
-  "warningFrom": 32,
-  "dangerFrom": 38,
-  "decimals": 1
-}
-```
-
-Campos:
-
-| Campo | Descrição |
+| HTTP | code / situação |
 |---|---|
-| `unit` | Unidade exibida |
-| `min` | Valor mínimo da escala |
-| `max` | Valor máximo da escala |
-| `warningFrom` | Valor a partir do qual o app pode exibir alerta visual |
-| `dangerFrom` | Valor a partir do qual o app pode exibir perigo visual |
-| `decimals` | Casas decimais |
+| 400 | INVALID_REQUEST: corpo ausente/null, JSON/tipo/campo/ID inválido. |
+| 400 | INVALID_DASHBOARD_NAME: name ausente na criação, null ou inválido. |
+| 400 | INVALID_LAYOUT_TYPE, INVALID_WIDGET_POSITION, INVALID_WIDGET_CONFIG, INVALID_DATA_MODE. |
+| 400 | INVALID_REFRESH_INTERVAL, INVALID_DISPLAY_ORDER, INVALID_WIDGET_TITLE, INVALID_DASHBOARD_DESCRIPTION. |
+| 404 | DASHBOARD_NOT_FOUND, WIDGET_NOT_FOUND, CAPABILITY_NOT_FOUND, DEVICE_NOT_FOUND, WIDGET_TYPE_NOT_FOUND. |
+| 422 | WIDGET_TYPE_DISABLED, INVALID_WIDGET_FOR_CAPABILITY, UNSUPPORTED_CAPABILITY_DATA_TYPE, DEVICE_CAPABILITY_MISMATCH. |
+| 405 | METHOD_NOT_ALLOWED: método não suportado em rota existente. |
+| 415 | UNSUPPORTED_MEDIA_TYPE: escrita sem JSON suportado. |
+| 500 | INTERNAL_ERROR: falha inesperada que impede a resposta global. |
+| 503 | DATA_SOURCE_UNAVAILABLE: indisponibilidade/timeout da persistência que impede atender a chamada. |
 
----
+Não usar 204/200 para erro de escrita. Status de dados por widget da seção 11
+não é erro HTTP: uma resposta parcialmente utilizável continua 200. Não retornar
+lista vazia ou capability_missing para esconder falha global de banco.
 
-### 13.2 Value card
+## 10. Responsabilidades de domínio
 
-```json
-{
-  "unit": "°C",
-  "decimals": 1,
-  "showLastUpdated": true
-}
-```
+DashboardService coordena CRUD, defaults, validação e invariantes do domínio.
+DashboardWidgetCompatibilityResolver aplica a tabela de tipos e o catálogo.
+DashboardDataResolver resolve valores atuais, metadados e apresentação por widget.
+Contratos/repositórios locais persistem o domínio seguindo precedentes Dapper.
+A divisão interna dos métodos, queries e transações é escolha de implementação.
 
----
+## 11. Conversão, status e tempo
 
-### 13.3 State icon
+### 11.1 Conversão do valor
 
-```json
-{
-  "onIcon": "power-on",
-  "offIcon": "power-off",
-  "onLabel": "Ligado",
-  "offLabel": "Desligado",
-  "invertState": false
-}
-```
+Ausência nunca produz 0, false, off ou closed. Null, string vazia ou somente
+espaços é ausência para todos os tipos. Fora disso:
 
-Para porta:
+| Tipo da fonte | Conversão JSON |
+|---|---|
+| float | Número finito com ponto decimal/cultura invariável, sinal e expoente permitidos; sem separador de milhar, NaN ou infinito. |
+| integer | Inteiro com sinal opcional, domínio Int64; sem parte decimal nem expoente. |
+| boolean | true/false textual sem distinção de caixa → booleano JSON; não aceitar 0/1. |
+| detection | detected/undetected ou true/false → true/false. |
+| open_closed | open/closed; true → closed, false → open, preservando a semântica existente. |
+| on_off, power | on/off; true → on, false → off. |
+| press | pressed/released; true → pressed, false → released. |
+| text | String original, sem inferir número/booleano. |
+| time | String de instante RFC 3339 com offset, normalizada para UTC; texto sem offset é inválido. |
 
-```json
-{
-  "openIcon": "door-open",
-  "closedIcon": "door-closed",
-  "openLabel": "Aberta",
-  "closedLabel": "Fechada",
-  "invertState": false
-}
-```
+Exceto text, remover espaços externos; tokens lógicos/de estado são comparados
+sem distinção de caixa e retornam em minúsculas. Valor fora da regra é
+invalid_value com value=null. Tipo/compatibilidade alterado depois da criação
+que torne o widget inválido também resulta em invalid_value, assim como tipo
+de widget posteriormente desabilitado. Não adaptar silenciosamente o widget.
 
----
+### 11.2 Status e precedência
+
+Avaliar na ordem abaixo; primeiro caso aplicável vence:
+
+| status | Condição | value e apresentação |
+|---|---|---|
+| capability_missing | Consulta bem-sucedida confirma capability inexistente. | value/label/icon/unit/lastUpdatedAt e metadados derivados null. |
+| error | Falha isolada impede resolver este widget; ou fuso de origem necessário inválido/ausente. | value/label/icon=null; metadados conhecidos podem permanecer. |
+| offline | Device ausente, Device.IsActive=false, Capability.Active=false ou Device.State aparado igual a offline, sem distinção de caixa. | value/label/icon=null; lastUpdatedAt conhecido permanece. |
+| no_data | Sem valor, ou UpdatedAt ausente/default. | value/label/icon=null; lastUpdatedAt válido, se houver, permanece. |
+| invalid_value | Valor/tipo incompatível, conversão inválida ou instante da leitura no futuro. | value/label/icon=null. |
+| stale | Leitura válida com idade maior que 300 segundos. | Preservar valor convertido e apresentação, explicitamente marcados stale. |
+| ok | Leitura válida, idade de 0 a 300 segundos, inclusive. | Valor convertido e apresentação normal. |
+
+Não inferir offline pelo nome do sensor ou por leitura antiga; outras strings
+Device.State não significam offline. Sem defaults falsos para falhas. Falha
+de infraestrutura que impede o conjunto retorna HTTP 503/500, conforme seção 9.
+
+### 11.3 Instantes
+
+generatedAt e timestamps novos de Dashboard usam UTC em RFC 3339 com Z.
+lastUpdatedAt vem de Capability.UpdatedAt, não de uma nova consulta à fonte
+física. Como a baseline usa DATETIME sem offset, configurar explicitamente
+Dashboard:SourceTimeZone com identificador IANA do fuso dos dados persistidos;
+sem default implícito. Não alterar timestamps nem timezone das APIs existentes.
+Instante com offset conhecido é convertido para UTC; DATETIME sem offset usa
+essa configuração. Hora local ambígua/inexistente gera invalid_value; configuração
+necessária ausente/inválida gera error. Nos dois casos, lastUpdatedAt=null,
+pois não existe conversão confiável para um instante UTC. DateTime default
+representa ausência.
+
+A idade usa o mesmo generatedAt capturado para toda a resposta. stale não depende
+do refreshIntervalSeconds. O limiar de 300 segundos é regra autoral fixa desta v1.
+
+## 12. Apresentação
+
+value representa a fonte convertida: invertState nunca altera value. Unidade
+segue seção 3.2. Numeric usa decimals, arredondamento de ponto médio para longe
+de zero, ponto decimal e número fixo de casas no label; adicionar espaço + unit
+quando presente. text/event usam a string convertida como label.
+
+Para logical, usar onLabel/onIcon ou offLabel/offIcon. Para state open_closed,
+usar openLabel/openIcon ou closedLabel/closedIcon. on_off usa on/off;
+press usa pressed/released. invertState troca apenas o par usado para label/icon.
+status_card usa a mesma seleção; para text/event, icon=null. Outros widgets
+retornam icon=null. Status gauge não representa alarme: warningFrom/dangerFrom
+são configuração visual para o cliente e não substituem status de qualidade.
+
+## 13. Configuração JSON
+
+Merge é raso e validado conforme seção 6. Chaves não listadas para o tipo são
+rejeitadas. Nenhum objeto/array aninhado é aceito como valor dessas chaves.
+Config retornada contém todos os defaults e sobrescritas, inclusive nulls.
+
+| Tipo | defaultConfig |
+|---|---|
+| value_card | unit=null, decimals=1, showLastUpdated=true |
+| gauge | unit=null, min=0, max=100, warningFrom=null, dangerFrom=null, decimals=1 |
+| state_icon, status_card | unit=null, invertState=false, onLabel=Ligado, offLabel=Desligado, onIcon=power-on, offIcon=power-off, openLabel=Aberta, closedLabel=Fechada, openIcon=door-open, closedIcon=door-closed, pressedLabel=Pressionado, releasedLabel=Liberado, pressedIcon=null, releasedIcon=null |
+| line_chart | objeto vazio; disabled/planned, não configurável na v1 |
+
+min/max/thresholds são números finitos; min < max. Threshold não null deve
+estar dentro de [min,max]; se ambos presentes, warningFrom <= dangerFrom.
+decimals é inteiro 0–6. showLastUpdated e invertState são booleanos.
+unit é null ou string de 1–32 caracteres. Labels são strings de 1–120;
+ícones são null ou strings de 1–120; aparar espaços externos antes de validar.
+Nenhum lookup externo de ícones é realizado. Labels defaults não inferem
+semântica de sensor; são selecionados pelo tipo da fonte conforme seção 12.
 
 ## 14. Requisitos rastreáveis
 
-| ID | Contrato proposto | Referência |
+| ID | Contrato | Seções |
 |---|---|---|
-| DASH-001 | Criar, listar, consultar, atualizar e excluir dashboards; nome obrigatório e defaults declarados. | 5.1, 6.1, 7.1–7.5 |
-| DASH-002 | Manter no máximo um dashboard padrão por usuário/contexto definido. | 6.1; pendência P-01 |
-| DASH-003 | Criar, atualizar e excluir widgets vinculados a dashboard e capability existentes. | 5.2, 6.2–6.5, 7.6–7.8 |
-| DASH-004 | Validar tipo habilitado e compatibilidade pelo tipo visual, sem depender de nomes de sensores. | 3, 4, 6.2, 12 |
-| DASH-005 | Persistir título, posição, tamanho, ordem, intervalo e configuração; combinar defaults com configuração informada. | 5, 6, 13 |
-| DASH-006 | Expor catálogo, capabilities disponíveis e widgets compatíveis para o editor. | 7.9–7.11 |
-| DASH-007 | Resolver dados atuais para renderização com valor, tipo, unidade, label, status e instante da leitura. | 7.12, 11 |
-| DASH-008 | Devolver erros de domínio estruturados e distinguíveis. | 8, 9; pendência P-05 |
-| DASH-009 | Excluir widgets do dashboard excluído sem excluir capabilities ou devices. | 5.2, 6.4, 6.5 |
-| DASH-010 | Distinguir contrato futuro de histórico e recursos efetivamente habilitados na primeira entrega. | 3.4, 11; pendência P-03 |
+| DASH-001 | CRUD de dashboard com defaults, validações e ordenação definidos. | 4, 6, 7 |
+| DASH-002 | Contexto global, acesso sem isolamento por usuário e no máximo um padrão, inclusive sob concorrência. | 2, 6.4 |
+| DASH-003 | CRUD de widgets com vínculo válido, IDs reais e escopo aninhado. | 2, 6, 8 |
+| DASH-004 | Compatibilidade pelo mapeamento oficial e tipo habilitado. | 3, 10 |
+| DASH-005 | Persistência, PUT parcial, reset, merge e validação do estado efetivo. | 5, 6, 13 |
+| DASH-006 | Catálogo, capabilities disponíveis e compatíveis com metadados definidos. | 3, 7 |
+| DASH-007 | Valor atual, ausência, sete status, instantes e apresentação determinísticos. | 11, 12 |
+| DASH-008 | Erros HTTP estruturados, locais às novas rotas e sem persistência parcial. | 6.4, 8, 9 |
+| DASH-009 | Exclusão de dashboard/widget preserva fontes; exclusão da fonte preserva widget. | 5, 6.4 |
+| DASH-010 | Somente grid/current_value utilizáveis; line_chart planned/disabled. | 3 |
 
 ## 15. Critérios de aceite e evidências futuras
 
-Nenhum artefato de teste integra esta revisão. Esta autoria não executa
-build, testes, chamadas HTTP ou operações de banco. A suíte
-`tests/Api.Tests` permanece `Retired`. Os cenários abaixo orientam a análise
-e a validação futura, cuja execução depende da autorização operacional
-correspondente e de ambiente isolado.
+Nenhum artefato de teste integra esta revisão. Não criar, reparar ou executar
+`tests/Api.Tests`, globalmente Retired. Os cenários abaixo exigem validação
+futura por HTTP e/ou leitura de banco isolado, com autorização operacional
+própria. Nenhuma dessas execuções é autorizada por esta autoria documental.
 
-| Critério | Cenário e ação | Resultado observável | Meio de validação |
-|---|---|---|---|
-| AC-01 / DASH-001 | Criar dashboard com defaults, consultar, editar e excluir; repetir com nome inválido. | Campos persistidos e consultáveis; exclusão 204; nome inválido distinguível. | HTTP e leitura do banco isolado. |
-| AC-02 / DASH-002 | Marcar dois dashboards como padrão no mesmo contexto. | Somente um padrão; nenhum contexto alheio alterado. Depende de P-01. | HTTP e inspeção transacional no banco. |
-| AC-03 / DASH-003, DASH-004 | Criar gauge numérico e tentar gauge de estado, tipo desabilitado e capability ausente. | Válido persistido; inválidos rejeitados sem persistência parcial. | HTTP e banco isolado. |
-| AC-04 / DASH-005 | Salvar e alterar configuração e layout; consultar novamente. | Defaults e sobrescritas recuperados conforme contrato reconciliado em P-06. | Comparação de payloads HTTP. |
-| AC-05 / DASH-006, DASH-010 | Consultar catálogo e compatibilidade para cada grupo visual. | Matriz respeitada; recursos adiados não apresentados como utilizáveis. Depende de P-03. | Inspeção de respostas HTTP. |
-| AC-06 / DASH-007 | Consultar dados numéricos, lógicos e de estado conhecidos. | Valor JSON e metadados correspondem à fonte; configuração preservada. | Fixture conhecida e resposta HTTP; depende de P-02/P-04. |
-| AC-07 / DASH-008 | Solicitar dashboard/widget inexistente e enviar configuração inválida. | Erros identificáveis com código e status definidos em P-05/P-06. | HTTP e inspeção das respostas. |
-| AC-08 / DASH-009 | Excluir um widget e depois um dashboard com vários widgets. | Apenas os widgets pertinentes são removidos; devices/capabilities preservados. | Comparação de dados antes/depois no banco isolado. |
-| AC-09 / DASH-007 | Consultar fonte sem leitura, offline ou removida após criação do widget. | Comportamento definido em P-04, sem confundir ausência com zero/false. | Fixture controlada e resposta HTTP. |
-
-Critério sem execução é evidência ausente, não aprovação. Os critérios
-dependentes de decisão permanecem provisórios até reconciliação e análise.
-
-## 16. Fatos observados, propostas e decisões pendentes
-
-Baseline consultada: `main@648b4ce5c935b4343a3cca682b8f526fcf59249b`,
-árvore limpa antes da autoria.
-
-| ID | Fato ou ambiguidade | Decisão necessária antes da implementação |
+| Critério / requisitos | Cenário e resultado observável | Meio |
 |---|---|---|
-| P-01 | A proposta permite `user_id NULL` e menciona usuário/contexto sem contrato de ownership. | Definir escopo global, usuário ou residência, fonte da identidade e autorização de leitura/escrita; unicidade do padrão deve seguir esse escopo. Não presumir acesso público. |
-| P-02 | `Core.Entities.Capability` possui `Id int`, `UID string` e `DeviceId string`; os exemplos propõem `deviceId` numérico e `capabilityCode` não existente como propriedade própria. | Confirmar identificador público do device e origem de `capabilityCode`, `unit`, `semanticType` e tipo visual. Recomenda-se preservar o DeviceId público string e usar Capability.Id para capabilityId; os exemplos numéricos não autorizam mudar o contrato vigente. |
-| P-03 | `line_chart` aparece na matriz e catálogo, mas o resolver inicial é somente `current_value`; `history` e `aggregated_history` são posteriores. | Confirmar catálogo inicial; recomenda-se desabilitar line_chart e rejeitar modos históricos até entrega própria. Confirmar também se apenas grid é aceito, mantendo free_grid/list reservados. |
-| P-04 | O valor vigente da capability é string e DataType é opcional; UpdatedAt não declara offset no modelo. A proposta não define ausência, conversão inválida, obsolescência ou falha parcial. | Definir conversão JSON, timezone, freshness, status e tratamento de capability removida/inativa/offline; não inferir boolean/número por nome. |
-| P-05 | Há middleware global de erros; a proposta introduz envelope próprio sem tabela de status HTTP completa. | Confirmar status por código, erros de recurso aninhado e isolamento do envelope às novas rotas, preservando APIs existentes. |
-| P-06 | A proposta não define limites de posição/tamanho/refresh, colisões, merge profundo ou raso, nulls, PUT completo/parcial e semântica genérica de estados. | Confirmar validações, precedência de defaults, unidade/label/ícone, thresholds e invertState, concorrência e política de alterações inválidas. Não tornar valores exemplificativos limites obrigatórios. |
-| P-07 | `EKM-GAP-0002` registra ausência de schema MySQL completo e autoridade de migração. | Confirmar integração das tabelas propostas, tipos/FKs e procedimento de migração na etapa apropriada; SQL desta proposta não é migração aprovada. |
+| AC-01 / 001 | POST com name válido retorna 201/Location e defaults; GET/PUT recuperam os valores; DELETE retorna 204; repetição retorna 404; name vazio/null é rejeitado. Ordenação por displayOrder/id. | HTTP e banco isolado. |
+| AC-02 / 002 | Dois clientes admitidos observam o mesmo conjunto global; criar e atualizar padrões, inclusive concorrentemente, deixa no máximo um; desmarcar/excluir permite zero. | HTTP e inspeção transacional no banco. |
+| AC-03 / 003,004 | Exercitar todas as linhas do mapeamento: tipos visuais previstos e compatibilidade da matriz; tipo desconhecido não é inferido. DeviceId textual correto aceito; numérico, ausente no banco ou divergente rejeitado com código aplicável. | Fixtures conhecidas, HTTP e banco isolado. |
+| AC-04 / 005 | PUT omitindo campo mantém; null reseta; null em obrigatório rejeita. Gauge max=50/decimals=2: config={max:60} produz max=60/decimals=1; config=null restaura defaults. Position parcial mantém membros omitidos e reseta nulls. | Comparação HTTP e persistência. |
+| AC-05 / 006,010 | Catálogo mostra line_chart enabled=false/lifecycle=planned; nenhuma lista compatível o oferece. Sua criação é 422 WIDGET_TYPE_DISABLED; history/aggregated_history e free_grid/list retornam 400. | Inspeção HTTP. |
+| AC-06 / 007 | Fixtures de conversão válida, aliases, metadados, unit e inversão: value preserva fonte; label/icon seguem config. Nulls são emitidos e config completa permanece. Número 0 e booleano false reais continuam valores válidos. | Fixtures e respostas HTTP. |
+| AC-07 / 008 | IDs inválidos, JSON malformado, erros de config, recurso ausente e widget de outro dashboard retornam status/envelope da seção 9, sem mutação; APIs antigas conservam seus contratos. | HTTP e banco isolado. |
+| AC-08 / 009 | Excluir widget/dashboard remove somente widgets pertinentes; devices/capabilities permanecem. Excluir capability preserva widget com capabilityId original e status capability_missing. | Banco isolado antes/depois e HTTP. |
+| AC-09 / 007 | Cobrir os sete status e precedência: ausência não vira valor; offline prevalece sobre no_data; erro isolado não elimina os demais widgets. Idade 300s é ok, maior é stale; futuro é invalid_value; fuso ausente é error. Falha global do banco é 503. | Fixtures controladas e HTTP. |
+| AC-10 / 005,008 | x/y=-1, dimensão 0/5, refresh 0/86401 e decimals 7 rejeitados; limites válidos aceitos, colisão permitida. Config desconhecida, thresholds fora da escala e min>=max rejeitados atomicamente. | HTTP e banco isolado. |
+| AC-11 / 005 | Troca de tipo com config omitida inválida é rejeitada; config=null usa novos defaults. PUTs concorrentes em campos distintos preservam ambos; {} é no-op. | HTTP concorrente e banco isolado. |
 
-A existência de endpoint de histórico não demonstra que o contrato de gráficos,
-agregações ou períodos já esteja atendido. Mudança transversal necessária deve
-receber delimitação e decisão próprias, sem ser absorvida silenciosamente por
-Dashboard. Nenhuma pendência foi convertida em débito técnico aceito.
+Critério sem execução é evidência ausente, não aprovação. Não existe
+classificação Ready para 0.2 nesta atuação de autoria.
+
+## 16. Reconciliação da análise e dependências
+
+Baseline desta revisão: `ab3d671`, branch `spec/dashboard-api-v1`, árvore limpa
+antes da autoria. A análise da 0.1 é histórica e imutável; não classifica a 0.2.
+
+| Achado 0.1 | Disposição autoral na 0.2 |
+|---|---|
+| B-01 / P-01 | Contexto global, acesso e unicidade definidos na seção 2; atomicidade em 6.4. |
+| B-02 / P-02 | IDs, origem dos metadados, mapeamento e tipos desconhecidos em 2/3. |
+| B-03 / P-03 | Catálogo planejado/desabilitado e rejeição de layouts/modos em 3. |
+| B-04 / P-04 | Conversão, ausência, precedência dos sete status e fuso em 11. |
+| B-05 / P-05 | Envelope, status e recursos aninhados em 8/9. |
+| B-06 / P-06 | PUT, reset, defaults, limites, concorrência e apresentação em 6/12/13. |
+| P-07 / EKM-GAP-0002 | Limitação de integração preservada em 5; não encerrada nem convertida em débito aceito. |
+
+“Disposição autoral” registra onde o contrato foi detalhado, sem declarar os
+bloqueadores tecnicamente encerrados. Isso depende de análise da revisão 0.2.
+Nenhuma capacidade transversal foi incorporada para resolver ownership.
+Dashboard:SourceTimeZone é configuração de leitura desta funcionalidade;
+não altera relógio, sessões MySQL ou contratos de escrita de capabilities.
 
 ## 17. Fontes locais e encaminhamento
 
@@ -1238,16 +510,14 @@ Dashboard. Nenhuma pendência foi convertida em débito técnico aceito.
 - [Groups](GROUPS-MAINTENANCE-SUPPORT.md).
 - [Reset de settings](DEVICE-SETTINGS-RESET.md).
 - [Instruções locais](../../AGENTS.md).
-- Fontes factuais: `src/Core/Entities/Capability.cs`,
-  `src/Api/Models/Capability.cs` e
-  `src/Api/Controllers/CapabilityHistoryController.cs`.
-- Perfis consultados diretamente na raiz externa
-  `/Users/marcelocostamiranda/source/EKM-guidelines`:
-  `roles/REGRAS-COMUNS.md` (modelo 4.7) e
-  `roles/AUTOR-DA-ESPECIFICACAO.md`.
-  O bootstrap local informa modelo 4.6; não foi alterado nesta autoria.
+- [Análise histórica 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md).
+- Fontes factuais: src/Core/Entities/Capability.cs, Device.cs, CapabilityType.cs,
+  DataTypes/CapabilityDataType.cs e conversores; src/Api/Models/Capability.cs;
+  src/Data.Repositories/Repositories/Queries/CapabilityQuery.cs e DeviceQuery.cs;
+  src/Api/Program.cs e Middlewares/ExceptionHandler.cs.
+- Perfis externos consultados: roles/REGRAS-COMUNS.md e
+  roles/AUTOR-DA-ESPECIFICACAO.md na raiz EKM-guidelines. Bootstrap local 4.6
+  e perfis externos 4.7 permanecem sem alteração.
 
-A autorização atual cobre o registro documental da proposta. A análise formal
-de implementabilidade permanece não executada. O próximo estágio é reconciliar
-as pendências materiais e analisar a versão resultante; não há classificação
-`Ready`, aprovação de implementação nem encerramento `Done` nesta entrega.
+Revisão 0.2 registrada em Draft para nova Análise de Implementabilidade.
+Sem Ready, implementação, integração em main ou encerramento Done nesta entrega.
