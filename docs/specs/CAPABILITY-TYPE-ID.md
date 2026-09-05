@@ -6,9 +6,9 @@
 
 **Versão:** 0.1
 
-**Estado do workflow:** Rascunho [`Draft`]
+**Estado do workflow:** Em andamento [`In Progress`]
 
-**Implementação:** Não iniciada [`Not Started`]
+**Implementação:** Implementação concluída; encaminhada para Revisão
 
 **Relação normativa:** Nova [`New`] — primeiro contrato local para este
 recorte de CapabilityType, anteriormente inventariado em `EKM-GAP-0001`.

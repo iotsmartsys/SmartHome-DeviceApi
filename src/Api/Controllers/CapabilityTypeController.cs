@@ -33,6 +33,19 @@ public class CapabilityTypeController : ControllerBase
         return Ok((CapabilityType)capability);
     }
 
+    [HttpGet("id/{id:int}", Name = "GetCapabilityTypeById")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CapabilityType))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetCapabilityTypeById([FromServices] ICapabilityTypeRepository repository, [FromRoute] int id)
+    {
+        var capability = await repository.GetByIdAsync(id);
+        if (capability is null)
+            return NotFound();
+
+        return Ok((CapabilityType)capability);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CapabilityType))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,16 +55,17 @@ public class CapabilityTypeController : ControllerBase
         if (capabilityType is null)
             return BadRequest();
 
-        await repository.CreateAsync((Core.Entities.CapabilityType)capabilityType);
-        return CreatedAtRoute("GetCapabilityType", new { name = capabilityType.name }, capabilityType);
+        var entity = (Core.Entities.CapabilityType)capabilityType;
+        await repository.CreateAsync(entity);
+        return CreatedAtRoute("GetCapabilityType", new { name = entity.Name }, (CapabilityType)entity);
     }
 
-    [HttpPatch("{name}")]
+    [HttpPatch("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateCapabilityType([FromRoute] string name, [FromBody] JsonPatchDocument<CapabilityType> patch, [FromServices] ICapabilityTypeRepository repository)
+    public async Task<IActionResult> UpdateCapabilityType([FromRoute] int id, [FromBody] JsonPatchDocument<CapabilityType> patch, [FromServices] ICapabilityTypeRepository repository)
     {
-        var existing = await repository.GetByNameAsync(name);
+        var existing = await repository.GetByIdAsync(id);
         if (existing is null)
             return NotFound();
 
@@ -60,18 +74,17 @@ public class CapabilityTypeController : ControllerBase
 
         var entity = (Core.Entities.CapabilityType)model;
         entity.Id = existing.Id;
-        entity.Name = name; // mantém a coerência com o recurso da rota
 
         await repository.UpdateAsync(entity);
         return NoContent();
     }
 
-    [HttpDelete("{name}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> DeleteCapabilityType([FromRoute] string name, [FromServices] ICapabilityTypeRepository repository)
+    public async Task<IActionResult> DeleteCapabilityType([FromRoute] int id, [FromServices] ICapabilityTypeRepository repository)
     {
-        await repository.DeleteAsync(name);
+        await repository.DeleteAsync(id);
         return NoContent();
     }
 }

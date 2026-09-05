@@ -10,7 +10,8 @@ public record class CapabilityType(
     bool computed_value,
     string? value_symbol,
     string? active_value = null,
-    List<CapabilityIcon>? icons = null)
+    List<CapabilityIcon>? icons = null,
+    int id = 0)
 {
     public static implicit operator CapabilityType(Core.Entities.CapabilityType capabilityType)
         => new(
@@ -20,7 +21,8 @@ public record class CapabilityType(
             capabilityType.ComputedValue,
             capabilityType.ValueSymbol,
             capabilityType.ActiveValue,
-            capabilityType.Icons?.Select(i => new CapabilityIcon(i.Name, i.PrimaryColor, i.SecondaryColor)).ToList()
+            capabilityType.Icons?.Select(i => new CapabilityIcon(i.Name, i.PrimaryColor, i.SecondaryColor)).ToList(),
+            capabilityType.Id
         );
 
     public static implicit operator Core.Entities.CapabilityType(CapabilityType capabilityType)

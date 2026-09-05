@@ -4,10 +4,16 @@
 
 **Estado:** Open
 
-**Especificação:** `SHD-CAPABILITY-TYPE-ID-001@0.1`, `Draft`.
+**Especificação:** `SHD-CAPABILITY-TYPE-ID-001@0.1`.
+
+**Implementação:** Concluída; encaminhada para Revisão. Workflow `In Progress`.
+
+**Promoção e autorização:** ordem humana “Implemente a especificação”,
+aplicável à versão 0.1 com análise `Ready` e SHA-256 abaixo. Transição
+registrada mecanicamente nesta fonte operacional; contrato normativo intacto.
 
 **Autorização humana:** confirmação do rascunho e ordem de registro e análise
-na mesma atuação, em 04/09/2026. Implementação não iniciada.
+na mesma atuação, em 04/09/2026; seguida da ordem de implementação registrada acima.
 
 **Recorte:** PATCH e DELETE por id, novo GET `/id/{id:int}`, id do banco nas
 respostas, preservação do GET por nome e renomeação pelo PATCH com id estável.
@@ -23,10 +29,13 @@ cobre parte de `EKM-GAP-0001`, sem encerrar lacunas ou aceitar débitos.
 **Validação documental:** inspeção do contrato e referências locais;
 `git diff --check` registrado na entrega. Guarda
 `tools/validate_ekom_documents.py` ausente na baseline (`Not Executed`).
-Build e validação HTTP/banco não executados nesta atuação documental.
+Build canônico da API aprovado (saída 0, zero erros e dois avisos fora do delta).
+Validação HTTP/banco e testes: `Not Executed`.
 
-**Entrega:** somente documentos; commit e push da branch conforme regras comuns
-EKOM. Promoção, implementação e integração não realizadas nesta atuação.
+**Relatório de implementação:** `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T005640Z-3f300ef9-19cc7dd5-61d6-403a-9d85-ccf211d59718-implementation.md`.
+
+**Entrega:** código e documentação; commit e push da branch conforme regras comuns
+EKOM. Integração e conclusão do workflow não realizadas nesta atuação.
 
 ## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
 

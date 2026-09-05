@@ -86,6 +86,16 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         return type;
     }
 
+    public async Task<CapabilityType?> GetByIdAsync(int id)
+    {
+        var type = await connection.QueryFirstOrDefaultAsync<CapabilityType>(new CommandDefinition(CapabilityTypeQuery.GetById, new { id }, cancellationToken: default));
+        if (type is null) return null;
+
+        var icons = await connection.QueryAsync<CapabilityTypeIconRow>(CapabilityTypeQuery.SelectIconsByTypeId, new { id = type.Id });
+        type.Icons = icons.Select(r => new CapabilityIcon(r.Name, r.PrimaryColor, r.SecondaryColor)).ToList();
+        return type;
+    }
+
     public async Task UpdateAsync(string currentName, string? newName, string? actuatorMode, string? dataType, bool? computedValue, string? valueSymbol, IEnumerable<CapabilityIcon>? icons)
     {
         var existing = await GetByNameAsync(currentName);
@@ -138,9 +148,9 @@ internal class CapabilityTypeRepository : ICapabilityTypeRepository, IRepository
         }
     }
 
-    public async Task DeleteAsync(string name)
+    public async Task DeleteAsync(int id)
     {
-        var existing = await GetByNameAsync(name);
+        var existing = await GetByIdAsync(id);
         if (existing is null)
             return;
 

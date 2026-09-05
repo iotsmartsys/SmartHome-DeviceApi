@@ -18,6 +18,8 @@ internal static class CapabilityTypeQuery
 
     public const string GetByName = $@"{SelectBase} WHERE Name = @name";
 
+    public const string GetById = $@"{SelectBase} WHERE Id = @id";
+
     public const string Insert = @"
         INSERT INTO CapabilityTypes (Name, ActuatorMode, DataType, DynamicComputedValue, ValueSymbol)
         VALUES (@Name, @ActuatorMode, @DataType, @ComputedValue, @ValueSymbol);
