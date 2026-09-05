@@ -2,11 +2,11 @@
 
 ## EKM-CHG-0004 — CapabilityType por id
 
-**Estado:** Open
+**Estado:** Closed
 
 **Especificação:** `SHD-CAPABILITY-TYPE-ID-001@0.2`.
 
-**Implementação:** Concluída para 0.2; encaminhada para Revisão. Workflow `In Progress`.
+**Implementação:** Validada e testada pelo Arquiteto. Workflow `Done`.
 
 **Decisão e autorização:** após a entrega 0.1, o Arquiteto ordenou substituir
 GET por nome por GET individual somente em `/api/v1/capabilities-types/:id`.
@@ -25,12 +25,17 @@ contrato de GET individual e Location, sem encerrar lacunas ou aceitar débitos.
 
 **Validações:** build canônico aprovado, saída 0, zero erros e um aviso fora
 do delta; inspeção dos cinco critérios e integridade textual aprovadas.
-HTTP/banco e testes: `Not Executed`. Guarda documental ausente.
+HTTP/banco e testes pelo agente: `Not Executed`, preservados historicamente.
+Guarda documental ausente. Validação e testes declarados pelo Arquiteto e
+aceitos para encerramento; comandos, cenários e logs não foram informados.
 
 **Relatório de implementação:** `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T011121Z-0567d22b-3af01aa2-0190-4147-9641-18a4b5044986-implementation.md`.
 
-**Entrega:** commit e push da branch conforme regras comuns EKOM; integração
-e conclusão do workflow não realizadas.
+**Encerramento humano (04/09/2026):** “Implementação validada e testada. Encerre
+a especificação e promova para a main”. Versão 0.2 encerrada por decisão humana.
+
+**Entrega:** integração em `main` autorizada; o histórico Git registra sua
+execução. Relatórios de análise e implementação permanecem imutáveis.
 
 ## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
 

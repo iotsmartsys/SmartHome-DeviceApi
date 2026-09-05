@@ -6,9 +6,9 @@
 
 **Versão:** 0.2
 
-**Estado do workflow:** Em andamento [`In Progress`]
+**Estado do workflow:** Concluída [`Done`]
 
-**Implementação:** Implementação concluída; encaminhada para Revisão
+**Implementação:** Validada e testada pelo Arquiteto; encerramento autorizado
 
 **Relação normativa:** Emenda [`Amends`] da versão 0.1: substitui a consulta
 individual por nome e a rota `/id/{id:int}` por `/{id:int}` e ajusta o
@@ -138,3 +138,19 @@ Atualizar mapa, dossiê e `docs/rfc/EKM-CHANGELOG.md`, transação `EKM-CHG-0004
 A análise formal desta versão é registrada separadamente em
 `docs/reports/CAPABILITY-TYPE-ID/analysis/`, vinculada ao SHA-256 exato deste
 arquivo. Não há decisão funcional pendente nesta revisão corrigida pelo Arquiteto.
+
+## 7. Encerramento por decisão humana
+
+Em 04/09/2026, o Arquiteto declarou “Implementação validada e testada” e ordenou
+encerrar a especificação e promover para `main`. A versão 0.2 está Concluída
+[`Done`] por essa decisão, com implementação funcional entregue em `1cf56de`.
+
+A declaração humana constitui a evidência aceita para encerramento; não foram
+fornecidos comandos, cenários ou logs dos testes realizados pelo Arquiteto. Os
+registros anteriores de operações não executadas pelo agente permanecem
+históricos e não são convertidos em execução automatizada. O build canônico
+aprovado e as inspeções constam do relatório de implementação 0.2.
+
+A integração em `main` está autorizada na mesma decisão e sua execução é
+rastreável pelo histórico Git. Nenhum requisito funcional foi alterado nesta
+etapa de encerramento.

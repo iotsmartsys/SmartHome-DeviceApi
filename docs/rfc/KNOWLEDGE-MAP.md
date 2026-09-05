@@ -40,7 +40,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Properties | `EKM-GAP-0001` | `src/Api/Controllers/PropertiesController.cs`, `src/Data.Repositories/Repositories/PropertyRepository.cs` | Código e build | Inventoried |
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1`, `EKM-GAP-0001`, `EKM-GAP-0002` | `src/Api/Controllers/GroupController.cs`, modelos HTTP de Groups, `src/Core/Entities/Group.cs`, `src/Data.Repositories/Repositories/GroupRepository.cs` e queries relacionadas | Especificação v0.1 concluída; implementação, build Release e validação aceita pelo Arquiteto | Mapped |
 | Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
-| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Análise Ready; implementação e build concluídos, encaminhada para Revisão | Mapped |
+| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Versão 0.2 Done; build aprovado, validação e testes aceitos pelo Arquiteto | Mapped |
 | Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
 | OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
 | Persistência | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Queries Dapper e scripts parciais | Inventoried |
@@ -51,7 +51,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 ```text
 SmartHome-DeviceApi
 ├── Contratos normativos
-│   ├── Capability Types por id (implementação concluída, em revisão)
+│   ├── Capability Types por id (Done)
 │   ├── Suporte à manutenção de Groups
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
 ├── API e modelos HTTP
@@ -96,9 +96,11 @@ Análise: `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T011011Z-0567d22b-
 Classificação `Ready` para a versão 0.2, SHA-256 `0567d22b2b1a3b0a376893a6b52cf67e1d071309472bba89b70ec12b5042066d`.
 Implementação: `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T011121Z-0567d22b-3af01aa2-0190-4147-9641-18a4b5044986-implementation.md`.
 GET individual somente em `/api/v1/capabilities-types/{id}`; Location do POST
-por id. Implementação e build concluídos, encaminhada para Revisão.
-O SHA-256 identifica o snapshot analisado; apenas o metadado de implementação
-foi atualizado posteriormente. Relatórios 0.1 permanecem históricos.
+por id. Versão 0.2 Concluída (`Done`) por decisão humana após declaração de
+validação e testes; promoção para main autorizada.
+O SHA-256 identifica o snapshot analisado; os metadados de estado e o registro
+da decisão de encerramento foram atualizados posteriormente, sem mudança
+funcional. Relatórios anteriores permanecem históricos.
 
 ## 8. Manutenção
 
