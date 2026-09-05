@@ -40,7 +40,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Properties | `EKM-GAP-0001` | `src/Api/Controllers/PropertiesController.cs`, `src/Data.Repositories/Repositories/PropertyRepository.cs` | Código e build | Inventoried |
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1`, `EKM-GAP-0001`, `EKM-GAP-0002` | `src/Api/Controllers/GroupController.cs`, modelos HTTP de Groups, `src/Core/Entities/Group.cs`, `src/Data.Repositories/Repositories/GroupRepository.cs` e queries relacionadas | Especificação v0.1 concluída; implementação, build Release e validação aceita pelo Arquiteto | Mapped |
 | Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
-| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.1` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Análise Ready; implementação e build concluídos, encaminhada para Revisão | Mapped |
+| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Análise Ready; implementação e build concluídos, encaminhada para Revisão | Mapped |
 | Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
 | OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
 | Persistência | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Queries Dapper e scripts parciais | Inventoried |
@@ -92,12 +92,13 @@ observados permanecem na seção 5 até decisão humana de disposição.
 
 ## 7. Análise de Capability Types por id
 
-Relatório: `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T005112Z-3f300ef9-80a95854-7035-487a-8ef9-af14afd40318-implementability-analysis.md`.
-Classificação `Ready` para a versão 0.1, SHA-256 `3f300ef99c15dca9c638e9342f1679126f5fb0d14c850bd1eb3883bf5069cbc5`.
-Implementação concluída e encaminhada para Revisão; workflow `In Progress`.
-Relatório: `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T005640Z-3f300ef9-19cc7dd5-61d6-403a-9d85-ccf211d59718-implementation.md`.
-O SHA-256 acima identifica o snapshot analisado; a especificação recebeu somente
-atualização mecânica dos metadados de estado.
+Análise: `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T011011Z-0567d22b-92cb7a87-7715-44ab-b007-9a3acecb5b82-implementability-analysis.md`.
+Classificação `Ready` para a versão 0.2, SHA-256 `0567d22b2b1a3b0a376893a6b52cf67e1d071309472bba89b70ec12b5042066d`.
+Implementação: `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T011121Z-0567d22b-3af01aa2-0190-4147-9641-18a4b5044986-implementation.md`.
+GET individual somente em `/api/v1/capabilities-types/{id}`; Location do POST
+por id. Implementação e build concluídos, encaminhada para Revisão.
+O SHA-256 identifica o snapshot analisado; apenas o metadado de implementação
+foi atualizado posteriormente. Relatórios 0.1 permanecem históricos.
 
 ## 8. Manutenção
 

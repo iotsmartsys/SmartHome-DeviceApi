@@ -4,38 +4,33 @@
 
 **Estado:** Open
 
-**Especificação:** `SHD-CAPABILITY-TYPE-ID-001@0.1`.
+**Especificação:** `SHD-CAPABILITY-TYPE-ID-001@0.2`.
 
-**Implementação:** Concluída; encaminhada para Revisão. Workflow `In Progress`.
+**Implementação:** Concluída para 0.2; encaminhada para Revisão. Workflow `In Progress`.
 
-**Promoção e autorização:** ordem humana “Implemente a especificação”,
-aplicável à versão 0.1 com análise `Ready` e SHA-256 abaixo. Transição
-registrada mecanicamente nesta fonte operacional; contrato normativo intacto.
+**Decisão e autorização:** após a entrega 0.1, o Arquiteto ordenou substituir
+GET por nome por GET individual somente em `/api/v1/capabilities-types/:id`.
+A revisão 0.2 incorpora a correção e o Location do POST por id; listagem e
+filtro name permanecem. A ordem de correção autoriza esta implementação após
+nova análise; promoção registrada antes da alteração de código.
 
-**Autorização humana:** confirmação do rascunho e ordem de registro e análise
-na mesma atuação, em 04/09/2026; seguida da ordem de implementação registrada acima.
+**Branch:** `spec/capability-type-id`, baseline `b310b01`, árvore inicialmente limpa.
 
-**Recorte:** PATCH e DELETE por id, novo GET `/id/{id:int}`, id do banco nas
-respostas, preservação do GET por nome e renomeação pelo PATCH com id estável.
+**Análise atual:** `Ready`, `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T011011Z-0567d22b-92cb7a87-7715-44ab-b007-9a3acecb5b82-implementability-analysis.md`.
+SHA-256 `0567d22b2b1a3b0a376893a6b52cf67e1d071309472bba89b70ec12b5042066d`.
 
-**Branch:** `spec/capability-type-id`, derivada da `main` com árvore limpa.
+**Histórico:** versão 0.1 implementada em `b310b01`; relatórios anteriores
+preservados em `docs/reports/CAPABILITY-TYPE-ID/`. A revisão atual emenda seu
+contrato de GET individual e Location, sem encerrar lacunas ou aceitar débitos.
 
-**Análise:** `Ready`, relatório `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T005112Z-3f300ef9-80a95854-7035-487a-8ef9-af14afd40318-implementability-analysis.md`.
-Revisão normativa SHA-256 `3f300ef99c15dca9c638e9342f1679126f5fb0d14c850bd1eb3883bf5069cbc5`.
+**Validações:** build canônico aprovado, saída 0, zero erros e um aviso fora
+do delta; inspeção dos cinco critérios e integridade textual aprovadas.
+HTTP/banco e testes: `Not Executed`. Guarda documental ausente.
 
-**Autoridades:** primeiro contrato deste recorte (`New`); preserva Groups e
-cobre parte de `EKM-GAP-0001`, sem encerrar lacunas ou aceitar débitos.
+**Relatório de implementação:** `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T011121Z-0567d22b-3af01aa2-0190-4147-9641-18a4b5044986-implementation.md`.
 
-**Validação documental:** inspeção do contrato e referências locais;
-`git diff --check` registrado na entrega. Guarda
-`tools/validate_ekom_documents.py` ausente na baseline (`Not Executed`).
-Build canônico da API aprovado (saída 0, zero erros e dois avisos fora do delta).
-Validação HTTP/banco e testes: `Not Executed`.
-
-**Relatório de implementação:** `docs/reports/CAPABILITY-TYPE-ID/implementation/2026-09-05T005640Z-3f300ef9-19cc7dd5-61d6-403a-9d85-ccf211d59718-implementation.md`.
-
-**Entrega:** código e documentação; commit e push da branch conforme regras comuns
-EKOM. Integração e conclusão do workflow não realizadas nesta atuação.
+**Entrega:** commit e push da branch conforme regras comuns EKOM; integração
+e conclusão do workflow não realizadas.
 
 ## EKM-CHG-0003 — Suporte à manutenção administrativa de Groups
 
