@@ -2,6 +2,11 @@
 
 ## EKM-CHG-0006 — Suíte integrada HTTP Dashboard
 
+**Atalhos solicitados pelo Arquiteto:** Makefile da raiz agora fornece
+run-test e clear-test independentes, com manifesto configurável compartilhado.
+[Registro da adaptação](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T032207Z-0.1-841c66d8-fcd0-4938-8289-5e884a12137b-makefile-shortcuts.md).
+Somente dry-run/sintaxe verificados; nenhuma execução de testes ou limpeza.
+
 **Estado:** Open. **Workflow:** In Progress.
 
 **Ordem humana:** criar suíte automatizada de criação, consulta e alteração;

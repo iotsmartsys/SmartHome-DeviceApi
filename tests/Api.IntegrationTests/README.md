@@ -26,6 +26,43 @@ A partir da raiz do repositório, **somente compilar**:
 dotnet build tests/Api.IntegrationTests/Api.IntegrationTests.csproj
 ```
 
+## Atalhos no Makefile da raiz
+
+Executar criação, consulta e alteração:
+
+```sh
+make run-test TEST_API_URL=https://sua-api.example/
+```
+
+Limpar depois, separadamente:
+
+```sh
+make clear-test
+```
+
+Os dois alvos usam `tests/Api.IntegrationTests/.runs/dashboard.json` por padrão.
+`clear-test` lê o destino do manifesto e não precisa de TEST_API_URL. Os atalhos
+compilam o projeto quando necessário; não iniciam a API nem carregam `.env`.
+
+Variáveis podem ser fornecidas no ambiente ou na chamada do Make:
+
+| Variável | Uso / default |
+|---|---|
+| TEST_API_URL | Obrigatória para run-test; URL raiz da instalação. |
+| TEST_STATE | Manifesto; default `tests/Api.IntegrationTests/.runs/dashboard.json`. |
+| TEST_CAPABILITY_ID | Opcional; omitida usa seleção automática. |
+| TEST_TIMEOUT_SECONDS | Timeout por request; default 30. |
+
+Para outra execução, escolha outro manifesto e use o mesmo caminho na limpeza:
+
+```sh
+make run-test TEST_API_URL=https://sua-api.example/ TEST_STATE=tests/Api.IntegrationTests/.runs/dashboard-002.json TEST_CAPABILITY_ID=22
+make clear-test TEST_STATE=tests/Api.IntegrationTests/.runs/dashboard-002.json
+```
+
+A limpeza preserva o manifesto; um novo run não sobrescreve o arquivo anterior.
+O token continua sendo fornecido por `DASHBOARD_TEST_TOKEN` no ambiente.
+
 ## Criar, consultar e alterar em uma execução
 
 Substitua a URL abaixo pelo destino escolhido. Escolha um manifesto novo para
