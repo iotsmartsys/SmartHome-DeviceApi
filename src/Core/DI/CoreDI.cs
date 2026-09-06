@@ -10,8 +10,8 @@ public static class CoreDI
     public static IServiceCollection AddCore(this IServiceCollection services)
     {
         services.AddScoped<IAddCapabilityService, AddCapabilityService>();
-        services.AddScoped<DashboardService>();
-        services.AddScoped<DashboardWidgetCompatibilityResolver>();
+        services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IDashboardWidgetCompatibilityResolver, DashboardWidgetCompatibilityResolver>();
         return services;
     }
 }

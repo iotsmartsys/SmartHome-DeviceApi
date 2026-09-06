@@ -1,61 +1,38 @@
 # EKM — Histórico de mudanças
 
-## EKM-CHG-0005 — Especificação Dashboard API v1
+## EKM-CHG-0005 — Dashboard API v1
 
-**Estado:** Open
-
-**Data de abertura:** 04/09/2026
+**Estado:** Open. **Workflow:** In Progress, reimplementação entregue para Revisão.
 
 **Especificação:** [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md).
 
-**Workflow:** In Progress. Implementação técnica integral 0.3 e build canônico
-concluídos, encaminhados à Revisão; aceite operacional pendente.
+**Decisão humana de 05/09/2026:** o Arquiteto rejeitou a entrega de
+`a1f292d`/`90d5061` por não seguir os precedentes do repositório e ordenou
+reimplementação integral conforme nomenclatura, estilo, modelos/contratos,
+controllers, rotas/endpoints e queries, exceto precedentes imprecisos ou
+defeituosos. A rejeição foi registrada antes da alteração do código. A ordem
+original da 0.3 cobre esta correção; nenhum novo aceite foi presumido.
 
-**Autorização atual:** decisão expressa do Arquiteto pela precedência da
-seção 11.2. Revisão 0.3 incorpora essa decisão na listagem, nas regras de
-tipo/conversão e no AC-09; demais contratos da 0.2 preservados.
+**Correção atual:** modelos HTTP e entidades explícitos, serviços por interface,
+resultados MVC e persistência/queries conforme os precedentes. Sem mudança de
+contrato funcional 0.3, pacotes ou APIs anteriores.
+[Relatório corretivo](../reports/DASHBOARD-API-V1/implementation/2026-09-05T233757Z-0.3-c7fc139b-4018-4bea-b6d3-6b35860a446a-reimplementation.md)
+registra precedentes, exceções, rastreabilidade e limitações. Build final exit 0,
+zero erros e dois avisos preexistentes; nenhuma execução de testes/HTTP/banco.
+SQL não aplicado, SourceTimeZone não configurado. P-07/EKM-GAP-0002 aberta;
+DDL corrigido não migra eventual schema da implementação rejeitada.
 
-**Escopo:** contrato e critérios reconciliados, mapa e registro resumido.
-Relação New às APIs existentes; sem alteração de código ou autenticação
-transversal. Detalhes autorais complementares estão identificados na revisão.
+**Histórico preservado:** [análise 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md)
+identificou seis bloqueadores; [análise 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md)
+manteve B-04. A decisão humana pela precedência de 11.2 foi incorporada na 0.3;
+a [reanálise Ready](../reports/DASHBOARD-API-V1/analysis/2026-09-05T023452Z-0.3-c825daa4-0797-4357-8a48-82de0ed12147-implementability-analysis.md)
+se aplica ao snapshot `3a8c4ca27c3812a8a20452c456504f5512aadb87fdc7c17444646591f3af7139`.
+O [relatório da entrega rejeitada](../reports/DASHBOARD-API-V1/implementation/2026-09-05T025714Z-0.3-50c7654c-c78e-4d19-aa77-10fc5f53b503-implementation.md)
+e seus logs são históricos e não constituem aceite.
 
-**Baseline da revisão:** d32b419, branch spec/dashboard-api-v1, árvore limpa.
-A autoria inicial partiu de main@648b4ce5c935b4343a3cca682b8f526fcf59249b.
-
-**Histórico de análise:** [relatório imutável 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md),
-Not Ready — Specification Defect, seis bloqueadores. A seção 16 da 0.2
-localiza sua disposição autoral; não declara nova classificação técnica.
-
-**Limitação preservada:** P-07/EKM-GAP-0002, integração com schema e autoridade
-de migração. Nenhum débito aceito, implementação ou validação operacional.
-
-**Validação documental:** JSON, links locais, rastreabilidade e diff verificados.
-A guarda tools/validate_ekom_documents.py continua ausente. Build, testes,
-HTTP e banco não executados; suíte Api.Tests permanece Retired.
-
-**Análise histórica 0.2:** [relatório 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md),
-atuação exclusiva de Engenheiro Analista por ordem do Arquiteto. Dez requisitos,
-onze critérios e seis bloqueadores anteriores confrontados. B-01/02/03/05/06
-descartados; B-04 mantido, restrito à precedência contraditória de status para
-tipo não suportado na listagem. A decisão posterior foi incorporada na 0.3;
-relatórios históricos permanecem imutáveis e não classificam a nova revisão.
-
-**Reanálise 0.3:** [relatório](../reports/DASHBOARD-API-V1/analysis/2026-09-05T023452Z-0.3-c825daa4-0797-4357-8a48-82de0ed12147-implementability-analysis.md),
-por ordem do Arquiteto, atuação de Engenheiro Analista. Ready para SHA-256
-`3a8c4ca27c3812a8a20452c456504f5512aadb87fdc7c17444646591f3af7139`. Dez requisitos, onze critérios e seis achados
-confrontados; B-04 descartado pela precedência única, demais disposições
-preservadas. Challenge sem bloqueadores; limitações operacionais mantidas.
-Especificação e relatórios históricos permanecem inalterados nesta análise.
-
-**Implementação:** ordem explícita do Arquiteto para implementar integralmente
-0.3. [Relatório](../reports/DASHBOARD-API-V1/implementation/2026-09-05T025714Z-0.3-50c7654c-c78e-4d19-aa77-10fc5f53b503-implementation.md)
-registra CRUD, catálogo, resolução de dados, validação e DDL aditivo preparado.
-Build canônico exit 0; nenhum teste/HTTP/banco executado. SQL não aplicado,
-SourceTimeZone não presumido, P-07 preservada. Sem mudanças de pacotes,
-contratos antigos ou suíte Retired.
-
-**Estado resultante:** implementação técnica entregue para Revisão; In Progress.
-Sem aprovação de aceite operacional, integração em main ou conclusão Done.
+Sem aprovação operacional, integração em main ou conclusão Done. Api.Tests
+continua Retired. A guarda documental continua ausente. Nenhum débito aceito
+ou lacuna encerrada; inspeção documental não substitui evidência operacional.
 
 ## EKM-CHG-0004 — CapabilityType por id
 

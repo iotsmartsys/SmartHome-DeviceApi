@@ -8,8 +8,9 @@
 
 **Estado do workflow:** Em andamento [`In Progress`]
 
-**Implementação:** Implementação técnica concluída e encaminhada à Revisão;
-build canônico aprovado. Aceite operacional pendente. Ordem explícita do
+**Implementação:** Entrega anterior rejeitada pelo Arquiteto em 05/09/2026;
+reimplementação técnica entregue para Revisão com build canônico aprovado.
+[Relatório corretivo](../reports/DASHBOARD-API-V1/implementation/2026-09-05T233757Z-0.3-c7fc139b-4018-4bea-b6d3-6b35860a446a-reimplementation.md). Ordem explícita do
 Arquiteto para implementar integralmente 0.3 após análise Ready do snapshot
 `3a8c4ca27c3812a8a20452c456504f5512aadb87fdc7c17444646591f3af7139`.
 

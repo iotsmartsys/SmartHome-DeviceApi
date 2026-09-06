@@ -65,7 +65,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddScoped<Core.Services.DashboardDataResolver>(_ =>
+builder.Services.AddScoped<Core.Contracts.Services.IDashboardDataResolver>(_ =>
     new Core.Services.DashboardDataResolver(builder.Configuration["Dashboard:SourceTimeZone"]));
 
 builder.Services.AddHostedService<DatabaseWatchdogService>();

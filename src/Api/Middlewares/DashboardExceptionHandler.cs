@@ -1,4 +1,5 @@
-using System.Text.Json;
+using Api.Models;
+using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using Core.Exceptions;
 using MySqlConnector;
@@ -14,7 +15,7 @@ public sealed class DashboardExceptionHandler(RequestDelegate next, ILogger<Dash
         try
         {
             if (context.Request.Query.Count != 0)
-                throw new DashboardException("INVALID_REQUEST", 400, "Esta rota não aceita filtros de consulta.", context.Request.Query.Keys.First());
+                throw new DashboardExceptionDomain("INVALID_REQUEST", "Esta rota não aceita filtros de consulta.", context.Request.Query.Keys.First());
             await next(context);
             if (!context.Response.HasStarted && context.Response.StatusCode is 405 or 415)
             {
@@ -23,9 +24,9 @@ public sealed class DashboardExceptionHandler(RequestDelegate next, ILogger<Dash
                     status == 405 ? "Método não suportado." : "Tipo de mídia não suportado.", null);
             }
         }
-        catch (DashboardException ex) when (!context.Response.HasStarted)
+        catch (DashboardExceptionDomain ex) when (!context.Response.HasStarted)
         {
-            await Write(context, ex.StatusCode, ex.Code, ex.Message, ex.Field);
+            await Write(context, DashboardErrorResponse.GetStatusCode(ex.Code), ex.Code, ex.Message, ex.Field);
         }
         catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
         {
@@ -46,7 +47,6 @@ public sealed class DashboardExceptionHandler(RequestDelegate next, ILogger<Dash
         context.Response.ContentType = "application/json; charset=utf-8";
         // No response/body from a previously failed write should be advertised as a created resource.
         context.Response.Headers.Remove("Location");
-        object details = field is null ? new Dictionary<string, object>() : new { field };
-        return context.Response.WriteAsync(JsonSerializer.Serialize(new { error = new { code, message, details } }), context.RequestAborted);
+        return context.Response.WriteAsync(JsonConvert.SerializeObject(DashboardErrorResponse.Create(code, message, field)), context.RequestAborted);
     }
 }

@@ -1,17 +1,17 @@
 using System.Globalization;
-using System.Text.Json.Nodes;
+using Core.Contracts.Services;
 using System.Text.RegularExpressions;
 using Core.Entities;
 
 namespace Core.Services;
 
-public sealed class DashboardDataResolver(string? sourceTimeZone)
+public class DashboardDataResolver(string? sourceTimeZone) : IDashboardDataResolver
 {
     private static readonly Regex Numeric = new(@"^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$", RegexOptions.CultureInvariant);
     private static readonly Regex Integer = new(@"^[+-]?[0-9]+$", RegexOptions.CultureInvariant);
     private static readonly Regex Instant = new(@"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-][0-9]{2}:[0-9]{2})$", RegexOptions.CultureInvariant);
 
-    public DashboardReading Resolve(DashboardCapabilitySource? source, DashboardWidget? widget,
+    public DashboardReading Resolve(DashboardCapability? source, DashboardWidget? widget,
         IEnumerable<DashboardWidgetType> types, DateTimeOffset now)
     {
         if (source is null) return new(null, null, null, null, "capability_missing", null);
@@ -20,14 +20,14 @@ public sealed class DashboardDataResolver(string? sourceTimeZone)
         try
         {
             var config = widget?.Config;
-            unit = config?["unit"]?.GetValue<string>() ?? unit;
+            unit = config?.Unit ?? unit;
             var timeStatus = ReadTime(source.UpdatedAt, out updated);
-            if (timeStatus == "error") return Empty("error");
+            if (widget?.ConfigurationInvalid == true || timeStatus == "error") return Empty("error");
             if (!source.DeviceExists || !source.DeviceActive || !source.Active ||
                 string.Equals(source.DeviceState?.Trim(), "offline", StringComparison.OrdinalIgnoreCase)) return Empty("offline");
             if (string.IsNullOrWhiteSpace(source.Value) || !source.UpdatedAt.HasValue || source.UpdatedAt == default(DateTime)) return Empty("no_data");
             if (timeStatus == "invalid_value" || updated > now) return Empty("invalid_value");
-            var visual = DashboardWidgetCompatibilityResolver.VisualType(source);
+            var visual = source.DataType;
             var type = widget is null ? null : types.SingleOrDefault(t => t.Code == widget.WidgetType);
             if (visual is null || widget is not null && (type is null || !type.Enabled ||
                     !type.CompatibleDataTypes.Contains(visual, StringComparer.Ordinal) || widget.DataMode != "current_value"))
@@ -66,12 +66,12 @@ public sealed class DashboardDataResolver(string? sourceTimeZone)
         return null;
     }
 
-    private static bool Convert(DashboardCapabilitySource source, out object? value)
+    private static bool Convert(DashboardCapability source, out object? value)
     {
         value = null;
         var raw = source.Value!.Trim();
         var token = raw.ToLowerInvariant();
-        switch (DashboardWidgetCompatibilityResolver.SourceType(source))
+        switch (source.NormalizedSourceType)
         {
             case "float":
                 if (!Numeric.IsMatch(raw) || !double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) || !double.IsFinite(number)) return false;
@@ -99,12 +99,12 @@ public sealed class DashboardDataResolver(string? sourceTimeZone)
         return value is not null;
     }
 
-    private static (string? Label, string? Icon) Present(DashboardCapabilitySource source, object value, JsonObject? config, string? unit)
+    private static (string? Label, string? Icon) Present(DashboardCapability source, object value, DashboardWidgetConfig? config, string? unit)
     {
-        var visual = DashboardWidgetCompatibilityResolver.VisualType(source);
+        var visual = source.DataType;
         if (visual == "numeric")
         {
-            var decimals = config?["decimals"]?.GetValue<int>() ?? 1;
+            var decimals = config?.Decimals ?? 1;
             var format = "F" + decimals.ToString(CultureInfo.InvariantCulture);
             // Decimal source text preserves decimal midpoint rounding (e.g. 1.005 -> 1.01).
             // The double fallback retains the full finite range of float readings.
@@ -116,7 +116,7 @@ public sealed class DashboardDataResolver(string? sourceTimeZone)
         }
         if (visual is "text" or "event") return ((string)value, null);
         if (config is null) return (value.ToString(), null); // Metadata list does not expose presentation fields.
-        var invert = config["invertState"]!.GetValue<bool>();
+        var invert = config.InvertState!.Value;
         string key;
         if (visual == "logical") key = (bool)value ^ invert ? "on" : "off";
         else
@@ -128,6 +128,12 @@ public sealed class DashboardDataResolver(string? sourceTimeZone)
                 "pressed" => "released", "released" => "pressed", _ => key
             };
         }
-        return (config[key + "Label"]?.GetValue<string>(), config[key + "Icon"]?.GetValue<string>());
+        return key switch
+        {
+            "on" => (config.OnLabel, config.OnIcon), "off" => (config.OffLabel, config.OffIcon),
+            "open" => (config.OpenLabel, config.OpenIcon), "closed" => (config.ClosedLabel, config.ClosedIcon),
+            "pressed" => (config.PressedLabel, config.PressedIcon), "released" => (config.ReleasedLabel, config.ReleasedIcon),
+            _ => (null, null)
+        };
     }
 }

@@ -1,35 +1,54 @@
 using System.Data;
+using System.Text.Json;
 using Core.Contracts.Repositories;
+using Core.Contracts.Services;
 using Core.Entities;
+using Core.Exceptions;
 using Dapper;
+using Microsoft.Extensions.Logging;
 
 namespace Data.Repositories;
 
-internal sealed class DashboardRepository(IDbConnection connection) : IDashboardRepository
+internal class DashboardRepository(ILogger<DashboardRepository> logger, IDbConnection connection) : IDashboardRepository
 {
     private IDbTransaction? transaction;
-    private CommandDefinition Command(string sql, object? parameters, CancellationToken ct) =>
-        new(sql, parameters, transaction, cancellationToken: ct);
 
-    public async Task<T> WithWriteLockAsync<T>(Func<Task<T>> operation, CancellationToken ct)
+    public async Task<IEnumerable<Dashboard>> GetAllAsync(CancellationToken cancellationToken)
     {
-        if (transaction is not null) throw new InvalidOperationException("Nested Dashboard transaction.");
-        if (connection.State != ConnectionState.Open) connection.Open();
-        // READ COMMITTED makes each partial update observe the preceding committed writer.
-        using var current = connection.BeginTransaction(IsolationLevel.ReadCommitted);
-        transaction = current;
+        var command = new CommandDefinition(DashboardQuery.GetAllDashboards, transaction: transaction, cancellationToken: cancellationToken);
+        var dashboards = (await connection.QueryAsync<Dashboard>(command)).ToArray();
+        var widgets = await connection.QueryAsync<DashboardWidgetRow>(new CommandDefinition(
+            DashboardWidgetQuery.GetAllWidgets, transaction: transaction, cancellationToken: cancellationToken));
+        var grouped = widgets.Select(MapWidget).ToLookup(widget => widget.DashboardId);
+        foreach (var dashboard in dashboards) dashboard.Widgets = grouped[dashboard.Id].ToArray();
+        return dashboards;
+    }
+
+    public async Task<Dashboard?> GetByIdAsync(long id, CancellationToken cancellationToken)
+    {
+        var command = new CommandDefinition(DashboardQuery.GetById, new { id }, transaction: transaction, cancellationToken: cancellationToken);
+        var dashboard = await connection.QuerySingleOrDefaultAsync<Dashboard>(command);
+        if (dashboard is null) return null;
+        var widgets = await connection.QueryAsync<DashboardWidgetRow>(new CommandDefinition(
+            DashboardWidgetQuery.GetByDashboardId, new { dashboardId = id }, transaction: transaction, cancellationToken: cancellationToken));
+        dashboard.Widgets = widgets.Select(MapWidget).ToArray();
+        return dashboard;
+    }
+
+    public async Task AddAsync(Dashboard dashboard, CancellationToken cancellationToken)
+    {
+        using var current = await BeginWriteAsync(cancellationToken);
         try
         {
-            var lockId = await connection.QuerySingleAsync<int>(Command(
-                "SELECT id FROM dashboard_write_lock WHERE id=1 FOR UPDATE", null, ct));
-            if (lockId != 1) throw new InvalidOperationException("Dashboard write lock missing.");
-            var result = await operation();
+            await ClearDefaultAsync(dashboard, cancellationToken);
+            var command = new CommandDefinition(DashboardQuery.Insert, dashboard, transaction: current, cancellationToken: cancellationToken);
+            dashboard.Id = await connection.ExecuteScalarAsync<long>(command);
             current.Commit();
-            return result;
         }
-        catch
+        catch (Exception exception)
         {
-            current.Rollback();
+            Rollback(current);
+            logger.LogError(exception, "Erro ao persistir Dashboard");
             throw;
         }
         finally
@@ -39,78 +58,262 @@ internal sealed class DashboardRepository(IDbConnection connection) : IDashboard
         }
     }
 
-    public async Task<IReadOnlyList<Dashboard>> GetAllAsync(CancellationToken ct)
+    public async Task<Dashboard?> UpdateAsync(long id, DashboardRequest request, CancellationToken cancellationToken)
     {
-        var dashboards = (await connection.QueryAsync<Dashboard>(Command(
-            DashboardQuery.Dashboards + " ORDER BY display_order, id", null, ct))).ToArray();
-        var widgets = await connection.QueryAsync<DashboardWidget>(Command(
-            DashboardQuery.Widgets + " ORDER BY display_order, id", null, ct));
-        var grouped = widgets.ToLookup(w => w.DashboardId);
-        foreach (var dashboard in dashboards) dashboard.Widgets = grouped[dashboard.Id].ToList();
-        return dashboards;
+        using var current = await BeginWriteAsync(cancellationToken);
+        try
+        {
+            var dashboard = await GetByIdAsync(id, cancellationToken);
+            if (dashboard is not null && dashboard.Update(request))
+            {
+                await ClearDefaultAsync(dashboard, cancellationToken);
+                var command = new CommandDefinition(DashboardQuery.Update, dashboard, transaction: current, cancellationToken: cancellationToken);
+                await connection.ExecuteAsync(command);
+            }
+            current.Commit();
+            return dashboard;
+        }
+        catch (Exception exception)
+        {
+            Rollback(current);
+            logger.LogError(exception, "Erro ao persistir Dashboard");
+            throw;
+        }
+        finally
+        {
+            transaction = null;
+            connection.Close();
+        }
     }
 
-    public async Task<Dashboard?> GetAsync(long id, CancellationToken ct)
+    public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken)
     {
-        var dashboard = await connection.QuerySingleOrDefaultAsync<Dashboard>(Command(
-            DashboardQuery.Dashboards + " WHERE id=@id", new { id }, ct));
-        if (dashboard is null) return null;
-        dashboard.Widgets = (await connection.QueryAsync<DashboardWidget>(Command(
-            DashboardQuery.Widgets + " WHERE dashboard_id=@id ORDER BY display_order,id", new { id }, ct))).ToList();
-        return dashboard;
+        using var current = await BeginWriteAsync(cancellationToken);
+        try
+        {
+            var command = new CommandDefinition(DashboardQuery.Delete, new { id }, transaction: current, cancellationToken: cancellationToken);
+            var affectedRows = await connection.ExecuteAsync(command);
+            current.Commit();
+            return affectedRows > 0;
+        }
+        catch (Exception exception)
+        {
+            Rollback(current);
+            logger.LogError(exception, "Erro ao persistir Dashboard");
+            throw;
+        }
+        finally
+        {
+            transaction = null;
+            connection.Close();
+        }
     }
 
-    public async Task SaveAsync(Dashboard value, bool create, CancellationToken ct)
+    public async Task<DashboardWidget> AddWidgetAsync(long dashboardId, DashboardWidgetRequest request, CancellationToken cancellationToken)
     {
-        if (value.IsDefault)
-            await connection.ExecuteAsync(Command("""
-                UPDATE dashboards SET is_default=FALSE, updated_at=@now
-                WHERE is_default=TRUE AND id<>@id
-                """, new { id = value.Id, now = value.UpdatedAt ?? value.CreatedAt }, ct));
-        if (create)
-            value.Id = await connection.ExecuteScalarAsync<long>(Command("""
-                INSERT INTO dashboards(name,description,layout_type,is_default,display_order,created_at,updated_at)
-                VALUES(@Name,@Description,@LayoutType,@IsDefault,@DisplayOrder,@CreatedAt,@UpdatedAt);
-                SELECT LAST_INSERT_ID();
-                """, value, ct));
-        else
-            await connection.ExecuteAsync(Command("""
-                UPDATE dashboards SET name=@Name,description=@Description,layout_type=@LayoutType,
-                    is_default=@IsDefault,display_order=@DisplayOrder,updated_at=@UpdatedAt WHERE id=@Id
-                """, value, ct));
+        using var current = await BeginWriteAsync(cancellationToken);
+        try
+        {
+            var widget = await PrepareWidgetAsync(dashboardId, null, request, cancellationToken);
+            var command = new CommandDefinition(DashboardWidgetQuery.Insert, WidgetParameters(widget), transaction: current, cancellationToken: cancellationToken);
+            widget.Id = await connection.ExecuteScalarAsync<long>(command);
+            current.Commit();
+            return widget;
+        }
+        catch (Exception exception)
+        {
+            Rollback(current);
+            logger.LogError(exception, "Erro ao persistir Dashboard");
+            throw;
+        }
+        finally
+        {
+            transaction = null;
+            connection.Close();
+        }
     }
 
-    public async Task SaveWidgetAsync(DashboardWidget value, bool create, CancellationToken ct)
+    public async Task<DashboardWidget> UpdateWidgetAsync(long dashboardId, long widgetId, DashboardWidgetRequest request, CancellationToken cancellationToken)
     {
-        if (create)
-            value.Id = await connection.ExecuteScalarAsync<long>(Command("""
-                INSERT INTO dashboard_widgets(dashboard_id,capability_id,title,widget_type,data_mode,
-                    position_x,position_y,width,height,config_json,refresh_interval_seconds,display_order,created_at,updated_at)
-                VALUES(@DashboardId,@CapabilityId,@Title,@WidgetType,@DataMode,@X,@Y,@Width,@Height,
-                    @ConfigJson,@RefreshIntervalSeconds,@DisplayOrder,@CreatedAt,@UpdatedAt);
-                SELECT LAST_INSERT_ID();
-                """, value, ct));
-        else
-            await connection.ExecuteAsync(Command("""
-                UPDATE dashboard_widgets SET capability_id=@CapabilityId,title=@Title,widget_type=@WidgetType,
-                    data_mode=@DataMode,position_x=@X,position_y=@Y,width=@Width,height=@Height,config_json=@ConfigJson,
-                    refresh_interval_seconds=@RefreshIntervalSeconds,display_order=@DisplayOrder,updated_at=@UpdatedAt
-                WHERE id=@Id AND dashboard_id=@DashboardId
-                """, value, ct));
+        using var current = await BeginWriteAsync(cancellationToken);
+        try
+        {
+            var widget = await PrepareWidgetAsync(dashboardId, widgetId, request, cancellationToken);
+            // Unchanged values retain UpdatedAt; the SQL assignment cannot erase omitted fields.
+            var command = new CommandDefinition(DashboardWidgetQuery.Update, WidgetParameters(widget), transaction: current, cancellationToken: cancellationToken);
+            await connection.ExecuteAsync(command);
+            current.Commit();
+            return widget;
+        }
+        catch (Exception exception)
+        {
+            Rollback(current);
+            logger.LogError(exception, "Erro ao persistir Dashboard");
+            throw;
+        }
+        finally
+        {
+            transaction = null;
+            connection.Close();
+        }
     }
 
-    public async Task DeleteAsync(long id, CancellationToken ct) =>
-        await connection.ExecuteAsync(Command("DELETE FROM dashboards WHERE id=@id", new { id }, ct));
-    public async Task DeleteWidgetAsync(long dashboardId, long widgetId, CancellationToken ct) =>
-        await connection.ExecuteAsync(Command("DELETE FROM dashboard_widgets WHERE id=@widgetId AND dashboard_id=@dashboardId",
-            new { dashboardId, widgetId }, ct));
-    public async Task<IReadOnlyList<DashboardWidgetType>> GetWidgetTypesAsync(CancellationToken ct) =>
-        (await connection.QueryAsync<DashboardWidgetType>(Command(DashboardQuery.Types, null, ct)))
-        .OrderBy(t => t.Code, StringComparer.Ordinal).ToArray();
-    public async Task<IReadOnlyList<DashboardCapabilitySource>> GetSourcesAsync(CancellationToken ct) =>
-        (await connection.QueryAsync<DashboardCapabilitySource>(Command(DashboardQuery.Sources + " ORDER BY c.Id", null, ct))).ToArray();
-    public Task<DashboardCapabilitySource?> GetSourceAsync(int id, CancellationToken ct) =>
-        connection.QuerySingleOrDefaultAsync<DashboardCapabilitySource>(Command(DashboardQuery.Sources + " WHERE c.Id=@id" + (transaction is null ? "" : " LOCK IN SHARE MODE"), new { id }, ct));
-    public Task<bool> DeviceExistsAsync(string deviceId, CancellationToken ct) =>
-        connection.ExecuteScalarAsync<bool>(Command("SELECT EXISTS(SELECT 1 FROM Devices WHERE BINARY DeviceId=BINARY @deviceId)", new { deviceId }, ct));
+    public async Task<bool> DeleteWidgetAsync(long dashboardId, long widgetId, CancellationToken cancellationToken)
+    {
+        using var current = await BeginWriteAsync(cancellationToken);
+        try
+        {
+            if (await GetByIdAsync(dashboardId, cancellationToken) is null) throw Missing("DASHBOARD_NOT_FOUND");
+            var command = new CommandDefinition(DashboardWidgetQuery.Delete, new { dashboardId, widgetId }, transaction: current, cancellationToken: cancellationToken);
+            var affectedRows = await connection.ExecuteAsync(command);
+            current.Commit();
+            return affectedRows > 0;
+        }
+        catch (Exception exception)
+        {
+            Rollback(current);
+            logger.LogError(exception, "Erro ao persistir Dashboard");
+            throw;
+        }
+        finally
+        {
+            transaction = null;
+            connection.Close();
+        }
+    }
+
+    private async Task<DashboardWidget> PrepareWidgetAsync(long dashboardId, long? widgetId, DashboardWidgetRequest request, CancellationToken cancellationToken)
+    {
+        var dashboard = await GetByIdAsync(dashboardId, cancellationToken) ?? throw Missing("DASHBOARD_NOT_FOUND");
+        var widget = widgetId.HasValue
+            ? dashboard.Widgets.SingleOrDefault(widget => widget.Id == widgetId.Value) ?? throw Missing("WIDGET_NOT_FOUND")
+            : new DashboardWidget { DashboardId = dashboardId };
+        var capabilityId = !widgetId.HasValue || request.CapabilityIdSpecified ? request.CapabilityId : widget.CapabilityId;
+        var widgetType = !widgetId.HasValue || request.WidgetTypeSpecified ? request.WidgetType : widget.WidgetType;
+        if (capabilityId is null or <= 0) throw new DashboardExceptionDomain("INVALID_REQUEST", "capabilityId deve ser positivo.", "capabilityId");
+        if (string.IsNullOrEmpty(widgetType)) throw new DashboardExceptionDomain("INVALID_REQUEST", "widgetType é obrigatório.", "widgetType");
+        var type = (await GetWidgetTypesAsync(cancellationToken)).SingleOrDefault(type => type.Code == widgetType) ?? throw Missing("WIDGET_TYPE_NOT_FOUND");
+        if (!type.Enabled) throw new DashboardExceptionDomain("WIDGET_TYPE_DISABLED", "Tipo de widget desabilitado.", "widgetType");
+        var source = await GetCapabilityByIdAsync(capabilityId.Value, cancellationToken) ?? throw Missing("CAPABILITY_NOT_FOUND");
+        if (request.DeviceIdSpecified && request.DeviceId is not null)
+        {
+            var command = new CommandDefinition(DashboardCapabilityQuery.DeviceExists, new { deviceId = request.DeviceId }, transaction: transaction, cancellationToken: cancellationToken);
+            if (!await connection.ExecuteScalarAsync<bool>(command)) throw Missing("DEVICE_NOT_FOUND");
+            if (!string.Equals(request.DeviceId, source.DeviceId, StringComparison.Ordinal))
+                throw new DashboardExceptionDomain("DEVICE_CAPABILITY_MISMATCH", "Device não pertence à capability.", "deviceId");
+        }
+        widget.Update(request, type, source, create: !widgetId.HasValue);
+        return widget;
+    }
+
+    private async Task<IDbTransaction> BeginWriteAsync(CancellationToken cancellationToken)
+    {
+        if (connection.State != ConnectionState.Open) connection.Open();
+        transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+        try
+        {
+            var command = new CommandDefinition(DashboardQuery.GetWriteLock, transaction: transaction, cancellationToken: cancellationToken);
+            await connection.QuerySingleAsync<int>(command);
+            return transaction;
+        }
+        catch
+        {
+            Rollback(transaction);
+            transaction.Dispose();
+            transaction = null;
+            connection.Close();
+            throw;
+        }
+    }
+
+    private static void Rollback(IDbTransaction current)
+    {
+        try { current.Rollback(); }
+        catch (System.Data.Common.DbException) { } // Preserve the original error if the connection was lost.
+    }
+
+    private async Task ClearDefaultAsync(Dashboard dashboard, CancellationToken cancellationToken)
+    {
+        if (!dashboard.IsDefault) return;
+        var command = new CommandDefinition(DashboardQuery.RemoveDefault,
+            new { id = dashboard.Id, updatedAt = dashboard.UpdatedAt ?? dashboard.CreatedAt }, transaction: transaction, cancellationToken: cancellationToken);
+        await connection.ExecuteAsync(command);
+    }
+
+    public async Task<IEnumerable<DashboardWidgetType>> GetWidgetTypesAsync(CancellationToken cancellationToken)
+    {
+        var command = new CommandDefinition(DashboardWidgetTypeQuery.GetAllWidgetTypes, transaction: transaction, cancellationToken: cancellationToken);
+        var rows = await connection.QueryAsync<DashboardWidgetTypeRow>(command);
+        return rows.Select(row =>
+        {
+            row.CompatibleDataTypes = JsonSerializer.Deserialize<string[]>(row.CompatibleDataTypesJson)!;
+            row.DefaultConfig = ReadConfig(row.DefaultConfigJson);
+            return (DashboardWidgetType)row;
+        }).OrderBy(type => type.Code, StringComparer.Ordinal).ToArray();
+    }
+
+    public Task<IEnumerable<DashboardCapability>> GetCapabilitiesAsync(CancellationToken cancellationToken)
+    {
+        var command = new CommandDefinition(DashboardCapabilityQuery.GetOrdered, transaction: transaction, cancellationToken: cancellationToken);
+        return connection.QueryAsync<DashboardCapability>(command);
+    }
+
+    public Task<DashboardCapability?> GetCapabilityByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        var command = new CommandDefinition(transaction is null ? DashboardCapabilityQuery.GetById : DashboardCapabilityQuery.GetByIdForUpdate,
+            new { id }, transaction: transaction, cancellationToken: cancellationToken);
+        return connection.QuerySingleOrDefaultAsync<DashboardCapability>(command);
+    }
+
+    private static DashboardExceptionDomain Missing(string code) => new(code, "Recurso não encontrado.");
+
+    private static DashboardWidget MapWidget(DashboardWidgetRow row)
+    {
+        try { row.Config = ReadConfig(row.ConfigJson); }
+        catch (Exception exception) when (exception is JsonException or ArgumentException or InvalidOperationException or FormatException or OverflowException)
+        {
+            row.Config = new DashboardWidgetConfig();
+            row.ConfigurationInvalid = true;
+        }
+        return row;
+    }
+
+    private static object WidgetParameters(DashboardWidget widget) => new
+    {
+        widget.Id, widget.DashboardId, widget.CapabilityId, widget.Title, widget.WidgetType, widget.DataMode,
+        widget.X, widget.Y, widget.Width, widget.Height, ConfigJson = WriteConfig(widget.Config),
+        widget.RefreshIntervalSeconds, widget.DisplayOrder, widget.CreatedAt, widget.UpdatedAt
+    };
+
+    private static string WriteConfig(DashboardWidgetConfig config) => JsonSerializer.Serialize(
+        config.Fields.ToDictionary(field => JsonNamingPolicy.CamelCase.ConvertName(field.ToString()), field => config.GetValue(field)));
+
+    private static DashboardWidgetConfig ReadConfig(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        var config = new DashboardWidgetConfig();
+        foreach (var property in document.RootElement.EnumerateObject())
+        {
+            var field = Enum.Parse<DashboardConfigField>(property.Name, ignoreCase: true);
+            object? value = property.Value.ValueKind == JsonValueKind.Null ? null : field switch
+            {
+                DashboardConfigField.Min or DashboardConfigField.Max or DashboardConfigField.WarningFrom or DashboardConfigField.DangerFrom => property.Value.GetDouble(),
+                DashboardConfigField.Decimals => property.Value.GetInt32(),
+                DashboardConfigField.ShowLastUpdated or DashboardConfigField.InvertState => property.Value.GetBoolean(),
+                _ => property.Value.GetString()
+            };
+            config.SetValue(field, value);
+        }
+        return config;
+    }
+
+    private class DashboardWidgetRow : DashboardWidget
+    {
+        public string ConfigJson { get; set; } = "{}";
+    }
+    private class DashboardWidgetTypeRow : DashboardWidgetType
+    {
+        public string CompatibleDataTypesJson { get; set; } = "[]";
+        public string DefaultConfigJson { get; set; } = "{}";
+    }
 }
