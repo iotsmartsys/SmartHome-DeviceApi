@@ -151,6 +151,9 @@ está registrado em `EKM-GAP-0004`.
 - Solução: `src/SmartHome-Api.sln`.
 - Build canônico da API: `dotnet build src/Api/Api.csproj`.
 - Validações adicionais: definidas pela especificação aplicável.
+- Suíte HTTP Dashboard: `tests/Api.IntegrationTests`; run/cleanup independentes,
+  criada e compilada, sem execução nesta entrega.
+- Contrato da suíte: [DASHBOARD-API-INTEGRATION-TESTS](DASHBOARD-API-INTEGRATION-TESTS.md).
 - Suite histórica: `tests/Api.Tests`, classificada como `Retired`.
 - Execução local: `Makefile` carrega `.env` e inicia a API.
 - Imagem: `src/Api/Dockerfile`.

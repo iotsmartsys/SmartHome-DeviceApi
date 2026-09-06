@@ -42,6 +42,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
 | Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Versão 0.2 Done; build aprovado, validação e testes aceitos pelo Arquiteto | Mapped |
 | Dashboard API v1 | [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md) | Dashboard controllers/models, IDashboardService/Resolvers, entidades e queries Dapper | Ready; entrega anterior rejeitada; [reimplementação e build](../reports/DASHBOARD-API-V1/implementation/2026-09-05T233757Z-0.3-c7fc139b-4018-4bea-b6d3-6b35860a446a-reimplementation.md) para Revisão, aceite operacional pendente | In Progress |
+| Suíte HTTP Dashboard | [SHD-DASHBOARD-API-INTEGRATION-TESTS-001@0.1](../specs/DASHBOARD-API-INTEGRATION-TESTS.md) | [tests/Api.IntegrationTests](../../tests/Api.IntegrationTests/README.md), run/cleanup e manifesto | [Build aprovado](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T023221Z-0.1-580c8d1e-f5fc-4ff1-b50e-7aef3801c25c-implementation.md); nenhum cenário executado | In Progress |
 | Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
 | OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
 | Persistência | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Queries Dapper e scripts parciais | Inventoried |
@@ -53,6 +54,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 SmartHome-DeviceApi
 ├── Contratos normativos
 │   ├── Dashboard API v1 (In Progress; reimplementação para Revisão)
+│   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
 │   ├── Capability Types por id (Done)
 │   ├── Suporte à manutenção de Groups
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
@@ -68,6 +70,8 @@ SmartHome-DeviceApi
 ```mermaid
 flowchart LR
     DASHSPEC[SHD-DASHBOARD-API-V1-001 In Progress] -->|contrato| DASHAPI[Dashboard controllers / Models]
+    DASHTESTSPEC[Suíte HTTP Dashboard 0.1] --> DASHTEST[Api.IntegrationTests: run / cleanup]
+    DASHTEST -->|HTTP: manifesto por execução| DASHAPI
     DASHAPI --> DASHCORE[IDashboardService / Entidades / Resolvers]
     DASHCORE --> DASHDB[DashboardRepository / MySQL]
     DASHDB -->|leitura| DASHCAP[Capabilities existentes]

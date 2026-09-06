@@ -1,5 +1,23 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0006 — Suíte integrada HTTP Dashboard
+
+**Estado:** Open. **Workflow:** In Progress.
+
+**Ordem humana:** criar suíte automatizada de criação, consulta e alteração;
+exclusão somente por comando de limpeza independente via API. Não executar
+nenhum cenário nesta atuação. Contrato complementar
+[0.1](../specs/DASHBOARD-API-INTEGRATION-TESTS.md), com
+[análise Ready](../reports/DASHBOARD-API-INTEGRATION-TESTS/analysis/2026-09-06T021335Z-0.1-d6c4ac27-5714-422a-9bdf-82ea02a5c880-implementability-analysis.md).
+Implementação e build do projeto novo autorizados; API e suíte Retired intactas.
+
+**Entrega:** `tests/Api.IntegrationTests`, comandos run e cleanup separados,
+manifesto persistente e conferência de propriedade pela API.
+[Relatório](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T023221Z-0.1-580c8d1e-f5fc-4ff1-b50e-7aef3801c25c-implementation.md)
+registra build final exit 0, zero erros/avisos. Nenhum teste, HTTP ou limpeza
+executado; evidência operacional Not Executed, entrega para Revisão.
+
+
 ## EKM-CHG-0005 — Dashboard API v1
 
 **Estado:** Open. **Workflow:** In Progress, reimplementação entregue para Revisão.
