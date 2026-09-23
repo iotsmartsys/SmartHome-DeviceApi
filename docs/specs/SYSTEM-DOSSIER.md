@@ -172,6 +172,7 @@ das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 | Domínio | Fonte atual | Cobertura | Observação |
 |---|---|---|---|
 | Devices | Código e `Readme.md` | Inventoried | Sem especificação normativa EKM |
+| Estado composto do ar | `SHD-AIR-CONDITIONER-STATE-001@0.1` | Draft | JSON textual em Value; análise não pronta por decisões funcionais pendentes; implementação não iniciada |
 | Capabilities | Código | Inventoried | Inclui tipos, histórico e relações |
 | Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` | Mapped | Versão 0.2 Done por decisão humana; build aprovado, validação e testes aceitos pelo Arquiteto |
 | Dashboard API v1 | `SHD-DASHBOARD-API-V1-001@0.3` | Mapped | Entrega anterior rejeitada; reimplementação conforme precedentes e build para Revisão; schema não aplicado e aceite operacional pendente |

@@ -1,5 +1,21 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0007 — Estado composto de ar-condicionado
+
+**Estado:** Open. **Workflow:** Draft; análise `Not Ready — Specification Defect`.
+
+O Arquiteto aceitou o rascunho e ordenou seu registro e análise em 22/09/2026.
+[Especificação 0.1](../specs/AIR-CONDITIONER-STATE.md), com JSON textual em
+Capabilities.Value varchar(1000), comandos simples e preservação atômica.
+[Análise](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-23T024531Z-0.1-23ac1bde-af17-40e6-8bbf-eabd429251ff-implementability-analysis.md) vinculada ao hash
+exato registra B-01 (legado/inicialização), B-02 (modo/energia) e B-03
+(entrada de estado completo). Pendências não foram resolvidas por inferência.
+Qualificação de engenharia/readiness do repositório não localizada; análise
+não habilita implementação. Nenhum código, teste, banco, schema ou deploy
+alterado/executado; guarda documental ausente. Nenhum débito ou encerramento
+normativo declarado. Registro e análise documentais, sem implementação.
+
+
 ## EKM-CHG-0006 — Suíte integrada HTTP Dashboard
 
 **Atalhos solicitados pelo Arquiteto:** Makefile da raiz agora fornece
