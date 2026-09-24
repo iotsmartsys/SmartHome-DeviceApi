@@ -1,5 +1,13 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0008 — Preparação da qualificação EKOM
+
+**Estado:** Open. **Alcance:** capabilities e dependências da funcionalidade de ar 0.2.
+
+Ordem humana: preparar contrato e qualificação antes da implementação.
+[Contrato 0.1](REPOSITORY-ENGINEERING-CONTRACT.md) em Proposed; [avaliação](../reports/repository-readiness/2026-09-24T010845Z-0.1-5a49a376-9cb5-41f6-8230-2ef148769689.md) e [estado operacional](REPOSITORY-READINESS.md) Not Ready por aprovação do contrato e adoção/habilitação pendentes. Conteúdo mínimo confrontado com precedentes; sem insuficiência técnica material identificada no alcance proposto. AGENTS.md 4.6 preservado até decisão de adoção 5.0; nenhuma aprovação inferida. Nenhum código, build, teste, banco ou configuração alterado. Especificação funcional 0.2 e relatórios anteriores preservados. Qualificação não abrange todo o legado nem encerra lacunas/debitos.
+
+
 ## EKM-CHG-0007 — Estado composto de ar-condicionado
 
 **Estado:** Open. **Workflow:** especificação 0.2 registrada; análise `Ready`; implementação não iniciada.

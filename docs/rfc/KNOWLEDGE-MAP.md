@@ -10,6 +10,8 @@
 
 | Área | Fonte | Tipo | Estado |
 |---|---|---|---|
+| Contrato de engenharia (recorte capabilities) | [SHD-ENGINEERING-001@0.1](REPOSITORY-ENGINEERING-CONTRACT.md) | Proposta normativa | Proposed; aprovação pendente |
+| Qualificação do recorte | [Repository Readiness](REPOSITORY-READINESS.md) | Operacional | Not Ready; Q-01/Q-02 |
 | Bootstrap dos agentes | `AGENTS.md` | Normativo | Active |
 | Política de build e validação | `AGENTS.md` + especificação aplicável | Normativo | Active |
 | Conceito EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md` | Referência externa | Dynamic |
@@ -54,6 +56,8 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 ```text
 SmartHome-DeviceApi
 ├── Contratos normativos
+│   ├── Contrato de engenharia 0.1 (Proposed; capabilities)
+│   ├── Repository Readiness (Not Ready; aprovação/adoção pendentes)
 │   ├── Estado composto de ar-condicionado (0.2; análise Ready; sem implementação)
 │   ├── Dashboard API v1 (In Progress; reimplementação para Revisão)
 │   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
@@ -71,6 +75,8 @@ SmartHome-DeviceApi
 
 ```mermaid
 flowchart LR
+    ENGINEERING[Contrato engenharia 0.1 Proposed] --> READINESS[Qualificação Not Ready]
+    READINESS -.->|aprovação pendente| ACSPEC
     ACSPEC[Estado de ar-condicionado 0.2 Ready técnico] -.->|contrato proposto| ACAPI[CapabilityController / SmartHomeCapability]
     ACAPI --> ACCORE[Capability / CapabilityRepository]
     ACCORE --> ACDB[Capabilities.Value: JSON textual]

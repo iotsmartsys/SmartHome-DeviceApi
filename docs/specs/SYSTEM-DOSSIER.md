@@ -211,3 +211,7 @@ As fontes navegáveis e lacunas correspondentes estão em
 
 Este dossiê oferece navegação e visão geral. Não substitui especificações
 normativas nem transforma o estado atual do código em intenção confirmada.
+
+## Preparação da qualificação de engenharia
+
+[Contrato 0.1](../rfc/REPOSITORY-ENGINEERING-CONTRACT.md) proposto para capabilities e dependências do ar; [qualificação](../rfc/REPOSITORY-READINESS.md) Not Ready por aprovação/adoção pendentes. Nenhum domínio externo ao alcance foi habilitado. AGENTS.md conserva referência 4.6 até decisão explícita de adoção EKOM 5.0 no recorte.
