@@ -1,13 +1,13 @@
 # Repository Engineering Contract — Device API
 
 **ID:** `SHD-ENGINEERING-001`
-**Classe da fonte:** Proposta normativa
-**Estado:** Proposed
+**Classe da fonte:** Normativa
+**Estado:** Approved
 **Versão:** 0.1
 **Repositório:** SmartHome-DeviceApi
-**Responsável pela aprovação:** Arquiteto humano solicitante; identidade e decisão devem ser registradas no aceite.
-**Aprovação e habilitação:** Pendentes. A ordem de preparar estes documentos não aprova as regras.
-**Escopo proposto:** capabilities: inclusão, atualização de value, PATCH genérico, consulta comum e smart home; entidades, conversões, DI, repositórios, queries e tratamento de falhas materialmente necessários a SHD-AIR-CONDITIONER-STATE-001@0.2. Demais domínios não são qualificados por este documento.
+**Responsável pela aprovação:** usuário interlocutor desta tarefa, na função de Arquiteto humano do projeto.
+**Aprovação e habilitação:** aprovadas em 23/09/2026 (America/Bahia), pela resposta humana “Aprovo!” à pergunta que nomeou SHD-ENGINEERING-001@0.1, adoção/habilitação EKOM 5.0 no recorte e reconciliação do AGENTS.md. Referência: tarefa “Skill Alexa”, sequência posterior à entrega documental cbbad5a. O registro transcreve a decisão; não constitui aprovação do agente.
+**Escopo aprovado:** capabilities: inclusão, atualização de value, PATCH genérico, consulta comum e smart home; entidades, conversões, DI, repositórios, queries e tratamento de falhas materialmente necessários a SHD-AIR-CONDITIONER-STATE-001@0.2. Demais domínios não são qualificados por este documento.
 
 ## 1. Arquitetura e limites
 
@@ -79,7 +79,7 @@ A especificação determina artefatos e cenários de validação; SHD-AIR-CONDIT
 
 Verificar regras por inspeção de dependências, destinos, assinaturas, consultas, unidade transacional, tratamento de falhas e delta; build verifica construção. Guardas inexistentes não devem ser simuladas como aprovadas. Não criar ferramenta de governança ou suíte genérica como parte da implementação do ar.
 
-## 11. Precedentes candidatos a oficiais após aprovação
+## 11. Precedentes oficiais no escopo aprovado
 
 | Alteração | Fonte/símbolo existente | Regra exemplificada | Limite |
 |---|---|---|---|
@@ -98,12 +98,12 @@ Especificação governa comportamento; este contrato, construção. Precedência
 
 Nova abstração transversal, persistência geral, lifecycle, autenticação, dependência ou mudança de consumidor fora do recorte exige decisão arquitetural explícita. Exceção deve nomear regra, motivo, alcance e validade. Nenhuma exceção está proposta nesta revisão.
 
-## 13. Fatos, propostas e adoção
+## 13. Fatos e adoção aprovada
 
 Fatos: três projetos/camadas, Dapper/MySQL, DTO string, transações e DI já existem. Atomicidade do ar ainda não está implementada e não é requisito para qualificar a baseline para construí-la.
 
-Todas as regras imperativas acima são propostas até aprovação humana; frequência no código não as torna norma. Não se declara auditoria global do legado. O escopo exclui dashboard funcional, OAuth, infraestrutura/deploy, consumidores externos e publicação MQTT/Alexa.
+As regras imperativas desta revisão foram aprovadas pela decisão humana identificada nos metadados. A frequência no código não confere autoridade a precedentes não nomeados. Não se declara auditoria global do legado. O escopo exclui dashboard funcional, OAuth, infraestrutura/deploy, consumidores externos e publicação MQTT/Alexa.
 
-Adoção proposta: EKOM 5.0 exclusivamente para o escopo declarado e suas dependências materiais. AGENTS.md ainda declara 4.6 e referencia perfis externos 5.0; a aprovação deve autorizar reconciliar esse roteamento explicitamente, preservando o histórico 4.x e sem qualificar os outros domínios por inferência.
+Adoção aprovada: EKOM 5.0 exclusivamente para o escopo declarado e suas dependências materiais. AGENTS.md é reconciliado por autorização explícita, preservando o histórico 4.x e sem qualificar os outros domínios por inferência.
 
-Pendências humanas: aprovar SHD-ENGINEERING-001@0.1 e adoção delimitada; confirmar habilitação após avaliação da mesma revisão aprovada. Aprovação pode ser registrada numa única decisão explícita com versão e alcance. Este documento não substitui a análise Ready da funcionalidade nem a ordem de implementação.
+A decisão “Aprovo!” cobre contrato 0.1, adoção e habilitação no alcance da pergunta apresentada. A avaliação e o estado operacional registram a resolução de Q-01/Q-02. Esta aprovação não altera requisitos funcionais, não substitui a análise Ready da tarefa e não concede permissões de execução HTTP, banco, testes, hardware ou deploy.

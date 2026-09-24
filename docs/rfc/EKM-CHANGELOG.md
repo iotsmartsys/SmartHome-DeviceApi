@@ -2,6 +2,15 @@
 
 ## EKM-CHG-0008 — Preparação da qualificação EKOM
 
+**Aprovação registrada:** contrato SHD-ENGINEERING-001@0.1 e adoção/habilitação
+EKOM 5.0 no recorte foram aprovados pelo Arquiteto em 23/09/2026, “Aprovo!”.
+[Nova avaliação Ready](../reports/repository-readiness/2026-09-24T013135Z-0.1-approved-b4cb6af9-d2d1-4717-94a6-a4f09a50b632.md) resolve Q-01/Q-02;
+AGENTS.md reconciliado. Demais domínios não habilitados. Registro sem código,
+build/testes/HTTP/banco/deploy. Contrato não recebeu alteração de regras;
+relatórios e especificação funcional anteriores preservados.
+
+### Histórico da preparação
+
 **Estado:** Open. **Alcance:** capabilities e dependências da funcionalidade de ar 0.2.
 
 Ordem humana: preparar contrato e qualificação antes da implementação.

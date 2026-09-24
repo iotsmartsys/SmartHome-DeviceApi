@@ -10,8 +10,8 @@
 
 | Área | Fonte | Tipo | Estado |
 |---|---|---|---|
-| Contrato de engenharia (recorte capabilities) | [SHD-ENGINEERING-001@0.1](REPOSITORY-ENGINEERING-CONTRACT.md) | Proposta normativa | Proposed; aprovação pendente |
-| Qualificação do recorte | [Repository Readiness](REPOSITORY-READINESS.md) | Operacional | Not Ready; Q-01/Q-02 |
+| Contrato de engenharia (recorte capabilities) | [SHD-ENGINEERING-001@0.1](REPOSITORY-ENGINEERING-CONTRACT.md) | Normativo | Approved 0.1; escopo capabilities |
+| Qualificação do recorte | [Repository Readiness](REPOSITORY-READINESS.md) | Operacional | Ready no recorte; aprovação humana registrada |
 | Bootstrap dos agentes | `AGENTS.md` | Normativo | Active |
 | Política de build e validação | `AGENTS.md` + especificação aplicável | Normativo | Active |
 | Conceito EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md` | Referência externa | Dynamic |
@@ -37,7 +37,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Domínio | Fonte normativa | Implementação principal | Evidência atual | Cobertura |
 |---|---|---|---|---|
 | Devices | `EKM-GAP-0001` | `src/Api/Controllers/DeviceController.cs`, `src/Core/Entities/Device.cs`, `src/Data.Repositories/Repositories/DeviceRepository.cs` | Código e build | Inventoried |
-| Estado composto de ar-condicionado | [SHD-AIR-CONDITIONER-STATE-001@0.2](../specs/AIR-CONDITIONER-STATE.md) | CapabilityController, modelos Core/API e CapabilityRepository (alterações propostas) | [Análise 0.2 Ready](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-24T005515Z-0.2-b36f13f3-3d18-43a2-a437-176e65d33011-implementability-analysis.md); decisões incorporadas; qualificação do repositório não localizada; sem implementação | Draft / Ready técnico |
+| Estado composto de ar-condicionado | [SHD-AIR-CONDITIONER-STATE-001@0.2](../specs/AIR-CONDITIONER-STATE.md) | CapabilityController, modelos Core/API e CapabilityRepository (alterações propostas) | [Análise 0.2 Ready](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-24T005515Z-0.2-b36f13f3-3d18-43a2-a437-176e65d33011-implementability-analysis.md); decisões incorporadas; qualificação do recorte Ready; sem implementação | Draft / Ready técnico |
 | Capabilities e histórico | `EKM-GAP-0001` | `src/Api/Controllers/CapabilityController.cs`, `src/Api/Controllers/CapabilityHistoryController.cs`, `src/Core/Services/AddCapabilityService.cs`, repositórios relacionados | Código e build | Inventoried |
 | Settings globais e de device | `SHD-SETTINGS-RESET-001@0.1` + `EKM-GAP-0001` | `src/Api/Controllers/SettingsController.cs`, `src/Api/Controllers/DeviceSettingsController.cs`, `src/Data.Repositories/Repositories/SettingsRepository.cs`, `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs` | Código, inspeção das queries e especificação de reset de settings específicos | Mapped |
 | Properties | `EKM-GAP-0001` | `src/Api/Controllers/PropertiesController.cs`, `src/Data.Repositories/Repositories/PropertyRepository.cs` | Código e build | Inventoried |
@@ -56,8 +56,8 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 ```text
 SmartHome-DeviceApi
 ├── Contratos normativos
-│   ├── Contrato de engenharia 0.1 (Proposed; capabilities)
-│   ├── Repository Readiness (Not Ready; aprovação/adoção pendentes)
+│   ├── Contrato de engenharia 0.1 (Approved; capabilities)
+│   ├── Repository Readiness (Ready no recorte aprovado)
 │   ├── Estado composto de ar-condicionado (0.2; análise Ready; sem implementação)
 │   ├── Dashboard API v1 (In Progress; reimplementação para Revisão)
 │   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
@@ -75,8 +75,8 @@ SmartHome-DeviceApi
 
 ```mermaid
 flowchart LR
-    ENGINEERING[Contrato engenharia 0.1 Proposed] --> READINESS[Qualificação Not Ready]
-    READINESS -.->|aprovação pendente| ACSPEC
+    ENGINEERING[Contrato engenharia 0.1 Approved] --> READINESS[Qualificação Ready no recorte]
+    READINESS -.->|habilitado| ACSPEC
     ACSPEC[Estado de ar-condicionado 0.2 Ready técnico] -.->|contrato proposto| ACAPI[CapabilityController / SmartHomeCapability]
     ACAPI --> ACCORE[Capability / CapabilityRepository]
     ACCORE --> ACDB[Capabilities.Value: JSON textual]
