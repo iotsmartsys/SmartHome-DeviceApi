@@ -2,6 +2,18 @@
 
 ## EKM-CHG-0007 — Estado composto de ar-condicionado
 
+**Estado:** Open. **Workflow:** especificação 0.2 registrada; análise `Ready`; implementação não iniciada.
+
+Decisões humanas de 23/09/2026: defaults off/cool/22; seleção de modo liga;
+JSON parcial combina; null restaura padrão; power explícito prevalece sobre
+mode. Registro e reanálise autorizados. [Especificação 0.2](../specs/AIR-CONDITIONER-STATE.md)
+e [nova análise](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-24T005515Z-0.2-b36f13f3-3d18-43a2-a437-176e65d33011-implementability-analysis.md) reconciliam B-01/B-02/B-03.
+Qualificação de engenharia/readiness do repositório não localizada; Ready da
+funcionalidade não habilita implementação. Nenhum código/build/teste/HTTP/banco
+ou deploy executado. Hash e referências verificados; guarda documental ausente.
+
+### Histórico 0.1 preservado
+
 **Estado:** Open. **Workflow:** Draft; análise `Not Ready — Specification Defect`.
 
 O Arquiteto aceitou o rascunho e ordenou seu registro e análise em 22/09/2026.

@@ -35,7 +35,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Domínio | Fonte normativa | Implementação principal | Evidência atual | Cobertura |
 |---|---|---|---|---|
 | Devices | `EKM-GAP-0001` | `src/Api/Controllers/DeviceController.cs`, `src/Core/Entities/Device.cs`, `src/Data.Repositories/Repositories/DeviceRepository.cs` | Código e build | Inventoried |
-| Estado composto de ar-condicionado | [SHD-AIR-CONDITIONER-STATE-001@0.1](../specs/AIR-CONDITIONER-STATE.md) | CapabilityController, modelos Core/API e CapabilityRepository (alterações propostas) | Draft registrado; [análise não pronta](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-23T024531Z-0.1-23ac1bde-af17-40e6-8bbf-eabd429251ff-implementability-analysis.md); P-01/P-02/P-03 abertas; sem implementação | Draft |
+| Estado composto de ar-condicionado | [SHD-AIR-CONDITIONER-STATE-001@0.2](../specs/AIR-CONDITIONER-STATE.md) | CapabilityController, modelos Core/API e CapabilityRepository (alterações propostas) | [Análise 0.2 Ready](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-24T005515Z-0.2-b36f13f3-3d18-43a2-a437-176e65d33011-implementability-analysis.md); decisões incorporadas; qualificação do repositório não localizada; sem implementação | Draft / Ready técnico |
 | Capabilities e histórico | `EKM-GAP-0001` | `src/Api/Controllers/CapabilityController.cs`, `src/Api/Controllers/CapabilityHistoryController.cs`, `src/Core/Services/AddCapabilityService.cs`, repositórios relacionados | Código e build | Inventoried |
 | Settings globais e de device | `SHD-SETTINGS-RESET-001@0.1` + `EKM-GAP-0001` | `src/Api/Controllers/SettingsController.cs`, `src/Api/Controllers/DeviceSettingsController.cs`, `src/Data.Repositories/Repositories/SettingsRepository.cs`, `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs` | Código, inspeção das queries e especificação de reset de settings específicos | Mapped |
 | Properties | `EKM-GAP-0001` | `src/Api/Controllers/PropertiesController.cs`, `src/Data.Repositories/Repositories/PropertyRepository.cs` | Código e build | Inventoried |
@@ -54,7 +54,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 ```text
 SmartHome-DeviceApi
 ├── Contratos normativos
-│   ├── Estado composto de ar-condicionado (Draft; análise não pronta)
+│   ├── Estado composto de ar-condicionado (0.2; análise Ready; sem implementação)
 │   ├── Dashboard API v1 (In Progress; reimplementação para Revisão)
 │   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
 │   ├── Capability Types por id (Done)
@@ -71,7 +71,7 @@ SmartHome-DeviceApi
 
 ```mermaid
 flowchart LR
-    ACSPEC[Estado de ar-condicionado 0.1 Draft] -.->|contrato proposto| ACAPI[CapabilityController / SmartHomeCapability]
+    ACSPEC[Estado de ar-condicionado 0.2 Ready técnico] -.->|contrato proposto| ACAPI[CapabilityController / SmartHomeCapability]
     ACAPI --> ACCORE[Capability / CapabilityRepository]
     ACCORE --> ACDB[Capabilities.Value: JSON textual]
     DASHSPEC[SHD-DASHBOARD-API-V1-001 In Progress] -->|contrato| DASHAPI[Dashboard controllers / Models]
