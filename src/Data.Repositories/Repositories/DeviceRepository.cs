@@ -76,7 +76,14 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
             foreach (var capability in entity.Capabilities)
             {
                 logger.LogInformation("Adicionando capability {capabilityName} ao device {deviceId}", capability.Name, entity.DeviceId);
-                await connection.ExecuteAsync(capabilitySql, new
+                // Capabilities embedded in device creation use the same persisted type and state contract.
+                var dataType = await connection.QuerySingleOrDefaultAsync<string>(new CommandDefinition(
+                    CapabilityQuery.GetDataTypeByName, new { type = capability.Type }, transaction,
+                    cancellationToken: cancellationToken));
+                var isAir = AirConditionerState.IsDataType(dataType);
+                if (isAir) capability.Value = AirConditionerState.Initialize(capability.Value);
+                await connection.ExecuteAsync(new CommandDefinition(
+                    isAir ? CapabilityQuery.InsertCapability : capabilitySql, new
                 {
                     DeviceId = entity.Id,
                     capability.Name,
@@ -84,7 +91,7 @@ internal class DeviceRepository(ILogger<DeviceRepository> logger, IDbConnection 
                     capability.Type,
                     capability.Value,
                     capability.Description
-                }, transaction);
+                }, transaction, cancellationToken: cancellationToken));
                 logger.LogInformation("Capability {capabilityName} adicionada ao device {deviceId}", capability.Name, entity.DeviceId);
             }
 

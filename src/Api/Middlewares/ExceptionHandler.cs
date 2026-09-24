@@ -13,6 +13,11 @@ class ExceptionHandler(RequestDelegate _next)
         {
             await _next(context);
         }
+        catch (AirConditionerStateConflictException)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            await context.Response.WriteAsJsonAsync(new { error = "invalid_air_conditioner_stored_state" });
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Ocorreu um erro inesperado");

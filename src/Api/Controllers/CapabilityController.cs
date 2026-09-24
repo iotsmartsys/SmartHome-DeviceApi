@@ -124,6 +124,8 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
 
     [HttpPatch()]
     [HttpPatch("value")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -136,6 +138,8 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
     }
 
     [HttpPatch("{id}/patches")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -150,9 +154,19 @@ public class CapabilityController(ILogger<CapabilityController> logger) : Contro
         request.ApplyTo(model);
 
         entity = model;
-        await repository.UpdateAsync(entity, cancellationToken);
+        entity.Id = id;
+        // A metadata-only patch must not replay a stale value as a device command.
+        var valueChanged = request.Operations.Any(operation =>
+            !string.Equals(operation.op, "test", StringComparison.OrdinalIgnoreCase) &&
+            (TouchesValue(operation.path) ||
+             (string.Equals(operation.op, "move", StringComparison.OrdinalIgnoreCase) && TouchesValue(operation.from))));
+        await repository.UpdateAsync(entity, cancellationToken, valueChanged);
         return NoContent();
     }
+
+    private static bool TouchesValue(string? path) => path == "" ||
+        string.Equals(path, "/value", StringComparison.OrdinalIgnoreCase) ||
+        (path?.StartsWith("/value/", StringComparison.OrdinalIgnoreCase) ?? false);
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

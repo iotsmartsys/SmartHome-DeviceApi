@@ -19,7 +19,9 @@ Ordem humana: preparar contrato e qualificação antes da implementação.
 
 ## EKM-CHG-0007 — Estado composto de ar-condicionado
 
-**Estado:** Open. **Workflow:** especificação 0.2 registrada; análise `Ready`; implementação não iniciada.
+**Estado:** Open. **Workflow:** In Progress — código e build 0.2 entregues para revisão; validação HTTP/MySQL pendente.
+
+[Relatório de implementação](../reports/AIR-CONDITIONER-STATE/implementation/2026-09-24T021132Z-0.2-c8ed4cde-b583-477a-86d4-5f8cda26cb1e-implementation.md): normalização e combinação no Core, leitura sem escrita, inclusão direta/embutida e PATCH protegidos; persistência transacional. Build final exit 0, zero erros; avisos preexistentes documentados. Nenhum teste/HTTP/banco/deploy executado. Especificação e análises anteriores preservadas. Conclusão operacional não declarada.
 
 Decisões humanas de 23/09/2026: defaults off/cool/22; seleção de modo liga;
 JSON parcial combina; null restaura padrão; power explícito prevalece sobre
