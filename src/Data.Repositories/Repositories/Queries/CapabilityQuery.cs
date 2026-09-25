@@ -61,10 +61,30 @@ internal static class CapabilityQuery
             Id = @id;
     ";
 
+    public const string GetDataTypeByName = @"
+        SELECT DataType FROM CapabilityTypes WHERE Name = @type LIMIT 1;";
+
+    public const string SelectStateForUpdate = @"
+        SELECT c.Id, c.Value, ct.DataType
+        FROM Capabilities c
+        INNER JOIN Devices d ON d.Id = c.DeviceId
+        INNER JOIN CapabilityTypes ct ON ct.Id = c.CapabilityTypeId
+        WHERE c.Name = @capability_name AND d.DeviceId = @device_id
+        ORDER BY c.Id FOR UPDATE;";
+
+    public const string SelectStateByIdForUpdate = @"
+        SELECT c.Id, c.Value, ct.DataType
+        FROM Capabilities c
+        INNER JOIN CapabilityTypes ct ON ct.Id = c.CapabilityTypeId
+        WHERE c.Id = @id FOR UPDATE;";
+
+    public const string UpdateStateById = @"
+        UPDATE Capabilities SET Value = @value, UpdatedAt = CURRENT_TIMESTAMP WHERE Id = @id;";
+
     public const string UpdateForDevice = @"
         UPDATE Capabilities
         SET
-            Value = @value,
+            Value = CASE WHEN @writeValue THEN @value ELSE Value END,
             Name = @name,
             Description = @description,
             UpdatedAt = CURRENT_TIMESTAMP,

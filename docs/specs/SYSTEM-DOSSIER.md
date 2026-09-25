@@ -81,6 +81,7 @@ falhas consecutivas, permitindo reinício pelo orquestrador.
 
 - devices;
 - capabilities e histórico;
+- dashboards globais, widgets, catálogo e dados atuais (implementação 0.3; validação operacional pendente);
 - settings globais;
 - settings específicos por device;
 - properties por device;
@@ -150,6 +151,9 @@ está registrado em `EKM-GAP-0004`.
 - Solução: `src/SmartHome-Api.sln`.
 - Build canônico da API: `dotnet build src/Api/Api.csproj`.
 - Validações adicionais: definidas pela especificação aplicável.
+- Suíte HTTP Dashboard: `tests/Api.IntegrationTests`; run/cleanup independentes,
+  criada e compilada, sem execução nesta entrega.
+- Contrato da suíte: [DASHBOARD-API-INTEGRATION-TESTS](DASHBOARD-API-INTEGRATION-TESTS.md).
 - Suite histórica: `tests/Api.Tests`, classificada como `Retired`.
 - Execução local: `Makefile` carrega `.env` e inicia a API.
 - Imagem: `src/Api/Dockerfile`.
@@ -168,8 +172,10 @@ das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 | Domínio | Fonte atual | Cobertura | Observação |
 |---|---|---|---|
 | Devices | Código e `Readme.md` | Inventoried | Sem especificação normativa EKM |
+| Estado composto do ar | `SHD-AIR-CONDITIONER-STATE-001@0.2` | In Progress | Estado composto implementado; build aprovado; validação HTTP/MySQL pendente; sem aceite operacional |
 | Capabilities | Código | Inventoried | Inclui tipos, histórico e relações |
 | Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` | Mapped | Versão 0.2 Done por decisão humana; build aprovado, validação e testes aceitos pelo Arquiteto |
+| Dashboard API v1 | `SHD-DASHBOARD-API-V1-001@0.3` | Mapped | Entrega anterior rejeitada; reimplementação conforme precedentes e build para Revisão; schema não aplicado e aceite operacional pendente |
 | Settings | Código e queries | Mapped | Abrange settings globais, específicos e efetivos |
 | Properties | Código | Inventoried | Escopo por device |
 | Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e código | Mapped | Contrato administrativo concluído e validado por decisão do Arquiteto; mantém relações com capabilities |
@@ -205,3 +211,7 @@ As fontes navegáveis e lacunas correspondentes estão em
 
 Este dossiê oferece navegação e visão geral. Não substitui especificações
 normativas nem transforma o estado atual do código em intenção confirmada.
+
+## Preparação da qualificação de engenharia
+
+[Contrato 0.1](../rfc/REPOSITORY-ENGINEERING-CONTRACT.md) aprovado para capabilities e dependências do ar; [qualificação](../rfc/REPOSITORY-READINESS.md) Ready no recorte após decisão humana de 23/09/2026. Nenhum domínio externo ao alcance foi habilitado. AGENTS.md reconciliado para adoção EKOM 5.0 delimitada, preservando o histórico 4.x.

@@ -1,5 +1,109 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0008 — Preparação da qualificação EKOM
+
+**Aprovação registrada:** contrato SHD-ENGINEERING-001@0.1 e adoção/habilitação
+EKOM 5.0 no recorte foram aprovados pelo Arquiteto em 23/09/2026, “Aprovo!”.
+[Nova avaliação Ready](../reports/repository-readiness/2026-09-24T013135Z-0.1-approved-b4cb6af9-d2d1-4717-94a6-a4f09a50b632.md) resolve Q-01/Q-02;
+AGENTS.md reconciliado. Demais domínios não habilitados. Registro sem código,
+build/testes/HTTP/banco/deploy. Contrato não recebeu alteração de regras;
+relatórios e especificação funcional anteriores preservados.
+
+### Histórico da preparação
+
+**Estado:** Open. **Alcance:** capabilities e dependências da funcionalidade de ar 0.2.
+
+Ordem humana: preparar contrato e qualificação antes da implementação.
+[Contrato 0.1](REPOSITORY-ENGINEERING-CONTRACT.md) em Proposed; [avaliação](../reports/repository-readiness/2026-09-24T010845Z-0.1-5a49a376-9cb5-41f6-8230-2ef148769689.md) e [estado operacional](REPOSITORY-READINESS.md) Not Ready por aprovação do contrato e adoção/habilitação pendentes. Conteúdo mínimo confrontado com precedentes; sem insuficiência técnica material identificada no alcance proposto. AGENTS.md 4.6 preservado até decisão de adoção 5.0; nenhuma aprovação inferida. Nenhum código, build, teste, banco ou configuração alterado. Especificação funcional 0.2 e relatórios anteriores preservados. Qualificação não abrange todo o legado nem encerra lacunas/debitos.
+
+
+## EKM-CHG-0007 — Estado composto de ar-condicionado
+
+**Estado:** Open. **Workflow:** In Progress — código e build 0.2 entregues para revisão; validação HTTP/MySQL pendente.
+
+[Relatório de implementação](../reports/AIR-CONDITIONER-STATE/implementation/2026-09-24T021132Z-0.2-c8ed4cde-b583-477a-86d4-5f8cda26cb1e-implementation.md): normalização e combinação no Core, leitura sem escrita, inclusão direta/embutida e PATCH protegidos; persistência transacional. Build final exit 0, zero erros; avisos preexistentes documentados. Nenhum teste/HTTP/banco/deploy executado. Especificação e análises anteriores preservadas. Conclusão operacional não declarada.
+
+Decisões humanas de 23/09/2026: defaults off/cool/22; seleção de modo liga;
+JSON parcial combina; null restaura padrão; power explícito prevalece sobre
+mode. Registro e reanálise autorizados. [Especificação 0.2](../specs/AIR-CONDITIONER-STATE.md)
+e [nova análise](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-24T005515Z-0.2-b36f13f3-3d18-43a2-a437-176e65d33011-implementability-analysis.md) reconciliam B-01/B-02/B-03.
+Qualificação de engenharia/readiness do repositório não localizada; Ready da
+funcionalidade não habilita implementação. Nenhum código/build/teste/HTTP/banco
+ou deploy executado. Hash e referências verificados; guarda documental ausente.
+
+### Histórico 0.1 preservado
+
+**Estado:** Open. **Workflow:** Draft; análise `Not Ready — Specification Defect`.
+
+O Arquiteto aceitou o rascunho e ordenou seu registro e análise em 22/09/2026.
+[Especificação 0.1](../specs/AIR-CONDITIONER-STATE.md), com JSON textual em
+Capabilities.Value varchar(1000), comandos simples e preservação atômica.
+[Análise](../reports/AIR-CONDITIONER-STATE/analysis/2026-09-23T024531Z-0.1-23ac1bde-af17-40e6-8bbf-eabd429251ff-implementability-analysis.md) vinculada ao hash
+exato registra B-01 (legado/inicialização), B-02 (modo/energia) e B-03
+(entrada de estado completo). Pendências não foram resolvidas por inferência.
+Qualificação de engenharia/readiness do repositório não localizada; análise
+não habilita implementação. Nenhum código, teste, banco, schema ou deploy
+alterado/executado; guarda documental ausente. Nenhum débito ou encerramento
+normativo declarado. Registro e análise documentais, sem implementação.
+
+
+## EKM-CHG-0006 — Suíte integrada HTTP Dashboard
+
+**Atalhos solicitados pelo Arquiteto:** Makefile da raiz agora fornece
+run-test e clear-test independentes, com manifesto configurável compartilhado.
+[Registro da adaptação](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T032207Z-0.1-841c66d8-fcd0-4938-8289-5e884a12137b-makefile-shortcuts.md).
+Somente dry-run/sintaxe verificados; nenhuma execução de testes ou limpeza.
+
+**Estado:** Open. **Workflow:** In Progress.
+
+**Ordem humana:** criar suíte automatizada de criação, consulta e alteração;
+exclusão somente por comando de limpeza independente via API. Não executar
+nenhum cenário nesta atuação. Contrato complementar
+[0.1](../specs/DASHBOARD-API-INTEGRATION-TESTS.md), com
+[análise Ready](../reports/DASHBOARD-API-INTEGRATION-TESTS/analysis/2026-09-06T021335Z-0.1-d6c4ac27-5714-422a-9bdf-82ea02a5c880-implementability-analysis.md).
+Implementação e build do projeto novo autorizados; API e suíte Retired intactas.
+
+**Entrega:** `tests/Api.IntegrationTests`, comandos run e cleanup separados,
+manifesto persistente e conferência de propriedade pela API.
+[Relatório](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T023221Z-0.1-580c8d1e-f5fc-4ff1-b50e-7aef3801c25c-implementation.md)
+registra build final exit 0, zero erros/avisos. Nenhum teste, HTTP ou limpeza
+executado; evidência operacional Not Executed, entrega para Revisão.
+
+
+## EKM-CHG-0005 — Dashboard API v1
+
+**Estado:** Open. **Workflow:** In Progress, reimplementação entregue para Revisão.
+
+**Especificação:** [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md).
+
+**Decisão humana de 05/09/2026:** o Arquiteto rejeitou a entrega de
+`a1f292d`/`90d5061` por não seguir os precedentes do repositório e ordenou
+reimplementação integral conforme nomenclatura, estilo, modelos/contratos,
+controllers, rotas/endpoints e queries, exceto precedentes imprecisos ou
+defeituosos. A rejeição foi registrada antes da alteração do código. A ordem
+original da 0.3 cobre esta correção; nenhum novo aceite foi presumido.
+
+**Correção atual:** modelos HTTP e entidades explícitos, serviços por interface,
+resultados MVC e persistência/queries conforme os precedentes. Sem mudança de
+contrato funcional 0.3, pacotes ou APIs anteriores.
+[Relatório corretivo](../reports/DASHBOARD-API-V1/implementation/2026-09-05T233757Z-0.3-c7fc139b-4018-4bea-b6d3-6b35860a446a-reimplementation.md)
+registra precedentes, exceções, rastreabilidade e limitações. Build final exit 0,
+zero erros e dois avisos preexistentes; nenhuma execução de testes/HTTP/banco.
+SQL não aplicado, SourceTimeZone não configurado. P-07/EKM-GAP-0002 aberta;
+DDL corrigido não migra eventual schema da implementação rejeitada.
+
+**Histórico preservado:** [análise 0.1](../reports/DASHBOARD-API-V1/analysis/2026-09-05T015215Z-0.1-9cf22d3a-0934-4360-8a4d-a9330c4c74f4-implementability-analysis.md)
+identificou seis bloqueadores; [análise 0.2](../reports/DASHBOARD-API-V1/analysis/2026-09-05T022820Z-0.2-7df58234-3f0d-48e0-a1e4-896030148778-implementability-analysis.md)
+manteve B-04. A decisão humana pela precedência de 11.2 foi incorporada na 0.3;
+a [reanálise Ready](../reports/DASHBOARD-API-V1/analysis/2026-09-05T023452Z-0.3-c825daa4-0797-4357-8a48-82de0ed12147-implementability-analysis.md)
+se aplica ao snapshot `3a8c4ca27c3812a8a20452c456504f5512aadb87fdc7c17444646591f3af7139`.
+O [relatório da entrega rejeitada](../reports/DASHBOARD-API-V1/implementation/2026-09-05T025714Z-0.3-50c7654c-c78e-4d19-aa77-10fc5f53b503-implementation.md)
+e seus logs são históricos e não constituem aceite.
+
+Sem aprovação operacional, integração em main ou conclusão Done. Api.Tests
+continua Retired. A guarda documental continua ausente. Nenhum débito aceito
+ou lacuna encerrada; inspeção documental não substitui evidência operacional.
+
 ## EKM-CHG-0004 — CapabilityType por id
 
 **Estado:** Closed

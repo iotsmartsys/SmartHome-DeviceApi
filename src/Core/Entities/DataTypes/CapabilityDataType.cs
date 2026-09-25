@@ -3,6 +3,7 @@ namespace Core.Entities;
 
 public record struct CapabilityDataType(string Value)
 {
+    public const string AirConditioner = "air_condicionator";
     public const string Float = "float";
     public const string Detection = "detection";
     public const string Boolean = "boolean";

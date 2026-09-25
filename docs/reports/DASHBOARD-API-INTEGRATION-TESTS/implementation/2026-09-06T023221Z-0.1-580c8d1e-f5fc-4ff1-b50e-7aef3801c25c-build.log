@@ -1,0 +1,82 @@
+Build 1: dotnet build tests/Api.IntegrationTests/Api.IntegrationTests.csproj
+Exit code: 1
+  Determinando os projetos a serem restaurados...
+  /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj restaurado (em 66 ms).
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(23,41): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,74): error CS1026: ) esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,74): error CS1002: ; esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,92): error CS1002: ; esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,95): error CS1002: ; esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(23,93): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(24,1): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(24,12): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(25,13): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(25,25): error CS1026: ) esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(32,96): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(32,116): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(33,1): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(33,12): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(34,42): error CS1026: ) esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,95): error CS1513: } esperada [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+
+FALHA da compilação.
+
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(23,41): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,74): error CS1026: ) esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,74): error CS1002: ; esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,92): error CS1002: ; esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,95): error CS1002: ; esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(23,93): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(24,1): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(24,12): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(25,13): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(25,25): error CS1026: ) esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(32,96): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(32,116): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(33,1): error CS1010: Newline em constante [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(33,12): error CS1003: Erro de sintaxe, "," esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Options.cs(34,42): error CS1026: ) esperado [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Program.cs(35,95): error CS1513: } esperada [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/Api.IntegrationTests.csproj]
+    0 Aviso(s)
+    16 Erro(s)
+
+Tempo Decorrido 00:00:02.29
+
+
+Build 2: dotnet build tests/Api.IntegrationTests/Api.IntegrationTests.csproj
+Exit code: 0
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Api.IntegrationTests -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/bin/Debug/net9.0/Api.IntegrationTests.dll
+
+Compilação com êxito.
+    0 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:02.51
+
+
+Build 3: dotnet build tests/Api.IntegrationTests/Api.IntegrationTests.csproj
+Exit code: 0
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Api.IntegrationTests -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/bin/Debug/net9.0/Api.IntegrationTests.dll
+
+Compilação com êxito.
+    0 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:02.26
+
+
+Build 4: dotnet build tests/Api.IntegrationTests/Api.IntegrationTests.csproj
+Exit code: 0
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+  Api.IntegrationTests -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/tests/Api.IntegrationTests/bin/Debug/net9.0/Api.IntegrationTests.dll
+
+Compilação com êxito.
+    0 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:02.52

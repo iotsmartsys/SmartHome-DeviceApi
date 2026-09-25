@@ -1,6 +1,6 @@
 # Instruções permanentes e roteamento EKOM
 
-**Modelo EKOM:** 4.6
+**Modelo EKOM:** 5.0 no escopo qualificado de capabilities; histórico 4.x preservado
 
 **Modalidade:** capacidades referenciadas e governança proporcional
 
@@ -36,11 +36,22 @@ Análise de implementabilidade é obrigatória antes da implementação, mas pod
 ser executada na mesma atuação quando autorizada. Challenge é consultivo e
 proporcional ao risco, não um gate universal.
 
-Implementação exige análise `Ready`, promoção registrada e autorização da mesma
-versão. Com esses gates satisfeitos, o build canônico dos entregáveis
+Implementação no escopo qualificado exige contrato aprovado e Repository
+Readiness válida, análise `Ready` e ordem humana para a mesma versão. Não exige
+promoção documental adicional. Com essas condições satisfeitas, o build canônico dos entregáveis
 construíveis afetados integra a implementação e não exige cláusula na
 especificação. Coleta ou execução de testes, flash, monitor e hardware exigem
 autorização própria.
+
+## Qualificação de engenharia
+
+Contrato aprovado: [SHD-ENGINEERING-001@0.1](docs/rfc/REPOSITORY-ENGINEERING-CONTRACT.md).
+Estado, avaliação e decisão humana: [Repository Readiness](docs/rfc/REPOSITORY-READINESS.md).
+Adoção/habilitação EKOM 5.0 aprovada em 23/09/2026 para capabilities e dependências
+materiais necessárias ao estado do ar-condicionado: inclusão, value, PATCH,
+consultas, Core, conversões, persistência, DI e falhas específicas. Não inferir
+qualificação de outros domínios; trabalho fora do alcance exige avaliação própria.
+Histórico 4.x permanece rastreável e não é retroativamente reclassificado.
 
 ## Fontes locais do projeto
 

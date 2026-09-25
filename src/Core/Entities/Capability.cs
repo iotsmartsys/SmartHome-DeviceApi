@@ -68,7 +68,11 @@ public class Capability
 
     public void UpdateValue(string value)
     {
-        if (!string.IsNullOrWhiteSpace(DataType))
+        if (AirConditionerState.IsDataType(DataType))
+        {
+            Value = AirConditionerState.Apply(Value, value);
+        }
+        else if (!string.IsNullOrWhiteSpace(DataType))
         {
             var dt = new CapabilityDataType(DataType);
             Value = dt.Convert(value.ToLower());

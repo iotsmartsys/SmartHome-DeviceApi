@@ -1,0 +1,59 @@
+Build 1: dotnet build src/Api/Api.csproj
+Resultado: FALHA de compilação; código do processo não capturado separadamente (shell terminou 0 após cat)
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+  Core -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/bin/Debug/net9.0/Core.dll
+  Data.Repositories -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Data.Repositories/bin/Debug/net9.0/Data.Repositories.dll
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Controllers/CapabilityHistoryController.cs(6,79): warning CS9113: O parâmetro "logger" não está lido. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Models/DashboardError.cs(7,103): error CS0121: A chamada é ambígua entre os seguintes métodos ou propriedades: "DashboardErrorResponse.DashboardErrorResponse(DashboardError)" e "DashboardErrorResponse.DashboardErrorResponse(DashboardErrorResponse)" [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+
+FALHA da compilação.
+
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Controllers/CapabilityHistoryController.cs(6,79): warning CS9113: O parâmetro "logger" não está lido. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Models/DashboardError.cs(7,103): error CS0121: A chamada é ambígua entre os seguintes métodos ou propriedades: "DashboardErrorResponse.DashboardErrorResponse(DashboardError)" e "DashboardErrorResponse.DashboardErrorResponse(DashboardErrorResponse)" [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+    2 Aviso(s)
+    1 Erro(s)
+
+Tempo Decorrido 00:00:04.93
+
+
+Build 2: dotnet build src/Api/Api.csproj
+Resultado: exit 0
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+  Core -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/bin/Debug/net9.0/Core.dll
+  Data.Repositories -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Data.Repositories/bin/Debug/net9.0/Data.Repositories.dll
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Controllers/CapabilityHistoryController.cs(6,79): warning CS9113: O parâmetro "logger" não está lido. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+  Api -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/bin/Debug/net9.0/Api.dll
+
+Compilação com êxito.
+
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Controllers/CapabilityHistoryController.cs(6,79): warning CS9113: O parâmetro "logger" não está lido. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+    2 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:05.19
+
+
+Build 3: dotnet build src/Api/Api.csproj
+Resultado: exit 0
+  Determinando os projetos a serem restaurados...
+  Todos os projetos estão atualizados para restauração.
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+  Core -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/bin/Debug/net9.0/Core.dll
+  Data.Repositories -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Data.Repositories/bin/Debug/net9.0/Data.Repositories.dll
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Controllers/CapabilityHistoryController.cs(6,79): warning CS9113: O parâmetro "logger" não está lido. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+  Api -> /Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/bin/Debug/net9.0/Api.dll
+
+Compilação com êxito.
+
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Entities/Capability.cs(36,12): warning CS8618: O propriedade não anulável 'DeviceId' precisa conter um valor não nulo ao sair do construtor. Considere adicionar o modificador "obrigatório" ou declarar o propriedade como anulável. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Core/Core.csproj]
+/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Controllers/CapabilityHistoryController.cs(6,79): warning CS9113: O parâmetro "logger" não está lido. [/Volumes/NVME/Developer/Source/IoT/SmartHome/Services/SmartHome-DeviceApi/src/Api/Api.csproj]
+    2 Aviso(s)
+    0 Erro(s)
+
+Tempo Decorrido 00:00:03.76

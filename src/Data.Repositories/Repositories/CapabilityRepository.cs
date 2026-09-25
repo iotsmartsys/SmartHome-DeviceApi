@@ -8,14 +8,14 @@ namespace Data.Repositories;
 
 internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbConnection connection) : ICapabilityRepository, IRepository
 {
-    public async Task AddAsync(string device_id, IEnumerable<Capability> capabilities)
+    public async Task AddAsync(string device_id, IEnumerable<Capability> capabilities, CancellationToken cancellationToken = default)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
 
         try
         {
-            int idDevice = await connection.ExecuteScalarAsync<int>("SELECT Id FROM Devices WHERE DeviceId = @device_id", new { device_id }, transaction);
+            int idDevice = await connection.ExecuteScalarAsync<int>(new CommandDefinition("SELECT Id FROM Devices WHERE DeviceId = @device_id", new { device_id }, transaction, cancellationToken: cancellationToken));
             if (idDevice == 0)
             {
                 logger.LogWarning("Device {deviceId} not found", device_id);
@@ -25,8 +25,13 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
             foreach (var capability in capabilities)
             {
                 logger.LogInformation("Adicionando capability {capabilityName} para o device {deviceId}", capability.Name, device_id);
+                var dataType = await connection.QuerySingleOrDefaultAsync<string>(new CommandDefinition(
+                    CapabilityQuery.GetDataTypeByName, new { type = capability.Type }, transaction,
+                    cancellationToken: cancellationToken));
+                if (AirConditionerState.IsDataType(dataType))
+                    capability.Value = AirConditionerState.Initialize(capability.Value);
                 const string sql = CapabilityQuery.InsertCapability;
-                await connection.ExecuteAsync(sql, new
+                await connection.ExecuteAsync(new CommandDefinition(sql, new
                 {
                     DeviceId = idDevice,
                     capability.Name,
@@ -34,7 +39,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                     capability.Type,
                     capability.Value,
                     capability.Owner
-                }, transaction);
+                }, transaction, cancellationToken: cancellationToken));
 
                 logger.LogInformation("Capability {capabilityName} adicionada para o device {deviceId}", capability.Name, device_id);
             }
@@ -150,6 +155,11 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 return true;
             }, logger, command.CancellationToken);
 
+            foreach (var capability in map.Values)
+            {
+                if (AirConditionerState.IsDataType(capability.DataType))
+                    capability.Value = AirConditionerState.Normalize(capability.Value);
+            }
             return map.Values;
         }
         finally
@@ -188,13 +198,36 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
         }
     }
 
-    public async Task UpdateAsync(Capability capability, CancellationToken cancellationToken)
+    public async Task UpdateAsync(Capability capability, CancellationToken cancellationToken, bool valueChanged = true)
     {
         connection.Open();
         using var transaction = connection.BeginTransaction();
 
         try
         {
+
+            var current = await connection.QuerySingleOrDefaultAsync<Capability>(new CommandDefinition(
+                CapabilityQuery.SelectStateByIdForUpdate, new { id = capability.Id }, transaction,
+                cancellationToken: cancellationToken));
+            if (current is null) throw new NotFoundExceptionDomain("Capability not found.");
+            var targetType = await connection.QuerySingleOrDefaultAsync<string>(new CommandDefinition(
+                CapabilityQuery.GetDataTypeByName, new { type = capability.Type }, transaction,
+                cancellationToken: cancellationToken));
+            var currentIsAir = AirConditionerState.IsDataType(current.DataType);
+            var targetIsAir = AirConditionerState.IsDataType(targetType);
+            var writeValue = !(currentIsAir || targetIsAir) || valueChanged;
+            if (currentIsAir)
+            {
+                // Always use the state locked inside this transaction, never the controller snapshot.
+                capability.Value = valueChanged
+                    ? AirConditionerState.Apply(current.Value, capability.Value)
+                    : current.Value;
+            }
+            else if (targetIsAir)
+            {
+                capability.Value = AirConditionerState.Initialize(valueChanged ? capability.Value : current.Value);
+                writeValue = true;
+            }
 
             logger.LogInformation("Removendo o relacionamento de plataforma para a capability {capabilityName} do device {id}", capability.Name, capability.Id);
             var command = new CommandDefinition(CapabilityQuery.RemovePlatformFromCapability, new
@@ -254,9 +287,10 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
             logger.LogInformation("Atualizando capability {capabilityName} para o device {id}", capability.Name, capability.Id);
             const string sql = CapabilityQuery.UpdateForDevice;
-            await connection.ExecuteAsync(sql, new
+            await connection.ExecuteAsync(new CommandDefinition(sql, new
             {
                 id = capability.Id,
+                writeValue,
                 capability.Name,
                 capability.Description,
                 capability.Type,
@@ -266,7 +300,7 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
                 icon_name = capability.IconName,
                 IconActiveColor = capability.IconActiveColor,
                 IconInactiveColor = capability.IconInactiveColor
-            }, transaction);
+            }, transaction, cancellationToken: cancellationToken));
 
             logger.LogInformation("Capability {capabilityName} atualizada para o device {id}", capability.Name, capability.Id);
 
@@ -286,25 +320,33 @@ internal class CapabilityRepository(ILogger<CapabilityRepository> logger, IDbCon
 
     public async Task<bool> UpdateValueAsync(string device_id, string capability_name, string value, CancellationToken cancellationToken)
     {
-        logger.LogDebug("Atualizando valor da capability {capabilityName} para o device {deviceId}", capability_name, device_id);
-        const string sql = CapabilityQuery.UpdateValue;
         try
         {
-            var rows_affecteds = await Data.Repositories.Utils.DbRetry.ExecuteAsync(async () =>
-            {
-                if (connection.State != ConnectionState.Open)
-                    connection.Open();
-                var cmd = new CommandDefinition(sql, new { device_id, capability_name, value }, cancellationToken: cancellationToken);
-                return await connection.ExecuteAsync(cmd);
-            }, logger, cancellationToken);
+            if (connection.State != ConnectionState.Open) connection.Open();
+            using var transaction = connection.BeginTransaction();
+            // No blind retry across Commit: its outcome can be unknown after a connection failure.
+            var capabilities = (await connection.QueryAsync<Capability>(new CommandDefinition(
+                CapabilityQuery.SelectStateForUpdate, new { device_id, capability_name }, transaction,
+                cancellationToken: cancellationToken))).ToList();
+            if (capabilities.Count == 0) return false;
 
-            logger.LogDebug("Valor da capability {capabilityName} atualizado", capability_name);
-            return rows_affecteds > 0;
+            var updated = false;
+            foreach (var capability in capabilities)
+            {
+                var isAir = AirConditionerState.IsDataType(capability.DataType);
+                var next = isAir ? AirConditionerState.Apply(capability.Value, value) : value;
+                var rows = await connection.ExecuteAsync(new CommandDefinition(
+                    CapabilityQuery.UpdateStateById, new { id = capability.Id, value = next }, transaction,
+                    cancellationToken: cancellationToken));
+                // A valid repeated AC command still addresses an existing capability.
+                updated |= isAir || rows > 0;
+            }
+            transaction.Commit();
+            return updated;
         }
         finally
         {
-            if (connection.State != ConnectionState.Closed)
-                connection.Close();
+            if (connection.State != ConnectionState.Closed) connection.Close();
         }
     }
 }

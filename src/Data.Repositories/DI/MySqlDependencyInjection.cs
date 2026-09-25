@@ -15,6 +15,7 @@ public static class MySqlDependencyInjection
 
     services.AddTransient<IDbConnection>(_ => new MySqlConnection(connectionString));
         services
+            .AddScoped<IDashboardRepository, DashboardRepository>()
             .AddScoped<IDeviceRepository, DeviceRepository>()
             .AddScoped<ICapabilityRepository, CapabilityRepository>()
             .AddScoped<ICapabilityTypeRepository, CapabilityTypeRepository>()
