@@ -2,28 +2,26 @@
 
 ## EKM-CHG-0009 — Especificação do mapa de conhecimento
 
-**Estado:** Open. **Workflow:** especificação Draft; análise de implementabilidade
-Ready; Repository Readiness avaliado como Ready exclusivamente para a futura
-execução documental, sujeito a aprovação normativa e ordem explícita.
+**Estado:** Open. **Workflow:** especificação Approved; implementação documental
+In Progress; Repository Readiness Ready exclusivamente no alcance documental.
 
-O Arquiteto autorizou formalizar `SHD-KNOWLEDGE-MAP-001@0.1` e seus relatórios,
-sem autorizar a implementação documental. A especificação determina referências
-funcionais informativas em `docs/knowledge/`, mantendo
-`docs/rfc/KNOWLEDGE-MAP.md` e `docs/specs/SYSTEM-DOSSIER.md` como índice e visão
-geral. DA-03 classifica o OAuth técnico como controle de acesso proprietário
-legado `Deprecated`, ainda operacional segundo contexto informado, sem alteração
-ou investigação externa. A análise encontrou implementação documental
-plausível; o Ready de prontidão tem escopo apenas documental e não estende
-habilitação funcional a outros domínios.
+O Arquiteto aprovou a versão 0.1 e ordenou sua implementação exclusivamente
+documental em 23/11/2026. Foram criadas as referências por domínio, atualizados o
+índice, dossiê e registro de readiness somente para esse escopo. DA-03 classifica
+o componente OAuth como controle de acesso proprietário legado `Deprecated`,
+mantido sem alteração; operação atual é contexto informado. O relatório de
+cobertura identifica KM-AC-003 parcial por não haver OpenAPI gerado versionado e
+não ser permitida a execução da API. Implementação permanece In Progress; sem
+declaração Done ou validação operacional.
 
 [Especificação](../specs/SHD-KNOWLEDGE-MAP-001.md),
 [análise de implementabilidade](../reports/SHD-KNOWLEDGE-MAP/analysis/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-implementability-analysis.md),
-[avaliação de Repository Readiness](../reports/repository-readiness/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912.md) e
-[relatório consolidado](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-formalization.md).
-Nenhum conteúdo funcional do mapa ou do dossiê, código, teste ou contrato de
-API foi alterado; nenhum build ou teste foi executado. A aprovação da
-especificação e eventual atualização do estado operacional permanecem com o
-Arquiteto. Não foram criados débitos ou encerradas lacunas.
+[avaliação de Repository Readiness](../reports/repository-readiness/2026-11-23T190152Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-approved.md),
+[implementação](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191007Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-implementation.md) e
+[cobertura](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191007Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-coverage.md), além do [relatório de entrega](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191631Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-delivery.md).
+Nenhum código, teste, contrato funcional/OpenAPI, serviço externo ou destino
+público foi alterado. Não foram executados build ou testes. Não foram criados
+débitos nem encerradas lacunas. A ordem proíbe commit, merge e deploy.
 
 ## EKM-CHG-0008 — Preparação da qualificação EKOM
 

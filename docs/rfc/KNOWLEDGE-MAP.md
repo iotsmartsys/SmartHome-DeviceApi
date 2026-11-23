@@ -4,7 +4,7 @@
 
 **Status:** Active
 
-**Última auditoria:** 02/09/2026
+**Última auditoria:** 23/11/2026
 
 ## 1. Governança
 
@@ -12,6 +12,7 @@
 |---|---|---|---|
 | Contrato de engenharia (recorte capabilities) | [SHD-ENGINEERING-001@0.1](REPOSITORY-ENGINEERING-CONTRACT.md) | Normativo | Approved 0.1; escopo capabilities |
 | Qualificação do recorte | [Repository Readiness](REPOSITORY-READINESS.md) | Operacional | Ready no recorte; aprovação humana registrada |
+| Consolidação documental funcional | [SHD-KNOWLEDGE-MAP-001@0.1](../specs/SHD-KNOWLEDGE-MAP-001.md) | Normativo para atividade documental | Approved; implementação documental In Progress |
 | Bootstrap dos agentes | `AGENTS.md` | Normativo | Active |
 | Política de build e validação | `AGENTS.md` + especificação aplicável | Normativo | Active |
 | Conceito EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md` | Referência externa | Dynamic |
@@ -34,22 +35,23 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 
 ### 2.2 Domínios
 
-| Domínio | Fonte normativa | Implementação principal | Evidência atual | Cobertura |
+| Domínio | Fonte normativa/estado | Implementação principal | Referência informativa | Cobertura documental nesta auditoria |
 |---|---|---|---|---|
-| Devices | `EKM-GAP-0001` | `src/Api/Controllers/DeviceController.cs`, `src/Core/Entities/Device.cs`, `src/Data.Repositories/Repositories/DeviceRepository.cs` | Código e build | Inventoried |
-| Estado composto de ar-condicionado | [SHD-AIR-CONDITIONER-STATE-001@0.2](../specs/AIR-CONDITIONER-STATE.md) | AirConditionerState, CapabilityController, CapabilityRepository e inclusão em DeviceRepository | [Implementação/build para revisão](../reports/AIR-CONDITIONER-STATE/implementation/2026-09-24T021132Z-0.2-c8ed4cde-b583-477a-86d4-5f8cda26cb1e-implementation.md); HTTP/MySQL não executados | In Progress |
-| Capabilities e histórico | `EKM-GAP-0001` | `src/Api/Controllers/CapabilityController.cs`, `src/Api/Controllers/CapabilityHistoryController.cs`, `src/Core/Services/AddCapabilityService.cs`, repositórios relacionados | Código e build | Inventoried |
-| Settings globais e de device | `SHD-SETTINGS-RESET-001@0.1` + `EKM-GAP-0001` | `src/Api/Controllers/SettingsController.cs`, `src/Api/Controllers/DeviceSettingsController.cs`, `src/Data.Repositories/Repositories/SettingsRepository.cs`, `src/Data.Repositories/Repositories/DeviceSettingsRepository.cs` | Código, inspeção das queries e especificação de reset de settings específicos | Mapped |
-| Properties | `EKM-GAP-0001` | `src/Api/Controllers/PropertiesController.cs`, `src/Data.Repositories/Repositories/PropertyRepository.cs` | Código e build | Inventoried |
-| Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1`, `EKM-GAP-0001`, `EKM-GAP-0002` | `src/Api/Controllers/GroupController.cs`, modelos HTTP de Groups, `src/Core/Entities/Group.cs`, `src/Data.Repositories/Repositories/GroupRepository.cs` e queries relacionadas | Especificação v0.1 concluída; implementação, build Release e validação aceita pelo Arquiteto | Mapped |
-| Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
-| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Versão 0.2 Done; build aprovado, validação e testes aceitos pelo Arquiteto | Mapped |
-| Dashboard API v1 | [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md) | Dashboard controllers/models, IDashboardService/Resolvers, entidades e queries Dapper | Ready; entrega anterior rejeitada; [reimplementação e build](../reports/DASHBOARD-API-V1/implementation/2026-09-05T233757Z-0.3-c7fc139b-4018-4bea-b6d3-6b35860a446a-reimplementation.md) para Revisão, aceite operacional pendente | In Progress |
-| Suíte HTTP Dashboard | [SHD-DASHBOARD-API-INTEGRATION-TESTS-001@0.1](../specs/DASHBOARD-API-INTEGRATION-TESTS.md) | [tests/Api.IntegrationTests](../../tests/Api.IntegrationTests/README.md), `Makefile` (run-test/clear-test), run/cleanup e manifesto | [Build aprovado](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T023221Z-0.1-580c8d1e-f5fc-4ff1-b50e-7aef3801c25c-implementation.md); nenhum cenário executado | In Progress |
-| Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
-| OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
-| Persistência | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Queries Dapper e scripts parciais | Inventoried |
-| Build, validação, imagem e operação | `AGENTS.md` + `docs/specs/SYSTEM-DOSSIER.md` + especificação aplicável | `src/Api/Api.csproj`, `src/Api/Dockerfile`, `.github/workflows/docker-api.yml`, `build.sh`, `docker-compose.swarm.yaml` | Build canônico da API e validações declaradas por especificação; `tests/Api.Tests` é ignorado globalmente | Mapped |
+| Devices | `EKM-GAP-0001`; sem contrato funcional geral | `DeviceController`, `Device`, `DeviceRepository`, `DeviceQueryBuilder` | [devices.md](../knowledge/devices.md) | Mapped por código; limitações explícitas |
+| Capabilities e Capability History | Estado do ar [0.2](../specs/AIR-CONDITIONER-STATE.md); restante `EKM-GAP-0001` | `CapabilityController`, `CapabilityHistoryController`, Core e repositórios | [capabilities.md](../knowledge/capabilities.md) | Mapped; divergências de rota e resposta registradas |
+| Capability Types | [SHD-CAPABILITY-TYPE-ID-001@0.2](../specs/CAPABILITY-TYPE-ID.md), Done | `CapabilityTypeController`, DTO, Core, repository e queries | [capability-types.md](../knowledge/capability-types.md) | Mapped; contrato e estado separados |
+| Device Metrics | `EKM-GAP-0001`; schema em `EKM-GAP-0002` | `DeviceMetricsController`, DTO, repository | [device-metrics.md](../knowledge/device-metrics.md) | Mapped por controller/queries; schema parcial |
+| Device Settings e Settings globais | Reset normativo [0.1](../specs/DEVICE-SETTINGS-RESET.md); demais `EKM-GAP-0001` | `SettingsController`, `DeviceSettingsController`, repositories/queries | [settings.md](../knowledge/settings.md) | Mapped; herança/schema não integralmente confirmados |
+| Properties | `EKM-GAP-0001` | `PropertiesController`, Core e `PropertyRepository` | [properties.md](../knowledge/properties.md) | Mapped por código; sem contrato geral |
+| Groups | [SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1](../specs/GROUPS-MAINTENANCE-SUPPORT.md), concluída | `GroupController`, DTOs, Core, repository/queries | [groups.md](../knowledge/groups.md) | Mapped; referência normativa prevalece |
+| Platforms e Monitored Places | `EKM-GAP-0001` | Controllers, modelos e repositories | [platforms-and-places.md](../knowledge/platforms-and-places.md) | Mapped por endpoints de leitura; regras de relação em aberto |
+| Smart Home Capabilities | `EKM-GAP-0001` | `SmartHomeCapabilityController`, modelo Capability e query builder | [smart-home-capabilities.md](../knowledge/smart-home-capabilities.md) | Mapped; escopo de consulta divergente documentado |
+| Dashboards, widgets e catálogo | [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md); aceite operacional pendente | Controllers, `DashboardService`, resolvers e `DashboardRepository` | [dashboards-and-widgets.md](../knowledge/dashboards-and-widgets.md) | Mapped; não declara validação operacional |
+| Endpoints utilitários | Sem contrato funcional próprio localizado | Minimal APIs em `Program.cs`, response model e watchdog | [utility-endpoints.md](../knowledge/utility-endpoints.md) | Mapped; semântica/saúde limitadas ao código observado |
+| Controle de acesso legado | Estado Deprecated conforme decisão humana; contrato funcional não especificado | `OAuthController`, entidades/repos OAuth, DI | [legacy-access-control.md](../knowledge/legacy-access-control.md) | Mapped localmente; uso atual é contexto informado |
+| Persistência geral | `EKM-GAP-0002` | `src/Data.Repositories`, `database/` | Referências por domínio acima | Inventário parcial; schema e views autoritativos ausentes |
+| Suíte HTTP Dashboard | [SHD-DASHBOARD-API-INTEGRATION-TESTS-001@0.1](../specs/DASHBOARD-API-INTEGRATION-TESTS.md) | `tests/Api.IntegrationTests`, `Makefile` | [Dossier §9](../specs/SYSTEM-DOSSIER.md) e relatório da suíte | Criada/compilada; cenários não executados |
+| Build, imagem e operação | `AGENTS.md` + especificação aplicável | API csproj, Dockerfile, workflow, scripts e compose | [SYSTEM-DOSSIER](../specs/SYSTEM-DOSSIER.md) | Mapped parcialmente; caminhos de publicação diferem |
 
 ## 3. Árvore de conhecimento
 
@@ -63,10 +65,16 @@ SmartHome-DeviceApi
 │   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
 │   ├── Capability Types por id (Done)
 │   ├── Suporte à manutenção de Groups
+│   ├── SHD-KNOWLEDGE-MAP-001@0.1 (Approved; implementação documental In Progress)
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
 ├── API e modelos HTTP
 ├── Core e contratos de repositório
 ├── Persistência MySQL
+├── Referências informativas por domínio
+│   ├── Devices, Capabilities/History, Capability Types, Metrics
+│   ├── Settings, Properties, Groups, Platforms/Places, Smart Home
+│   ├── Dashboards/Widgets e endpoints utilitários
+│   └── Controle de acesso proprietário legado — Deprecated
 └── Consumidores
     └── AIoTSmartHome — manutenção de Groups
 ```
@@ -95,6 +103,18 @@ flowchart LR
     API --> CORE[Group / IGroupRepository]
     CORE --> DB[GroupRepository / MySQL]
     SPEC -->|Enables| APPSPEC[AIOTSMARTHOME-GROUPS-MAINTENANCE-001]
+    DEV[Device textual device_id] --> CAP[Capability por ID/UID/nome]
+    CAP --> TYPE[Capability Type / data_type]
+    CAP --> HIST[Capability History]
+    CAP --> GROUP[Group membership]
+    CAP --> PLATFORM[Platform reference]
+    CAP --> SMART[Smart Home association]
+    DEV --> METRICS[Current + History Metrics]
+    DEV --> SETTINGS[Device Settings / effective view]
+    DEV --> PROPERTY[Properties]
+    DASHAPI --> WIDGET[Dashboard Widget]
+    WIDGET --> CAP
+    LEGACY[Controle de acesso proprietário legado — Deprecated] --> TOKEN[Codes / Access Tokens]
 ```
 
 ## 5. Lacunas

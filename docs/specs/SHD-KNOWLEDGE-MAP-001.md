@@ -6,7 +6,9 @@
 
 **Versão:** 0.1
 
-**Estado normativo:** Draft — aguardando aprovação do Arquiteto
+**Estado normativo:** Approved — aprovação do Arquiteto em 23/11/2026
+
+**Estado da implementação:** In Progress — ordem explícita recebida em 23/11/2026
 
 **Análise de implementabilidade:** Ready para a versão 0.1, conforme relatório
 `docs/reports/SHD-KNOWLEDGE-MAP/analysis/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-implementability-analysis.md`
@@ -211,6 +213,8 @@ determina o destino futuro dessas referências.
 
 ## 12. Estado da autorização
 
-A especificação foi registrada por ordem expressa do Arquiteto para formalizá-la.
-Essa ordem não aprova automaticamente o conteúdo normativo e não autoriza sua
-implementação. O estado `Draft` permanece até decisão humana explícita.
+O Arquiteto aprovou formalmente a versão 0.1 e autorizou sua implementação
+exclusivamente documental pela ordem recebida em 23/11/2026. A autorização
+abrange KM-001 a KM-012 e KM-AC-001 a KM-AC-007 nos limites das seções 3, 4 e
+10. Não autoriza implementação funcional, alteração de testes ou código,
+integrações externas, commit, merge ou deploy.

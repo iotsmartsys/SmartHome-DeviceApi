@@ -4,14 +4,17 @@
 
 **Status:** Draft
 
-**Última auditoria:** 25/07/2026
+**Última auditoria:** 23/11/2026
 
 ## 1. Resumo executivo
 
 **Fato observado:** o SmartHome-DeviceApi é uma API HTTP em ASP.NET Core para
 gerenciamento de devices e recursos associados do ambiente IoT SmartHome. A
 solução também expõe capabilities, properties, settings, grupos, métricas,
-plataformas, locais monitorados e endpoints OAuth.
+plataformas, locais monitorados, dashboards e endpoints utilitários. O
+componente de controle de acesso próprio tem rotas técnicas `oauth` e é
+classificado como controle de acesso proprietário legado — `Deprecated`,
+conforme decisão humana.
 
 **Decisão confirmada:** a branch `main` é a referência de produção.
 
@@ -44,6 +47,8 @@ retrocompatibilidade ainda não possuem fonte normativa local.
 - o bootstrap registra os repositórios MySQL por injeção de dependência;
 - existe composição alternativa para SQL Server, mas ela não é selecionada por
   `src/Api/Program.cs`.
+
+As referências funcionais internas por domínio estão em [`docs/knowledge/`](../knowledge/). São informativas: descrevem código e evidências disponíveis, mas não substituem especificações normativas nem confirmam intenção não registrada.
 
 O fluxo predominante observado é:
 
@@ -92,6 +97,8 @@ falhas consecutivas, permitindo reinício pelo orquestrador.
 - capabilities por smart home;
 - OAuth;
 - timezone e health.
+
+Índice do conhecimento funcional: [KNOWLEDGE-MAP](../rfc/KNOWLEDGE-MAP.md). As referências detalhadas por domínio estão em [docs/knowledge](../knowledge/).
 
 `Readme.md` documenta parcialmente a API de devices. Swagger/OpenAPI é
 habilitado em ambiente de desenvolvimento. Não foi observada uma fonte
@@ -169,22 +176,28 @@ das evidências por domínio permanecem registradas em `EKM-GAP-0003`.
 
 ## 10. Domínios e fontes de verdade
 
-| Domínio | Fonte atual | Cobertura | Observação |
-|---|---|---|---|
-| Devices | Código e `Readme.md` | Inventoried | Sem especificação normativa EKM |
-| Estado composto do ar | `SHD-AIR-CONDITIONER-STATE-001@0.2` | In Progress | Estado composto implementado; build aprovado; validação HTTP/MySQL pendente; sem aceite operacional |
-| Capabilities | Código | Inventoried | Inclui tipos, histórico e relações |
-| Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` | Mapped | Versão 0.2 Done por decisão humana; build aprovado, validação e testes aceitos pelo Arquiteto |
-| Dashboard API v1 | `SHD-DASHBOARD-API-V1-001@0.3` | Mapped | Entrega anterior rejeitada; reimplementação conforme precedentes e build para Revisão; schema não aplicado e aceite operacional pendente |
-| Settings | Código e queries | Mapped | Abrange settings globais, específicos e efetivos |
-| Properties | Código | Inventoried | Escopo por device |
-| Groups | `SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1` e código | Mapped | Contrato administrativo concluído e validado por decisão do Arquiteto; mantém relações com capabilities |
-| Métricas | Código e schema parcial | Mapped | A suíte histórica `tests/Api.Tests` está `Retired` e não constitui evidência |
-| OAuth | Código | Inventoried | Contratos e política ainda não especificados |
-| Operação | Docker, workflow e scripts | Mapped | Existem caminhos de publicação distintos |
+O [`KNOWLEDGE-MAP.md`](../rfc/KNOWLEDGE-MAP.md) é o índice de autoridades,
+evidências e lacunas. As referências abaixo são informativas; contratos
+normativos existentes mantêm autoridade para o comportamento que especificam.
 
-As fontes navegáveis e lacunas correspondentes estão em
-`docs/rfc/KNOWLEDGE-MAP.md`.
+| Domínio | Referência informativa | Estado/limite documental |
+|---|---|---|
+| Devices | [devices.md](../knowledge/devices.md) | Código mapeado; sem especificação normativa geral; diferenças de DTO/settings registradas. |
+| Capabilities e histórico | [capabilities.md](../knowledge/capabilities.md) | Inclui relações, filtros e histórico; rota por nome e resposta vazia têm divergências registradas. |
+| Capability Types | [capability-types.md](../knowledge/capability-types.md) | [Contrato 0.2](CAPABILITY-TYPE-ID.md) Done; estado preservado. |
+| Device Metrics | [device-metrics.md](../knowledge/device-metrics.md) | Validações e queries mapeadas; schema geral continua parcial. |
+| Device Settings e Settings globais | [settings.md](../knowledge/settings.md) | [Reset 0.1](DEVICE-SETTINGS-RESET.md) cobre reset específico; view/precedência não integralmente confirmadas. |
+| Properties | [properties.md](../knowledge/properties.md) | Escopo por device mapeado; sem contrato EKM geral localizado. |
+| Groups | [groups.md](../knowledge/groups.md) | [Contrato 0.1](GROUPS-MAINTENANCE-SUPPORT.md) concluído; associações documentadas separadamente. |
+| Platforms e Monitored Places | [platforms-and-places.md](../knowledge/platforms-and-places.md) | Endpoints de leitura mapeados; relações/constraints incompletas. |
+| Smart Home Capabilities | [smart-home-capabilities.md](../knowledge/smart-home-capabilities.md) | Filtros e escopo de consulta individual têm limitações registradas. |
+| Dashboards e widgets | [dashboards-and-widgets.md](../knowledge/dashboards-and-widgets.md) | [Contrato 0.3](DASHBOARD-API-V1.md); aceite operacional pendente no registro anterior. |
+| Endpoints utilitários | [utility-endpoints.md](../knowledge/utility-endpoints.md) | Sem contrato funcional próprio; health não verifica banco. |
+| Controle de acesso legado | [legacy-access-control.md](../knowledge/legacy-access-control.md) | `Deprecated` por decisão humana; operação atual é contexto informado, não uso demonstrado no repo. |
+| Operação | Docker, workflow e scripts | Caminhos de publicação distintos; vigência e ownership não confirmados. |
+
+Nenhum desses mapas declara completude funcional, execução de testes ou aceite
+operacional além do que decisão e fonte normativa citadas sustentam.
 
 ## 11. Riscos, legado e preparação futura
 
@@ -192,10 +205,30 @@ As fontes navegáveis e lacunas correspondentes estão em
 - schema MySQL completo e processo de migração não localizados;
 - cobertura automatizada limitada entre os domínios;
 - política de segurança e segredos não consolidada;
-- documentação de API parcial;
+- OpenAPI/Swagger é configurado no bootstrap e habilitado em Development; não há
+  documento OpenAPI versionado integral nesta baseline;
 - caminhos distintos de publicação, cuja vigência relativa não está confirmada;
 - apontamento absoluto para a EKM externa, adequado ao experimento local, mas
   ainda não portátil.
+
+## 11.1 Divergências observadas na auditoria documental
+
+- `CapabilityController` declara rota de leitura por nome com e sem
+  `device_id`, mas a ação requer esse parâmetro; o template global não o fornece.
+- GET de Capability History declara `404` em atributo, mas devolve `200` com a
+  coleção, inclusive quando vazia.
+- Filtro Smart Home compara `smart_home_id` com `sh.Name`; consulta individual
+  por UID não aplica esse escopo.
+- DTO de Device contém `settings`, mas conversões e criação inspecionadas não
+  demonstram leitura/gravação desse campo nesse endpoint.
+- Métricas exigem `device_id` no body, mas o mapper não o usa e a chave efetiva
+  vem da rota.
+- `/api/v1/timezone` devolve a etiqueta `zone` e tempos locais/UTC, sem converter
+  o instante ao fuso indicado; `timezone/datetime` não recebe fuso apesar da
+  descrição.
+
+As divergências são registros de implementação, não foram corrigidas e não
+constituem contratos novos.
 
 ## 12. Questões abertas
 
@@ -215,3 +248,7 @@ normativas nem transforma o estado atual do código em intenção confirmada.
 ## Preparação da qualificação de engenharia
 
 [Contrato 0.1](../rfc/REPOSITORY-ENGINEERING-CONTRACT.md) aprovado para capabilities e dependências do ar; [qualificação](../rfc/REPOSITORY-READINESS.md) Ready no recorte após decisão humana de 23/09/2026. Nenhum domínio externo ao alcance foi habilitado. AGENTS.md reconciliado para adoção EKOM 5.0 delimitada, preservando o histórico 4.x.
+
+A habilitação documental de `SHD-KNOWLEDGE-MAP-001@0.1` é um escopo separado
+registrado em [Repository Readiness](../rfc/REPOSITORY-READINESS.md); não
+qualifica mudanças funcionais nos domínios listados.
