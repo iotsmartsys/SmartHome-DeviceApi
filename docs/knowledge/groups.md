@@ -1,5 +1,7 @@
 # Groups
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa, subordinada a [SHD-GROUPS-MAINTENANCE-SUPPORT-001@0.1](../specs/GROUPS-MAINTENANCE-SUPPORT.md). Evidência adicional: [GroupController](../../src/Api/Controllers/GroupController.cs), [DTOs](../../src/Api/Models/Group.cs), [Core entity](../../src/Core/Entities/Group.cs), [repository](../../src/Data.Repositories/Repositories/GroupRepository.cs) e queries de Groups.
 
 ## Relações e identidade

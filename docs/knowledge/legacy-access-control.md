@@ -1,5 +1,7 @@
 # Controle de acesso proprietário legado — Deprecated
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Classificação aprovada:** controle de acesso proprietário legado — **Deprecated**.
 **Natureza:** referência interna informativa, não contrato de OAuth 2.0.
 

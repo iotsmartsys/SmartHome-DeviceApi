@@ -1,5 +1,7 @@
 # Settings globais e de device
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa. Sources: [SettingsController](../../src/Api/Controllers/SettingsController.cs), [DeviceSettingsController](../../src/Api/Controllers/DeviceSettingsController.cs), [modelos](../../src/Api/Models/Settings.cs), [repositories](../../src/Data.Repositories/Repositories/SettingsRepository.cs) e [DeviceSettingsRepository](../../src/Data.Repositories/Repositories/DeviceSettingsRepository.cs), [queries](../../src/Data.Repositories/Repositories/Queries/DeviceSettingsQuery.cs).
 
 ## Responsabilidade e modelo

@@ -1,5 +1,7 @@
 # Properties
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa. Fontes: [controller](../../src/Api/Controllers/PropertiesController.cs), [DTO e validação](../../src/Api/Models/Property.cs), [Core entity](../../src/Core/Entities/Property.cs), [repository](../../src/Data.Repositories/Repositories/PropertyRepository.cs) e [query builder](../../src/Data.Repositories/Repositories/Builders/PropertyQueryBuilder.cs).
 
 ## Conceitos

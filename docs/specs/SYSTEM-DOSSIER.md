@@ -101,9 +101,14 @@ falhas consecutivas, permitindo reinício pelo orquestrador.
 Índice do conhecimento funcional: [KNOWLEDGE-MAP](../rfc/KNOWLEDGE-MAP.md). As referências detalhadas por domínio estão em [docs/knowledge](../knowledge/).
 
 `Readme.md` documenta parcialmente a API de devices. Swagger/OpenAPI é
-habilitado em ambiente de desenvolvimento. Não foi observada uma fonte
-normativa completa para compatibilidade da API; os contratos funcionais devem
-ser especificados incrementalmente.
+habilitado em ambiente de desenvolvimento. Um snapshot derivado fornecido pelo
+Arquiteto está versionado em [`docs/contracts/openapi.json`](../contracts/openapi.json);
+ele declara OpenAPI 3.0.1 e API 1.0, mas não informa data, ferramenta nem revisão
+de geração. Sua procedência e confronto estático integral estão registrados no
+[relatório de reconciliação](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md).
+O artefato é derivado e informativo, não uma fonte normativa completa para
+compatibilidade; especificações funcionais continuam sendo elaboradas
+incrementalmente.
 
 ## 6. Dados e persistência
 

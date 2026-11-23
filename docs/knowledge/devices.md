@@ -1,5 +1,7 @@
 # Devices
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa; contratos normativos existentes prevalecem. Código inspecionado: [DeviceController](../../src/Api/Controllers/DeviceController.cs), [modelo Device](../../src/Api/Models/Device.cs), [entidade Core](../../src/Core/Entities/Device.cs), [repositório](../../src/Data.Repositories/Repositories/DeviceRepository.cs) e [queries/builder](../../src/Data.Repositories/Repositories/Queries/DeviceQueryBuilder.cs).
 
 ## Conceitos e identificadores

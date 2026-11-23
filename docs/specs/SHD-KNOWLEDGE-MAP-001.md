@@ -8,7 +8,7 @@
 
 **Estado normativo:** Approved — aprovação do Arquiteto em 23/11/2026
 
-**Estado da implementação:** In Progress — ordem explícita recebida em 23/11/2026
+**Estado da implementação:** Done — encerramento autorizado condicionalmente na ordem complementar de 23/11/2026 após atendimento dos critérios
 
 **Análise de implementabilidade:** Ready para a versão 0.1, conforme relatório
 `docs/reports/SHD-KNOWLEDGE-MAP/analysis/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-implementability-analysis.md`
@@ -218,3 +218,20 @@ exclusivamente documental pela ordem recebida em 23/11/2026. A autorização
 abrange KM-001 a KM-012 e KM-AC-001 a KM-AC-007 nos limites das seções 3, 4 e
 10. Não autoriza implementação funcional, alteração de testes ou código,
 integrações externas, commit, merge ou deploy.
+
+## 13. Ordem complementar e estado de encerramento
+
+Em 23/11/2026, o Arquiteto autorizou complementar a evidência documental com o
+snapshot OpenAPI fornecido, sem editá-lo, e reconciliar integralmente seus
+contratos HTTP com controllers, modelos e referências funcionais. A ordem
+permite incluir o arquivo como artefato derivado informativo em
+`docs/contracts/openapi.json`; não altera a natureza normativa desta
+especificação nem o comportamento da API. O relatório de reconciliação registra
+procedência incompleta, inventário integral, schemas, respostas e divergências.
+
+Após a reconciliação, os sete critérios KM-AC-001 a KM-AC-007 estão atendidos,
+conforme a matriz de cobertura atualizada. O Arquiteto autorizou a transição
+condicional para `Done`; a implementação documental é registrada como
+concluída em 23/11/2026. Permanecem as lacunas e divergências informativas
+documentadas, sem correção funcional. Nenhum commit, merge ou deploy foi
+autorizado nesta ordem complementar.

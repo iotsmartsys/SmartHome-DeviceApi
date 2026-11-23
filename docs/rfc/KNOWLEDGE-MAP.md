@@ -12,7 +12,8 @@
 |---|---|---|---|
 | Contrato de engenharia (recorte capabilities) | [SHD-ENGINEERING-001@0.1](REPOSITORY-ENGINEERING-CONTRACT.md) | Normativo | Approved 0.1; escopo capabilities |
 | Qualificação do recorte | [Repository Readiness](REPOSITORY-READINESS.md) | Operacional | Ready no recorte; aprovação humana registrada |
-| Consolidação documental funcional | [SHD-KNOWLEDGE-MAP-001@0.1](../specs/SHD-KNOWLEDGE-MAP-001.md) | Normativo para atividade documental | Approved; implementação documental In Progress |
+| Consolidação documental funcional | [SHD-KNOWLEDGE-MAP-001@0.1](../specs/SHD-KNOWLEDGE-MAP-001.md) | Normativo para atividade documental | Approved; implementação documental Done |
+| Contratos HTTP gerados | [OpenAPI 3.0.1 / API 1.0](../contracts/openapi.json) e [procedência](../contracts/README.md) | Derivado e informativo | Snapshot fornecido pelo Arquiteto; data e revisão de geração não informadas |
 | Bootstrap dos agentes | `AGENTS.md` | Normativo | Active |
 | Política de build e validação | `AGENTS.md` + especificação aplicável | Normativo | Active |
 | Conceito EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md` | Referência externa | Dynamic |
@@ -65,7 +66,7 @@ SmartHome-DeviceApi
 │   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
 │   ├── Capability Types por id (Done)
 │   ├── Suporte à manutenção de Groups
-│   ├── SHD-KNOWLEDGE-MAP-001@0.1 (Approved; implementação documental In Progress)
+│   ├── SHD-KNOWLEDGE-MAP-001@0.1 (Approved; implementação documental Done)
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
 ├── API e modelos HTTP
 ├── Core e contratos de repositório
@@ -80,6 +81,8 @@ SmartHome-DeviceApi
 ```
 
 ## 4. Diagrama de relações
+
+O [inventário integral OpenAPI e confronto com controllers](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md) enumera os 76 pares método/rota e referencia a documentação funcional de cada domínio. O JSON é evidência de contrato HTTP gerado, não autoridade normativa.
 
 ```mermaid
 flowchart LR

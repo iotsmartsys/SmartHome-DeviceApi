@@ -1,5 +1,7 @@
 # Device Metrics
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa; não existe especificação funcional específica identificada no mapa. Fontes: [controller](../../src/Api/Controllers/DeviceMetricsController.cs), [DTOs e validação](../../src/Api/Models/DeviceMetrics.cs), [entidades](../../src/Core/Entities/DeviceMetrics.cs), [repository](../../src/Data.Repositories/Repositories/DeviceMetricsRepository.cs).
 
 ## Conceitos e identificadores

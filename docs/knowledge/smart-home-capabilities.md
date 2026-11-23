@@ -1,5 +1,7 @@
 # Smart Home Capabilities
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa; código observado em [SmartHomeCapabilityController](../../src/Api/Controllers/SmartHomeCapabilityController.cs), [CapabilityController](../../src/Api/Controllers/CapabilityController.cs), [Capability DTO](../../src/Api/Models/Capability.cs), [Core entities](../../src/Core/Entities/Capability.cs) e query builder de capabilities.
 
 ## Modelo e consulta

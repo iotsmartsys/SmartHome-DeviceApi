@@ -1,5 +1,7 @@
 # Dashboards, widgets e catálogo
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa; o contrato normativo é [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md). Fontes de implementação: [DashboardController](../../src/Api/Controllers/DashboardController.cs), [DashboardWidgetController](../../src/Api/Controllers/DashboardWidgetController.cs), [catálogo e capabilities](../../src/Api/Controllers/DashboardWidgetTypeController.cs), [serviço Core](../../src/Core/Services/DashboardService.cs), [resolver de dados](../../src/Core/Services/DashboardDataResolver.cs), [compatibilidade](../../src/Core/Services/DashboardWidgetCompatibilityResolver.cs) e [repository](../../src/Data.Repositories/Repositories/DashboardRepository.cs).
 
 ## Modelo e relações

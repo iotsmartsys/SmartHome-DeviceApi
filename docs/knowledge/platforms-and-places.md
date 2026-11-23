@@ -1,5 +1,7 @@
 # Platforms e Monitored Places
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa; não foram encontradas especificações normativas próprias para estes recursos no índice. Evidências: [controllers](../../src/Api/Controllers/PlatformController.cs) e [MonitoredPlaceController](../../src/Api/Controllers/MonitoredPlaceController.cs), [DTOs](../../src/Api/Models/Platform.cs) e [MonitoredPlace](../../src/Api/Models/MonitoredPlace.cs), [repositories](../../src/Data.Repositories/Repositories/PlatformRepository.cs).
 
 ## Recursos

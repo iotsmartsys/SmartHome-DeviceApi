@@ -2,26 +2,32 @@
 
 ## EKM-CHG-0009 — Especificação do mapa de conhecimento
 
-**Estado:** Open. **Workflow:** especificação Approved; implementação documental
-In Progress; Repository Readiness Ready exclusivamente no alcance documental.
+**Estado:** Done. **Workflow:** especificação Approved; implementação documental
+Done; Repository Readiness Ready exclusivamente no alcance documental.
 
 O Arquiteto aprovou a versão 0.1 e ordenou sua implementação exclusivamente
 documental em 23/11/2026. Foram criadas as referências por domínio, atualizados o
-índice, dossiê e registro de readiness somente para esse escopo. DA-03 classifica
-o componente OAuth como controle de acesso proprietário legado `Deprecated`,
-mantido sem alteração; operação atual é contexto informado. O relatório de
-cobertura identifica KM-AC-003 parcial por não haver OpenAPI gerado versionado e
-não ser permitida a execução da API. Implementação permanece In Progress; sem
-declaração Done ou validação operacional.
+índice, dossiê e registro de readiness somente para esse escopo. A ordem
+complementar incorporou o snapshot OpenAPI fornecido como evidência derivada e
+autorizou sua reconciliação integral, sem alterar o JSON nem executar a API.
+DA-03 classifica o componente OAuth como controle de acesso proprietário legado
+`Deprecated`, mantido sem alteração; operação atual é contexto informado. O
+relatório de cobertura registra os sete critérios atendidos após comparar as 76
+operações do OpenAPI com 73 pares controller/rota e três Minimal APIs. KM-AC-003
+foi atendido por confronto estático e registro de divergências, sem validação
+operacional. Implementação documental `Done`; runtime, banco e consumidores não
+foram exercitados.
 
 [Especificação](../specs/SHD-KNOWLEDGE-MAP-001.md),
 [análise de implementabilidade](../reports/SHD-KNOWLEDGE-MAP/analysis/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-implementability-analysis.md),
 [avaliação de Repository Readiness](../reports/repository-readiness/2026-11-23T190152Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-approved.md),
 [implementação](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191007Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-implementation.md) e
-[cobertura](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191007Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-coverage.md), além do [relatório de entrega](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191631Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-delivery.md).
-Nenhum código, teste, contrato funcional/OpenAPI, serviço externo ou destino
-público foi alterado. Não foram executados build ou testes. Não foram criados
-débitos nem encerradas lacunas. A ordem proíbe commit, merge e deploy.
+[cobertura anterior](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191007Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-coverage.md), além do [relatório de entrega anterior](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T191631Z-0.1-4b8f1bf6-3735-4c85-89f3-8edeebafc3d4-delivery.md), [reconciliação OpenAPI](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md), [nova cobertura](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211526Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-coverage.md) e [entrega complementar](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211526Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-delivery.md).
+Nenhum código, teste, OpenAPI original, serviço externo ou destino público foi
+alterado. Nenhum build, teste, chamada HTTP, acesso ao banco ou validação
+operacional foi executado. Não foram criados débitos nem declaradas quitadas
+lacunas fora do critério documental. A ordem complementar proíbe commit, merge
+e deploy; alterações ficam locais.
 
 ## EKM-CHG-0008 — Preparação da qualificação EKOM
 

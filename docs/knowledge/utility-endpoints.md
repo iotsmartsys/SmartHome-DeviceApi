@@ -1,5 +1,7 @@
 # Endpoints utilitários
 
+**Contrato HTTP complementar:** [OpenAPI derivado](../contracts/openapi.json) e [reconciliação integral](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T211211Z-c31c6cb4-2d80-42cd-9fbf-9dd40921395c-openapi-reconciliation.md). O artefato é informativo, não normativo; o relatório contém o inventário integral de operações, parâmetros, schemas, respostas e divergências deste domínio.
+
 **Natureza:** referência informativa baseada no bootstrap [Program.cs](../../src/Api/Program.cs), [TimezoneResponse](../../src/Api/Models/TimezoneResponse.cs) e [DatabaseWatchdogService](../../src/Api/Services/DatabaseWatchdogService.cs).
 
 ## HTTP
@@ -10,7 +12,7 @@
 | `GET /api/v1/timezone/datetime` | Retorna string `yyyy-MM-dd HH:mm:ss` de `DateTimeOffset.Now`, dependente do timezone local do processo. Apesar da descrição mencionar fuso horário, a rota não recebe parâmetro. |
 | `GET /api/v1/health` | Retorna `{ status: "Healthy" }`; endpoint não verifica diretamente dependências. |
 
-Swagger/OpenAPI e OpenAPI mapeado pelo bootstrap estão habilitados no ambiente Development; isso não constitui artefato contratual versionado completo.
+Swagger/OpenAPI e OpenAPI mapeado pelo bootstrap estão habilitados no ambiente Development. [`docs/contracts/openapi.json`](../contracts/openapi.json) é um snapshot derivado fornecido pelo Arquiteto, com procedência de geração incompleta; não constitui contrato normativo completo.
 
 ## Operação hospedada
 
