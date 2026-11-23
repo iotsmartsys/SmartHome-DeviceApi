@@ -2,6 +2,10 @@
 
 **Modelo EKOM:** 5.0 no escopo qualificado de capabilities; histórico 4.x preservado
 
+**Fonte oficial verificada:** `https://github.com/iotsmartsys/EKOM-guidelines`,
+revisão `e0498569169a46257a0f7a278cb48ff17774ded0` (branch `main`, consultada em
+23/11/2026). A versão oficial vigente nessa revisão é 5.0.
+
 **Modalidade:** capacidades referenciadas e governança proporcional
 
 **Estado:** vigente
@@ -63,12 +67,62 @@ Histórico 4.x permanece rastreável e não é retroativamente reclassificado.
   `EKOM-DEBT-NNNN`;
 - mapa de conhecimento: `docs/rfc/KNOWLEDGE-MAP.md`;
 - visão e navegação: `docs/specs/SYSTEM-DOSSIER.md`;
-- diretriz local de adoção: `docs/rfc/EKOM-GUIDELINES.md`;
-- arquitetura e contratos: `docs/specs/ISSP-Architecture.md`,
-  `docs/specs/ISSP-Commissioning.md` e `components/README.md`;
-- targets e execução de testes:
-  `docs/specs/Repository-Test-Execution-Policy.md`;
-- guarda documental: `python3 tools/validate_ekom_documents.py .`.
+- arquitetura e prontidão: `docs/specs/SYSTEM-DOSSIER.md`,
+  `docs/rfc/REPOSITORY-ENGINEERING-CONTRACT.md` e
+  `docs/rfc/REPOSITORY-READINESS.md`;
+- implementação por camada: `src/Api/`, `src/Core/` e
+  `src/Data.Repositories/`;
+- contratos HTTP derivados e sua procedência: `docs/contracts/openapi.json` e
+  `docs/contracts/README.md`;
+- conhecimento funcional: `docs/knowledge/`;
+- execução da suíte de integração HTTP Dashboard:
+  `tests/Api.IntegrationTests/README.md`;
+- não há uma guarda estrutural documental instalada neste repositório. O
+  [template opcional do EKOM](https://github.com/iotsmartsys/EKOM-guidelines/blob/e0498569169a46257a0f7a278cb48ff17774ded0/templates/tools/validate_ekom_documents.py)
+  está disponível na revisão oficial registrada acima.
+
+## Manutenção obrigatória da base de conhecimento funcional
+
+A cada implementação realizada neste repositório, independentemente do domínio
+funcional afetado, avalie o impacto sobre todos os documentos existentes em
+`docs/knowledge/`. Atualize todos os documentos materialmente afetados e crie
+referências funcionais quando forem introduzidos domínios, recursos ou
+conceitos não adequadamente representados. Siga os precedentes de organização,
+nomenclatura, estrutura, conteúdo e rastreabilidade dos documentos existentes.
+
+Atualize `docs/rfc/KNOWLEDGE-MAP.md` quando houver mudança relevante na
+organização, cobertura, referências ou lacunas do conhecimento. Atualize
+`docs/specs/SYSTEM-DOSSIER.md` quando a visão arquitetural ou funcional do
+sistema for afetada. Quando houver mudança em contratos HTTP, avalie
+`docs/contracts/openapi.json`; registre explicitamente eventual desatualização
+e preserve a procedência do artefato.
+
+Preserve a distinção entre contrato normativo, comportamento implementado,
+comportamento observado, contexto informado e informação não confirmada.
+Registre divergências e lacunas identificadas, sem ocultá-las nem convertê-las
+em afirmações sem suporte.
+
+A manutenção documental integra a mesma transação EKOM da implementação.
+Documentos sem conteúdo afetado não precisam ser modificados, mas a ausência de
+impacto deve resultar de avaliação explícita. O relatório de implementação deve
+identificar documentos atualizados, novos documentos criados e o resultado da
+avaliação de impacto. A implementação não está concluída enquanto houver
+atualização documental materialmente necessária pendente. Esta obrigação
+também se aplica a correções, refatorações e alterações arquiteturais quando
+afetarem o conhecimento documentado.
+
+## Arquitetura da base de conhecimento
+
+- `docs/rfc/KNOWLEDGE-MAP.md` é o índice central de descoberta, autoridades,
+  evidências e lacunas.
+- `docs/specs/SYSTEM-DOSSIER.md` mantém a visão sistêmica, arquitetural e
+  funcional.
+- `docs/knowledge/` contém referências funcionais especializadas e
+  informativas; não as promova a especificações normativas.
+- `docs/contracts/` contém artefatos derivados de contratos HTTP e suas
+  informações de procedência.
+- Não crie processo paralelo à EKOM, duplique governança nem introduza
+  ferramentas sem necessidade demonstrada.
 
 ## Suite de testes descontinuada
 

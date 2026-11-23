@@ -16,10 +16,12 @@
 | Contratos HTTP gerados | [OpenAPI 3.0.1 / API 1.0](../contracts/openapi.json) e [procedência](../contracts/README.md) | Derivado e informativo | Snapshot fornecido pelo Arquiteto; data e revisão de geração não informadas |
 | Bootstrap dos agentes | `AGENTS.md` | Normativo | Active |
 | Política de build e validação | `AGENTS.md` + especificação aplicável | Normativo | Active |
-| Conceito EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md` | Referência externa | Dynamic |
-| Método EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-METHOD.md` | Referência externa | Dynamic |
-| Governança EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/GOVERNANCE.md` | Referência externa | Dynamic |
-| Coordenação por atores | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md` | Protocolo experimental externo | Proposed |
+| Manutenção obrigatória do conhecimento funcional | `AGENTS.md`, seção "Manutenção obrigatória da base de conhecimento funcional" | Normativo | Active |
+| Modelo EKOM vigente | [Repositório oficial, revisão e049856](https://github.com/iotsmartsys/EKOM-guidelines/tree/e0498569169a46257a0f7a278cb48ff17774ded0) | Referência externa | EKOM 5.0; revisão verificada em 23/11/2026 |
+| Conceito EKOM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKOM-CONCEPT.md` | Referência externa | EKOM 5.0 na revisão registrada em `AGENTS.md` |
+| Método EKOM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKOM-METHOD.md` | Referência externa | EKOM 5.0 na revisão registrada em `AGENTS.md` |
+| Governança EKOM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/GOVERNANCE.md` | Referência externa | EKOM 5.0 na revisão registrada em `AGENTS.md` |
+| Coordenação por atores | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/experiments/COORDINATED-ACTOR-MODEL.md` | Protocolo experimental externo | Proposed; não é norma geral |
 | Mapa de conhecimento | `docs/rfc/KNOWLEDGE-MAP.md` | Normativo | Active |
 | Histórico e transações | `docs/rfc/EKM-CHANGELOG.md` | Operacional | Active |
 | Visão do sistema | `docs/specs/SYSTEM-DOSSIER.md` | Informativo | Draft |

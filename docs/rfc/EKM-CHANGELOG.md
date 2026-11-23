@@ -1,5 +1,26 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0010 — Reconciliação da adoção EKOM e manutenção do conhecimento
+
+**Estado:** Done. **Alcance:** governança e documentação; sem requalificação de
+engenharia.
+
+A fonte oficial consultada em 23/11/2026 identifica EKOM 5.0 como modelo
+vigente. O `AGENTS.md` já adotava 5.0 no escopo aprovado de capabilities; essa
+qualificação foi preservada sem extensão a outros domínios e sem alterar
+Repository Readiness ou o histórico 4.x. O roteador foi corrigido para remover
+referências inexistentes ou herdadas de outro projeto, e recebeu a obrigação
+permanente de avaliar e atualizar o conhecimento funcional em cada
+implementação. O mapa registra a fonte oficial e a autoridade dessa política.
+
+O template de guarda documental oficial existe, mas é opcional e incompatível
+com documentos históricos e a estrutura local do mapa; não foi instalado. A
+execução integral encontrou falhas preexistentes, preservadas como limitações
+históricas. Não houve alterações de comportamento funcional, HTTP, testes,
+infraestrutura ou Readiness.
+
+[Relatório de reconciliação](../reports/EKOM-ADOPTION/2026-11-23T215611Z-c4a447d4-8ed3-4b13-92c4-4e905e28c3cf-reconciliation.md).
+
 ## EKM-CHG-0009 — Especificação do mapa de conhecimento
 
 **Estado:** Done. **Workflow:** especificação Approved; implementação documental
