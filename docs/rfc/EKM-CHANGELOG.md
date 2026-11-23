@@ -1,5 +1,30 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0009 — Especificação do mapa de conhecimento
+
+**Estado:** Open. **Workflow:** especificação Draft; análise de implementabilidade
+Ready; Repository Readiness avaliado como Ready exclusivamente para a futura
+execução documental, sujeito a aprovação normativa e ordem explícita.
+
+O Arquiteto autorizou formalizar `SHD-KNOWLEDGE-MAP-001@0.1` e seus relatórios,
+sem autorizar a implementação documental. A especificação determina referências
+funcionais informativas em `docs/knowledge/`, mantendo
+`docs/rfc/KNOWLEDGE-MAP.md` e `docs/specs/SYSTEM-DOSSIER.md` como índice e visão
+geral. DA-03 classifica o OAuth técnico como controle de acesso proprietário
+legado `Deprecated`, ainda operacional segundo contexto informado, sem alteração
+ou investigação externa. A análise encontrou implementação documental
+plausível; o Ready de prontidão tem escopo apenas documental e não estende
+habilitação funcional a outros domínios.
+
+[Especificação](../specs/SHD-KNOWLEDGE-MAP-001.md),
+[análise de implementabilidade](../reports/SHD-KNOWLEDGE-MAP/analysis/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-implementability-analysis.md),
+[avaliação de Repository Readiness](../reports/repository-readiness/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912.md) e
+[relatório consolidado](../reports/SHD-KNOWLEDGE-MAP/2026-11-23T182436Z-0.1-347bf974-2461-43e3-8c61-8010c93cb912-formalization.md).
+Nenhum conteúdo funcional do mapa ou do dossiê, código, teste ou contrato de
+API foi alterado; nenhum build ou teste foi executado. A aprovação da
+especificação e eventual atualização do estado operacional permanecem com o
+Arquiteto. Não foram criados débitos ou encerradas lacunas.
+
 ## EKM-CHG-0008 — Preparação da qualificação EKOM
 
 **Aprovação registrada:** contrato SHD-ENGINEERING-001@0.1 e adoção/habilitação
