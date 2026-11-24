@@ -4,7 +4,7 @@
 
 **Status:** Draft
 
-**Última auditoria:** 23/11/2026
+**Última auditoria:** 24/11/2026
 
 ## 1. Resumo executivo
 
@@ -71,7 +71,8 @@ MySQL
 - obtém a connection string `Devices`;
 - registra Core, repositórios MySQL, cache, controllers, OpenAPI e Swagger;
 - habilita CORS para qualquer origem, header e método;
-- configura output cache com base de dois segundos;
+- configura política base de output cache com expiração de dois segundos e a
+  registra no pipeline depois do CORS;
 - inicia `DatabaseWatchdogService`;
 - mapeia controllers, timezone e health;
 - usa `ExceptionHandler`;
@@ -79,6 +80,31 @@ MySQL
 
 O watchdog consulta o banco a cada dois minutos e encerra o processo após três
 falhas consecutivas, permitindo reinício pelo orquestrador.
+
+No ASP.NET Core 9, a política base inclui a política padrão: só tenta armazenar
+GET/HEAD sem header `Authorization` e sem identidade autenticada; só persiste
+resposta `200` que não envie `Set-Cookie`. Sua expiração configurada é de dois
+segundos. A chave varia por método, esquema, host/porta, path e todos os parâmetros da
+query; não varia por identidade, cookie de requisição ou outros headers, pois
+nenhuma dessas dimensões foi configurada.
+Logo, um GET `200` elegível pode refletir estado anterior por até dois segundos
+após uma escrita. `204`, redirecionamentos, erros e demais respostas não-200 não
+são gravados, mas uma resposta `200` já armazenada permanece até expirar.
+
+O pipeline local não configura autenticação/autorização ASP.NET. Se o APISIX
+preservar `Authorization`, esse header exclui a requisição do output cache; se a
+identidade externa depender de cookie ou header próprio, o código local não a
+usa na chave nem confirma isolamento entre identidades. A configuração do
+gateway e o efeito implantado não foram observados nesta consolidação. O
+comportamento decorre da [configuração de política base documentada pelo
+ASP.NET Core 9](https://learn.microsoft.com/en-us/aspnet/core/performance/caching/output?view=aspnetcore-9.0)
+e da [política padrão](https://github.com/dotnet/aspnetcore/blob/v9.0.0/src/Middleware/OutputCaching/src/Policies/DefaultPolicy.cs),
+[regra padrão de variação por host](https://github.com/dotnet/aspnetcore/blob/v9.0.0/src/Middleware/OutputCaching/src/CacheVaryByRules.cs)
+e [composição da chave](https://github.com/dotnet/aspnetcore/blob/v9.0.0/src/Middleware/OutputCaching/src/OutputCacheKeyProvider.cs)
+do framework. Não houve observação de runtime nesta consolidação.
+`CapabilityController.GetAllCapabilitiesTiny` também mantém um `IMemoryCache`
+próprio com TTL de dois segundos e chave que omite filtros; ele pode interagir
+com a camada de output cache e tem seu limite descrito na referência do domínio.
 
 ## 5. API pública e consumidores
 
@@ -110,6 +136,15 @@ O artefato é derivado e informativo, não uma fonte normativa completa para
 compatibilidade; especificações funcionais continuam sendo elaboradas
 incrementalmente.
 
+A auditoria documental da revisão `43fbdc06e97a58f4ee55a84030a1053d5f1d997f`
+inventariou 76 pares método/rota no código e no snapshot; 22 têm tratamento
+normativo direto. A revisão atual `48806770fdd486229981ae4973b70632710271e6`
+não contém alterações funcionais posteriores. A cobertura descritiva por
+operação, suas limitações e a reconciliação dos treze achados estão nos
+[relatórios de consolidação](../reports/DEVICE-API-KNOWLEDGE-CONSOLIDATION/DEVICE-API-CONSOLIDATED-KNOWLEDGE-COVERAGE.md).
+O inventário inclui aliases, endpoints utilitários e três rotas OAuth legadas;
+presença na aplicação não comprova disponibilidade pública.
+
 ## 6. Dados e persistência
 
 **Fatos observados:**
@@ -131,7 +166,7 @@ autoridade do schema e das views está registrada em `EKM-GAP-0002`.
 
 | Integração | Evidência observada | Estado documental |
 |---|---|---|
-| MySQL | bootstrap, repositórios e connection string de runtime | Mapped parcialmente |
+| MySQL | bootstrap, repositórios, SQL Dapper e connection string de runtime | Código e comandos descritos por domínio; DDL autoritativo, views, constraints, defaults e cascades ausentes (`EKM-GAP-0002`) |
 | GitHub Actions e GHCR | workflow de build e publicação de imagem | Mapped |
 | Portainer | webhook posterior à publicação | Mapped parcialmente |
 | Docker Swarm e Traefik | compose de deploy e labels de roteamento | Mapped parcialmente |
@@ -140,14 +175,21 @@ autoridade do schema e das views está registrada em `EKM-GAP-0002`.
 Timeouts, autenticação das integrações e ownership operacional ainda não possuem
 fonte normativa consolidada.
 
+Os fluxos HTTP investigados não demonstram publicação MQTT ou chamada a broker
+como efeito das operações de settings. O nome de uma configuração, isolado, não
+prova uma integração ativa. Comunicação de dispositivos e comportamento de
+consumidores externos não são deduzidos da API.
+
 ## 8. Falhas, segurança e recuperação
 
 **Fatos observados:**
 
-- exceções de argumento, ausência e falhas MySQL são convertidas em respostas
-  HTTP pelo middleware;
+- exceções de argumento, ausência e falhas MySQL percorrem tratamentos que
+  dependem do middleware e da rota; model binding, estado do ar, Dashboard e o
+  handler geral podem produzir envelopes distintos;
 - timeouts e perdas críticas de banco podem solicitar encerramento do processo;
-- cada erro tratado recebe um identificador de rastreamento na resposta;
+- o ramo geral inclui `X-Trace-Id`; isso não é garantia uniforme para cada
+  resposta de erro, pois há caminhos próprios e respostas de model binding;
 - o watchdog também encerra o processo diante de falhas consecutivas;
 - o CORS está configurado para permitir qualquer origem, header e método;
 - endpoints OAuth existem, mas não foi observada configuração global de
@@ -157,6 +199,40 @@ fonte normativa consolidada.
 A política pretendida de autenticação, autorização, exposição CORS, segredos e
 rotação não pode ser inferida apenas do código. O risco de configuração sensível
 está registrado em `EKM-GAP-0004`.
+
+O bootstrap local não aplica uma policy global de autenticação/autorização aos
+controllers de negócio. Isso descreve somente a aplicação; admissão, identidade,
+permissões, TLS e transformação de erros no APISIX dependem da configuração por
+ambiente, não versionada neste repositório. CORS permissivo não comprova acesso
+anônimo ou exposição externa. Ver [reconciliação AUD-DEV-009](../reports/DEVICE-API-KNOWLEDGE-CONSOLIDATION/DEVICE-API-AUDIT-KNOWLEDGE-RECONCILIATION.md).
+
+### Tratamento HTTP de exceções
+
+O `ExceptionHandler` geral é registrado antes do handler específico de
+Dashboard. Respostas explícitas de controllers, erros de model binding e
+handlers OAuth próprios não passam necessariamente por esse mapeamento.
+
+| Caminho local | Resposta implementada |
+|---|---|
+| `ArgumentDomainException` | `400`; mensagem textual no corpo, media type configurado como `application/json; charset=utf-8`, header `X-Trace-Id`. O corpo não é um objeto JSON. |
+| `NotFoundExceptionDomain` | `404`; mesmo formato textual e header de rastreamento do ramo geral. |
+| `MySqlException` 1062 | `409` com mensagem genérica de duplicidade; inclui `X-Trace-Id`. |
+| `MySqlException` 1451/1452 | `400`; mensagem sobre relação inválida; inclui `X-Trace-Id`. |
+| `MySqlException` 1205 | `503`; mensagem de timeout; solicita parada da aplicação. |
+| `MySqlException` 1213, 1040 | `503`; mensagens de deadlock/conexões; não solicitam parada pelo ramo descrito. |
+| `MySqlException` 2006/2013 | `503`; mensagem de perda de conexão; solicita parada da aplicação. |
+| `TimeoutException` | `503`; solicita parada da aplicação. |
+| Exceção não mapeada no handler geral | `500`; mensagem genérica textual, media type JSON, `X-Trace-Id`. |
+| `AirConditionerStateConflictException` | `409` com JSON `{"error":"invalid_air_conditioner_stored_state"}`; caminho curto, sem o `X-Trace-Id` do ramo geral. |
+| Rotas Dashboard | Handler dedicado produz `{ "error": { "code", "message", "details" } }`; validação, ausência, incompatibilidade, datasource e erro interno usam códigos/status específicos da especificação e `DashboardErrorResponse`. Erro remove `Location`. |
+| Model binding / `[ApiController]` | Resultado de validação automática é `400` Problem Details/Validation Problem Details e não recebe necessariamente o header do middleware geral. Resposta pode variar conforme model/converter. |
+
+O handler geral gera um novo identificador e o escreve em `X-Trace-Id` apenas
+quando a resposta ainda não começou. Assim, nem todos os erros tratados,
+incluindo respostas explícitas e os caminhos próprios acima, oferecem esse
+header. Falhas anteriores ao serviço, como APISIX/TLS, têm formato externo.
+Erros e respostas não-200 ficam fora do armazenamento padrão do output cache;
+um sucesso anterior ainda pode ser servido até o TTL terminar.
 
 ## 9. Build, testes e operação
 
@@ -187,22 +263,28 @@ normativos existentes mantêm autoridade para o comportamento que especificam.
 
 | Domínio | Referência informativa | Estado/limite documental |
 |---|---|---|
-| Devices | [devices.md](../knowledge/devices.md) | Código mapeado; sem especificação normativa geral; diferenças de DTO/settings registradas. |
-| Capabilities e histórico | [capabilities.md](../knowledge/capabilities.md) | Inclui relações, filtros e histórico; rota por nome e resposta vazia têm divergências registradas. |
-| Capability Types | [capability-types.md](../knowledge/capability-types.md) | [Contrato 0.2](CAPABILITY-TYPE-ID.md) Done; estado preservado. |
-| Device Metrics | [device-metrics.md](../knowledge/device-metrics.md) | Validações e queries mapeadas; schema geral continua parcial. |
-| Device Settings e Settings globais | [settings.md](../knowledge/settings.md) | [Reset 0.1](DEVICE-SETTINGS-RESET.md) cobre reset específico; view/precedência não integralmente confirmadas. |
-| Properties | [properties.md](../knowledge/properties.md) | Escopo por device mapeado; sem contrato EKM geral localizado. |
-| Groups | [groups.md](../knowledge/groups.md) | [Contrato 0.1](GROUPS-MAINTENANCE-SUPPORT.md) concluído; associações documentadas separadamente. |
-| Platforms e Monitored Places | [platforms-and-places.md](../knowledge/platforms-and-places.md) | Endpoints de leitura mapeados; relações/constraints incompletas. |
-| Smart Home Capabilities | [smart-home-capabilities.md](../knowledge/smart-home-capabilities.md) | Filtros e escopo de consulta individual têm limitações registradas. |
-| Dashboards e widgets | [dashboards-and-widgets.md](../knowledge/dashboards-and-widgets.md) | [Contrato 0.3](DASHBOARD-API-V1.md); aceite operacional pendente no registro anterior. |
-| Endpoints utilitários | [utility-endpoints.md](../knowledge/utility-endpoints.md) | Sem contrato funcional próprio; health não verifica banco. |
-| Controle de acesso legado | [legacy-access-control.md](../knowledge/legacy-access-control.md) | `Deprecated` por decisão humana; operação atual é contexto informado, não uso demonstrado no repo. |
+| Devices | [devices.md](../knowledge/devices.md) | Cinco operações, campos requeridos, projeções e fluxo de criação/escrita descritos; DDL/gateway externos. |
+| Capabilities e histórico | [capabilities.md](../knowledge/capabilities.md) | 22 pares método/rota, filtros, associações, cache, history e divergências descritos. |
+| Capability Types | [capability-types.md](../knowledge/capability-types.md) | [Contrato 0.2](CAPABILITY-TYPE-ID.md) Done; modelo e cinco operações descritos, estado preservado. |
+| Device Metrics | [device-metrics.md](../knowledge/device-metrics.md) | Três operações; DTO, faixas, projeções e paginação descritos; DDL externo. |
+| Device Settings e Settings globais | [settings.md](../knowledge/settings.md) | Seis operações; view efetiva, update/upsert/reset e erros descritos; DDL externo. |
+| Properties | [properties.md](../knowledge/properties.md) | Seis operações; queries incompatíveis e falha pós-commit descritas; sem contrato EKM geral. |
+| Groups | [groups.md](../knowledge/groups.md) | [Contrato 0.1](GROUPS-MAINTENANCE-SUPPORT.md) concluído; CRUD normativo e associações legadas descritos. |
+| Platforms e Monitored Places | [platforms-and-places.md](../knowledge/platforms-and-places.md) | Dois endpoints somente leitura e suas projeções descritos; relações/constraints dependem do DDL. |
+| Smart Home Capabilities | [smart-home-capabilities.md](../knowledge/smart-home-capabilities.md) | Duas consultas; comparação por nome e ausência de escopo por UID descritas. |
+| Dashboards e widgets | [dashboards-and-widgets.md](../knowledge/dashboards-and-widgets.md) | [Contrato 0.3](DASHBOARD-API-V1.md); 12 operações e regras descritas, aceite operacional continua pendente. |
+| Endpoints utilitários | [utility-endpoints.md](../knowledge/utility-endpoints.md) | Três endpoints; health sem verificação de DB e watchdog distinto descritos. |
+| Controle de acesso legado | [legacy-access-control.md](../knowledge/legacy-access-control.md) | `Deprecated` por decisão humana; três rotas proprietárias e limites descritos, uso atual permanece contexto informado. |
 | Operação | Docker, workflow e scripts | Caminhos de publicação distintos; vigência e ownership não confirmados. |
 
 Nenhum desses mapas declara completude funcional, execução de testes ou aceite
 operacional além do que decisão e fonte normativa citadas sustentam.
+
+A [matriz consolidada](../reports/DEVICE-API-KNOWLEDGE-CONSOLIDATION/DEVICE-API-CONSOLIDATED-KNOWLEDGE-COVERAGE.md)
+acompanha as 76 operações e as dimensões de documentação; a reconciliação,
+lacunas externas e relatório da intervenção estão no mesmo diretório. Essa
+cobertura descreve o código local e não altera o aceite operacional dos
+Dashboards nem as autoridades normativas.
 
 ## 11. Riscos, legado e preparação futura
 
@@ -210,8 +292,17 @@ operacional além do que decisão e fonte normativa citadas sustentam.
 - schema MySQL completo e processo de migração não localizados;
 - cobertura automatizada limitada entre os domínios;
 - política de segurança e segredos não consolidada;
-- OpenAPI/Swagger é configurado no bootstrap e habilitado em Development; não há
-  documento OpenAPI versionado integral nesta baseline;
+- OpenAPI e Swagger usam caminhos de geração distintos em Development; existe
+  snapshot OpenAPI 3.0.1/API 1.0 versionado, fornecido pelo Arquiteto, cuja
+  revisão e ferramenta de geração originais não estão identificadas. O snapshot
+  e os geradores não representam integralmente os comportamentos observados;
+  divergências não foram corrigidas nesta consolidação;
+- há 76 pares método/rota no inventário auditado; o snapshot OpenAPI não inclui
+  exemplos, e a auditoria identificou checks automatizados em 14/76 operações.
+  As referências funcionais agora incluem exemplos sintéticos por família de
+  entrada; a [matriz consolidada](../reports/DEVICE-API-KNOWLEDGE-CONSOLIDATION/DEVICE-API-CONSOLIDATED-KNOWLEDGE-COVERAGE.md)
+  distingue comportamento descrito de dependências externas e não afirma
+  execução ou persistência real;
 - caminhos distintos de publicação, cuja vigência relativa não está confirmada;
 - apontamento absoluto para a EKM externa, adequado ao experimento local, mas
   ainda não portátil.
@@ -234,6 +325,10 @@ operacional além do que decisão e fonte normativa citadas sustentam.
 
 As divergências são registros de implementação, não foram corrigidas e não
 constituem contratos novos.
+
+A lista anterior resume apenas discrepâncias representativas. O registro
+completo dos achados AUD-DEV-001 a AUD-DEV-013 e a respectiva localização
+descritiva estão na [matriz de reconciliação](../reports/DEVICE-API-KNOWLEDGE-CONSOLIDATION/DEVICE-API-AUDIT-KNOWLEDGE-RECONCILIATION.md).
 
 ## 12. Questões abertas
 
