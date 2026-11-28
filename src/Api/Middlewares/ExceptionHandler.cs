@@ -20,15 +20,14 @@ class ExceptionHandler(RequestDelegate _next)
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ocorreu um erro inesperado");
-            logger.LogCritical(ex, $"Exception: {ex}\n Inner: {ex.InnerException?.ToString()}\n StackTrace: {ex.StackTrace}");
+            logger.LogError("Request failed. ExceptionType={ExceptionType}", ex.GetType().Name);
             await HandleExceptionAsync(context, ex, logger);
         }
     }
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception, ILogger<ExceptionHandler> logger)
     {
-        logger.LogError(exception, "Ocorreu um erro inesperado");
+        logger.LogError("Request failed. ExceptionType={ExceptionType}", exception.GetType().Name);
         string message = "Ocorreu um erro inesperado ao processar a requisição.";
         string traceId = Guid.NewGuid().ToString();
         HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
@@ -45,7 +44,7 @@ class ExceptionHandler(RequestDelegate _next)
                 statusCode = HttpStatusCode.NotFound;
                 break;
             case MySqlException mySqlEx:
-                logger.LogError(mySqlEx, "Erro de banco de dados: {Message}", mySqlEx.Message);
+                logger.LogError("Database request failed. ErrorNumber={ErrorNumber}", mySqlEx.Number);
                 message = "Erro ao processar a requisição";
                 // Mapear códigos de erro MySQL mais comuns
                 switch (mySqlEx.Number)
@@ -60,7 +59,7 @@ class ExceptionHandler(RequestDelegate _next)
                     case 1452:
                         var foreignKeyContext = ExtractForeignKeyContext(mySqlEx.Message);
                         message = BuildForeignKeyViolationMessage(mySqlEx.Number, foreignKeyContext);
-                        logger.LogWarning("Violação de FK detectada: {Message}", mySqlEx.Message);
+                        logger.LogWarning("Database foreign-key constraint rejected the request. ErrorNumber={ErrorNumber}", mySqlEx.Number);
                         statusCode = HttpStatusCode.BadRequest;
                         break;
                     // Lock wait timeout exceeded
@@ -129,7 +128,7 @@ class ExceptionHandler(RequestDelegate _next)
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Falha ao solicitar StopApplication");
+                logger.LogError("StopApplication failed. ExceptionType={ExceptionType}", e.GetType().Name);
             }
         }
     }

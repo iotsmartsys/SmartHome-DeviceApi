@@ -1,4 +1,5 @@
 using Api.Models;
+using Api.Configuration;
 using Core.DI;
 using Data.Repositories.MySql.DI;
 using Microsoft.AspNetCore.JsonPatch;
@@ -9,6 +10,15 @@ using Microsoft.OpenApi.Models;
 var cts = new CancellationTokenSource();
 
 var builder = WebApplication.CreateBuilder(args);
+var environmentName = DeviceConnectionConfiguration.RequireSupportedEnvironment(
+    builder.Environment.EnvironmentName,
+    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+    Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT"),
+    args);
+DeviceConnectionConfiguration.AddKeyPerFileProviderAndValidate(
+    builder.Configuration,
+    environmentName,
+    DeviceConnectionConfiguration.SecretDirectory);
 string? connectionString = builder.Configuration.GetConnectionString("Devices");
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();

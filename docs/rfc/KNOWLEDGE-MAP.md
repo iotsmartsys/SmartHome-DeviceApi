@@ -12,6 +12,7 @@
 |---|---|---|---|
 | Contrato de engenharia (recorte capabilities) | [SHD-ENGINEERING-001@0.1](REPOSITORY-ENGINEERING-CONTRACT.md) | Normativo | Approved 0.1; escopo capabilities |
 | Qualificação do recorte | [Repository Readiness](REPOSITORY-READINESS.md) | Operacional | Ready no recorte; aprovação humana registrada |
+| Configuração por arquivo na Devices API | [SHD-DOCKER-SECRETS-001@0.1](../specs/DOCKER-SWARM-SECRETS.md) | Normativo | Approved / In Progress; análise Ready; Repository Readiness Ready no escopo limitado aprovado |
 | Bootstrap dos agentes | `AGENTS.md` | Normativo | Active |
 | Política de build e validação | `AGENTS.md` + especificação aplicável | Normativo | Active |
 | Conceito EKM | `/Users/marcelocostamiranda/source/EKM-guidelines/docs/EKM-CONCEPT.md` | Referência externa | Dynamic |
@@ -45,6 +46,7 @@ gates obrigatórios enquanto seu processo não estiver especificado e aprovado.
 | Métricas de device | `EKM-GAP-0001` | `src/Api/Controllers/DeviceMetricsController.cs`, `src/Data.Repositories/Repositories/DeviceMetricsRepository.cs` | Código, schema MySQL parcial e build da API; `tests/Api.Tests` é registro histórico `Retired`, não evidência | Mapped |
 | Capability Types por id | `SHD-CAPABILITY-TYPE-ID-001@0.2` + `EKM-GAP-0001` | `src/Api/Controllers/CapabilityTypeController.cs`, modelo HTTP, contrato do Core e repositório/queries correspondentes | Versão 0.2 Done; build aprovado, validação e testes aceitos pelo Arquiteto | Mapped |
 | Dashboard API v1 | [SHD-DASHBOARD-API-V1-001@0.3](../specs/DASHBOARD-API-V1.md) | Dashboard controllers/models, IDashboardService/Resolvers, entidades e queries Dapper | Ready; entrega anterior rejeitada; [reimplementação e build](../reports/DASHBOARD-API-V1/implementation/2026-09-05T233757Z-0.3-c7fc139b-4018-4bea-b6d3-6b35860a446a-reimplementation.md) para Revisão, aceite operacional pendente | In Progress |
+| Configuração por arquivo da connection string | [SHD-DOCKER-SECRETS-001@0.1](../specs/DOCKER-SWARM-SECRETS.md) | Bootstrap de `src/Api/Program.cs`, provider KeyPerFile e testes sintéticos específicos | [Builds e validação final](../reports/DOCKER-SWARM-SECRETS/implementation/2026-11-28T033921Z-0.1-1bf5a80e-5377-4d87-b3ca-894456a1df06-final-validation.md); 23/23 testes aprovados | Approved / In Progress; testes direcionados aprovados, implementação encaminhada para revisão |
 | Suíte HTTP Dashboard | [SHD-DASHBOARD-API-INTEGRATION-TESTS-001@0.1](../specs/DASHBOARD-API-INTEGRATION-TESTS.md) | [tests/Api.IntegrationTests](../../tests/Api.IntegrationTests/README.md), `Makefile` (run-test/clear-test), run/cleanup e manifesto | [Build aprovado](../reports/DASHBOARD-API-INTEGRATION-TESTS/implementation/2026-09-06T023221Z-0.1-580c8d1e-f5fc-4ff1-b50e-7aef3801c25c-implementation.md); nenhum cenário executado | In Progress |
 | Demais tipos, plataformas e locais monitorados | `EKM-GAP-0001` | controllers, entidades e repositórios correspondentes | Código e build | Inventoried |
 | OAuth | `EKM-GAP-0001` | `src/Api/Controllers/OAuth/OAuthController.cs`, entidades e repositórios OAuth | Código e build | Inventoried |
@@ -62,6 +64,7 @@ SmartHome-DeviceApi
 │   ├── Dashboard API v1 (In Progress; reimplementação para Revisão)
 │   ├── Suíte HTTP Dashboard (In Progress; criada/compilada, não executada)
 │   ├── Capability Types por id (Done)
+│   ├── Configuração da Devices API por arquivo (0.1; 23/23 testes aprovados; revisão pendente)
 │   ├── Suporte à manutenção de Groups
 │   └── Contratos funcionais ainda abertos em EKM-GAP-0001
 ├── API e modelos HTTP
@@ -90,6 +93,9 @@ flowchart LR
     CTSPEC[SHD-CAPABILITY-TYPE-ID-001] -->|contrato| CTAPI[CapabilityTypeController]
     CTAPI --> CTCORE[CapabilityType / ICapabilityTypeRepository]
     CTCORE --> CTDB[CapabilityTypeRepository / MySQL]
+    SECRETCONFIG[SHD-DOCKER-SECRETS-001 0.1] -->|contrato de configuração| DEVICESBOOT[Bootstrap Devices API / KeyPerFile]
+    DEVICESBOOT -->|ConnectionStrings:Devices| DEVICESDB[Composição MySQL]
+    SECRETCONFIG --> SECRETTESTS[Api.ConfigurationTests: 23 aprovados]
     APP[AIoTSmartHome Groups] -->|HTTP /api/v1/groups| API[GroupController]
     SPEC[SHD-GROUPS-MAINTENANCE-SUPPORT-001] --> API
     API --> CORE[Group / IGroupRepository]
@@ -112,7 +118,24 @@ flowchart LR
 Nenhum débito técnico foi aceito pelo Arquiteto neste mapa. Lacunas e riscos
 observados permanecem na seção 5 até decisão humana de disposição.
 
-## 7. Análise de Capability Types por id
+## 7. Manutenção
+
+**Namespace de transações, lacunas e débitos:** `EKOM` | `EKM` legado para
+transações e lacunas
+
+Atualize este mapa quando uma especificação, fonte relacionada, autoridade,
+responsabilidade, evidência, estado, lacuna ou débito mudar. Cada domínio deve
+apontar para a especificação ou fonte normativa aplicável; não remova entrada
+sem indicar o destino do conhecimento.
+
+Reconcilie também a árvore quando contenção ou responsabilidade mudar e o
+diagrama quando surgir, desaparecer ou mudar uma relação material entre alvos.
+
+Somente o Arquiteto determina Concluída ou Reaberta. Estados mais granulares
+podem permanecer na especificação quando necessários, sem transferir essa
+autoridade.
+
+## 8. Análise de Capability Types por id
 
 Análise: `docs/reports/CAPABILITY-TYPE-ID/analysis/2026-09-05T011011Z-0567d22b-92cb7a87-7715-44ab-b007-9a3acecb5b82-implementability-analysis.md`.
 Classificação `Ready` para a versão 0.2, SHA-256 `0567d22b2b1a3b0a376893a6b52cf67e1d071309472bba89b70ec12b5042066d`.
@@ -123,9 +146,3 @@ validação e testes; promoção para main autorizada.
 O SHA-256 identifica o snapshot analisado; os metadados de estado e o registro
 da decisão de encerramento foram atualizados posteriormente, sem mudança
 funcional. Relatórios anteriores permanecem históricos.
-
-## 8. Manutenção
-
-Atualize este mapa quando uma fonte, autoridade, responsabilidade, evidência,
-estado ou lacuna mudar. Não remova uma entrada sem indicar o destino do
-conhecimento.

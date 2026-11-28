@@ -42,7 +42,11 @@ public class DatabaseWatchdogService : BackgroundService
             catch (Exception ex)
             {
                 _failureCount++;
-                _logger.LogError(ex, "Falha ao acessar o banco de dados. Tentativa {Count}/{Threshold}", _failureCount, _failureThreshold);
+                _logger.LogError(
+                    "Database access failed. ExceptionType={ExceptionType}; Attempt={Count}/{Threshold}",
+                    ex.GetType().Name,
+                    _failureCount,
+                    _failureThreshold);
 
                 if (_failureCount >= _failureThreshold)
                 {

@@ -123,6 +123,7 @@ autoridade do schema e das views está registrada em `EKM-GAP-0002`.
 | GitHub Actions e GHCR | workflow de build e publicação de imagem | Mapped |
 | Portainer | webhook posterior à publicação | Mapped parcialmente |
 | Docker Swarm e Traefik | compose de deploy e labels de roteamento | Mapped parcialmente |
+| Configuração por arquivo da Devices API | [SHD-DOCKER-SECRETS-001@0.1](DOCKER-SWARM-SECRETS.md), bootstrap local da API e provider KeyPerFile | Approved / In Progress; build concluído e 23 testes direcionados aprovados; revisão pendente; Repository Readiness estendida somente para este recorte |
 | Azure Container Registry | script local de build e deploy | Legado ou uso atual não confirmado |
 
 Timeouts, autenticação das integrações e ownership operacional ainda não possuem
@@ -192,6 +193,9 @@ As fontes navegáveis e lacunas correspondentes estão em
 - schema MySQL completo e processo de migração não localizados;
 - cobertura automatizada limitada entre os domínios;
 - política de segurança e segredos não consolidada;
+- leitura KeyPerFile para a connection string da Devices API em implementação
+  conforme `SHD-DOCKER-SECRETS-001`; builds e 23 testes direcionados aprovados,
+  revisão pendente;
 - documentação de API parcial;
 - caminhos distintos de publicação, cuja vigência relativa não está confirmada;
 - apontamento absoluto para a EKM externa, adequado ao experimento local, mas

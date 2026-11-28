@@ -1,5 +1,26 @@
 # EKM — Histórico de mudanças
 
+## EKM-CHG-0009 — Configuração por arquivo da Devices API
+
+**Estado:** Open. **Workflow:** Approved / In Progress 0.1; builds e 23 testes
+direcionados aprovados; revisão da implementação pendente.
+
+[Especificação](../specs/DOCKER-SWARM-SECRETS.md) revisada para separar o
+contrato de configuração da API do provisionamento externo do arquivo. Mantém
+`Development` local sem arquivo e exige fonte de ambiente confiável e arquivo
+válido em `Production`; arquivo presente inválido falha sem fallback. [Nova
+análise](../reports/DOCKER-SWARM-SECRETS/analysis/2026-11-28T030354Z-0.1-973053ab-82a4-4e28-b530-7510794e5cb7-implementability-analysis.md)
+concluiu Ready técnico. O Arquiteto aprovou explicitamente a versão e estendeu
+Repository Readiness ao escopo limitado de bootstrap/KeyPerFile; decisão e
+evidência constam em [Repository Readiness](REPOSITORY-READINESS.md) e na
+[avaliação](../reports/repository-readiness/2026-11-28T031617Z-0.1-8a136f88-2e3f-4f92-9d27-4681448629a1.md).
+O build canônico da API, o build do projeto de testes e a execução direcionada
+dos 23 casos passaram; os testes da suíte `Retired` não foram executados.
+Nenhum HTTP, banco ou operação externa foi executado. Commit e push permanecem
+proibidos pela decisão temporária do Arquiteto. A guarda documental EKOM está
+em regularização neste registro; ver a classificação de achados no relatório
+final de validação.
+
 ## EKM-CHG-0008 — Preparação da qualificação EKOM
 
 **Aprovação registrada:** contrato SHD-ENGINEERING-001@0.1 e adoção/habilitação
